@@ -179,7 +179,7 @@ def subset_symbolic_data(
     data: dict[str, Any], source_mask: np.ndarray
 ) -> dict[str, Any]:
     result = data.copy()
-    for key in ("X", "y", "segment_index", "source_curve_index"):
+    for key in ("X", "y", "segment_index", "source_curve_index", "frequency_hz"):
         if key in result:
             result[key] = result[key][source_mask]
     return result

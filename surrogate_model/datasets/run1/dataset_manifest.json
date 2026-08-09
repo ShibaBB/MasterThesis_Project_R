@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "run_id": "run1",
-  "status": "configured_not_generated",
+  "status": "generated",
   "description": "Wool paired complex-reflection surrogate dataset over 100-4950 Hz.",
   "config_path": "surrogate_model/datasets/run1/dataset_config.json",
   "target_schema": {
@@ -39,18 +39,23 @@
   },
   "teacher_dataset": {
     "path": "surrogate_model/datasets/run1/MLP/Wool_R.mat",
-    "status": "not_generated"
+    "status": "generated"
   },
   "shared_curve_split": {
     "path": "surrogate_model/datasets/run1/shared_curve_split.json",
-    "status": "not_generated",
-    "frequency_grid_independent": true
+    "status": "generated",
+    "frequency_grid_independent": true,
+    "split_hash_algorithm": "sha256",
+    "split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+    "train_curves": 700,
+    "validation_curves": 150,
+    "test_curves": 150
   },
   "derived_datasets": [
     {
       "model_branch": "segmented_SR",
       "path": "surrogate_model/datasets/run1/segmented_SR/Wool_R_segmented.mat",
-      "status": "not_generated",
+      "status": "generated",
       "segments_hz": [
         {
           "name": "low_100_700",
@@ -113,7 +118,7 @@
     {
       "model_branch": "global_SR",
       "path": "surrogate_model/datasets/run1/global_SR/Wool_R_global.mat",
-      "status": "not_generated",
+      "status": "generated",
       "domain": {
         "name": "global_100_4950",
         "bounds_hz": [

@@ -32,6 +32,10 @@ from shared_split_utils import (  # noqa: E402
     resolve_and_load_shared_split,
     source_curve_mask,
 )
+from symbolic_feature_transform import (  # noqa: E402
+    apply_feature_transform,
+    fit_feature_transform,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -115,8 +119,8 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional cap for quick pipeline tests. Use all rows when omitted.",
     )
-    parser.add_argument("--niterations", type=int, default=40)
-    parser.add_argument("--populations", type=int, default=8)
+    parser.add_argument("--niterations", type=int, default=100)
+    parser.add_argument("--populations", type=int, default=12)
     parser.add_argument("--population-size", type=int, default=80)
     parser.add_argument("--maxsize", type=int, default=24)
     parser.add_argument("--model-selection", choices=["best", "accuracy", "score"], default="best")
@@ -236,6 +240,12 @@ def read_symbolic_dataset(dataset_file: Path, target: str, dataset_run: str) -> 
         fiberfolder = decode_matlab_string(file, info_group["fiberfolder"])
         num_curve_samples = int(np.array(info_group["num_curve_samples"]).reshape(-1)[0])
         num_symbolic_samples = int(np.array(info_group["num_symbolic_samples"]).reshape(-1)[0])
+        recommended_log10_indices = (
+            np.array(info_group["recommended_log10_feature_indices"])
+            .reshape(-1)
+            .astype(int)
+            .tolist()
+        )
 
     if x_symbolic.shape[0] != y_symbolic.shape[0]:
         raise ValueError("X_symbolic row count does not match y_symbolic length.")
@@ -263,6 +273,7 @@ def read_symbolic_dataset(dataset_file: Path, target: str, dataset_run: str) -> 
         "fiberfolder": fiberfolder,
         "num_curve_samples": num_curve_samples,
         "num_symbolic_samples": num_symbolic_samples,
+        "recommended_log10_feature_indices_1based": recommended_log10_indices,
     }
 
 
@@ -452,6 +463,19 @@ def main() -> None:
     data["shared_split"] = resolve_and_load_shared_split(
         resolved_dataset_run, args.split_file, data["num_curve_samples"]
     )
+    training_mask = source_curve_mask(
+        data["source_curve_index"], data["shared_split"], "train"
+    )
+    original_feature_names = list(data["feature_names"])
+    feature_transform = fit_feature_transform(
+        data["X"][training_mask],
+        original_feature_names,
+        data["recommended_log10_feature_indices_1based"],
+    )
+    data["X"] = apply_feature_transform(
+        data["X"], original_feature_names, feature_transform
+    )
+    data["feature_names"] = feature_transform["transformed_feature_names"]
     validate_output_path_length(args.output_dir, data["segment_names"])
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise FileExistsError(f"Refusing to overwrite non-empty training directory: {args.output_dir}")
@@ -468,9 +492,11 @@ def main() -> None:
         "fiberfolder": data["fiberfolder"],
         "num_curve_samples": data["num_curve_samples"],
         "num_symbolic_samples": data["num_symbolic_samples"],
+        "original_feature_names": original_feature_names,
         "feature_names": data["feature_names"],
         "pysr_variable_names": data["pysr_variable_names"],
         "feature_name_mapping": dict(zip(data["feature_names"], data["pysr_variable_names"])),
+        "feature_transform": feature_transform,
         "segment_names": data["segment_names"],
         "segment_bounds": data["segment_bounds"].tolist(),
         "training_args": {

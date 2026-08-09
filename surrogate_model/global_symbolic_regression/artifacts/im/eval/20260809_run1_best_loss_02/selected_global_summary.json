@@ -1,0 +1,71 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_run": "run1",
+  "target": "im",
+  "target_name": "R_imag",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "training_dir": "surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260809_run1",
+  "candidate_selection_split": "validation",
+  "final_evaluation_split": "test",
+  "selection_rule": "best_loss",
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "selected_candidate": 12,
+  "global_name": "global_100_4950",
+  "global_bounds_hz": [
+    100.0,
+    4950.0
+  ],
+  "feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "pysr_variable_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda_var",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "overall_metrics": {
+    "rmse": 0.08446508486204712,
+    "mae": 0.060212937031592875,
+    "max_abs_error": 0.4137804844763876,
+    "r2": 0.40250682991725806,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.20213411538375756,
+    "prediction_min": -0.42403634768058895,
+    "prediction_max": -0.009513830859966266
+  },
+  "validation_selection_metrics": {
+    "rmse": 0.08940276750839438,
+    "mae": 0.06372885311365305,
+    "max_abs_error": 0.39060094037140614,
+    "r2": 0.40248311040414364,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.37342165433912,
+    "prediction_max": -0.016072145632342716
+  },
+  "raw_prediction_diagnostics": {
+    "prediction_min": -0.42403634768058895,
+    "prediction_max": -0.009513830859966266,
+    "finite_count": 19200
+  },
+  "prediction_diagnostics": {
+    "prediction_min": -0.42403634768058895,
+    "prediction_max": -0.009513830859966266,
+    "finite_count": 19200
+  }
+}

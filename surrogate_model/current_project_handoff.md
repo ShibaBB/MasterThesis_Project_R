@@ -1,69 +1,48 @@
-# MasterThesis Project R — Current Handoff
+# MasterThesis Project R - Current Handoff
 
 Last updated: 2026-08-09.
 
-## Purpose
+## Project Purpose
 
-This repository is the clean starting point for a new surrogate-learning task.
-The three retained model families are:
-
-1. MLP
-2. segmented symbolic regression (PySR)
-3. global symbolic regression (PySR)
-
-Their input side remains unchanged:
-
-```text
-[phi, h, sigma, alpha_infinity, lambda, lambda_prime, k0_prime]
-```
-
-The new targets are two separate real-valued response curves:
+This repository builds surrogate models for the complex acoustic reflection
+coefficient produced by the JCAL teacher model. The learning targets are two
+independent real-valued frequency-response curves:
 
 ```text
 R_real(f) = real(Reflect(f))
 R_imag(f) = imag(Reflect(f))
 ```
 
-Every model family must train and evaluate one model for `R_real` and another
-for `R_imag`. Absorption-coefficient prediction, clipping, reconstruction, and
-evaluation are outside the scope of this repository.
+The repository contains three surrogate families:
 
-## Current Repository State
+1. MLP
+2. segmented symbolic regression with PySR
+3. global symbolic regression with PySR
 
-The repository is located at:
+Every family trains and evaluates `R_real` and `R_imag` separately while using
+the same material samples, frequency grid, source-curve split, and target
+definition. No model output is clipped. Absorption prediction and impedance
+component prediction are outside the project scope.
+
+## Repository And Git State
 
 ```text
-C:/MasterThesis_Project_R
+Repository: C:/MasterThesis_Project_R
+GitHub:     https://github.com/ShibaBB/MasterThesis_Project_R
 ```
 
-GitHub:
+The repository history contains the paired-target implementation, the full
+`run1` datasets, formal PySR artifacts, dynamic evaluation-axis fix, shared
+symbolic feature transform, and the training/evaluation updates described in
+this handoff. Use `git log -1` and `git status` to verify the exact checkout.
 
-```text
-https://github.com/ShibaBB/MasterThesis_Project_R
-```
+The previously tracked obsolete artifact files were removed. New artifacts are
+generated independently under short `re/` and `im/` directories.
 
-The new repository has an independent root history. The generation and model
-code now implements the paired `R_real` / `R_imag` contract. The active
-dataset run is `run1`; its configuration and manifest exist, while its full
-MAT datasets and formal model runs have not yet been generated.
+## Target Definition
 
-The 51 tracked legacy artifact files were removed. A temporary 50-curve smoke
-dataset verified exact component extraction, paired scalar expansion, shared
-curve splitting, and independent one-epoch MLP Re/Im training; those temporary
-outputs were removed after verification. PySR loaders and CLI contracts were
-checked for both targets, but actual PySR searches still require installation
-or recreation of the project Python/Julia environment.
-
-## Critical JCAL Target Definition
-
-Read `jcal_reflection.m` before changing any dataset code.
-
-Its first output, `Reflect`, is the complex reflection coefficient required by
-this project. The function's existing fourth and fifth outputs named `Re` and
-`Im` are **not** `real(Reflect)` and `imag(Reflect)`: they are the normalized
-real and imaginary components of surface impedance `Zs`.
-
-Therefore teacher generation must use:
+`jcal_reflection.m` returns the complex reflection coefficient as its first
+output. Teacher generation uses that output directly:
 
 ```matlab
 [Reflect, ~, ~, ~, ~, ~, ~] = jcal_reflection(...);
@@ -71,244 +50,286 @@ R_real = real(Reflect);
 R_imag = imag(Reflect);
 ```
 
-Do not silently train on the existing fourth/fifth outputs. During the
-implementation, rename or document those impedance outputs more clearly if
-needed, but do not change the JCAL physics merely to adapt the surrogate.
+The fourth and fifth outputs of `jcal_reflection.m` are normalized surface
+impedance components and must not be used as the surrogate targets.
 
-## Dataset Strategy
+## Active Dataset Run
 
-### One paired teacher dataset per run
-
-Generate the material parameters and call JCAL once per source curve. Store
-both targets in the same teacher MAT file so they cannot drift apart:
+The active dataset is `run1`.
 
 ```text
-X         : [n_curves, 7]
-Y_re      : [n_curves, n_frequency_points]
-Y_im      : [n_curves, n_frequency_points]
-freq_grid : [1, n_frequency_points]
-dataset_info
-sample_metadata
+Teacher curves:          1000
+Material inputs:         7 per curve
+Frequency range:         100-4950 Hz
+Frequency points:        128
+Teacher X shape:         [1000, 7]
+Teacher Y_re shape:      [1000, 128]
+Teacher Y_im shape:      [1000, 128]
+Symbolic X shape:        [128000, 8]
+Symbolic target shape:   [128000, 1] for each target
+Curve split:             700 train / 150 validation / 150 test
+Split hash:              cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0
 ```
 
-Recommended metadata:
+Canonical files:
 
 ```text
-target_names = ["R_real", "R_imag"]
-complex_source = "Reflect"
-target_definition.R_real = "real(Reflect)"
-target_definition.R_imag = "imag(Reflect)"
+surrogate_model/datasets/run1/dataset_config.json
+surrogate_model/datasets/run1/dataset_manifest.json
+surrogate_model/datasets/run1/shared_curve_split.json
+surrogate_model/datasets/run1/MLP/Wool_R.mat
+surrogate_model/datasets/run1/global_SR/Wool_R_global.mat
+surrogate_model/datasets/run1/segmented_SR/Wool_R_segmented.mat
 ```
 
-Do not generate Re and Im with independent LHS draws. They must share the same
-`X`, frequency grid, source-curve indices, and teacher call.
+Both symbolic MAT files contain `y_re_symbolic` and `y_im_symbolic` aligned to
+the same scalar rows, curve IDs, frequency values, and segment IDs. Splitting
+is always performed by source curve, never by scalar frequency row.
 
-### One shared curve split
+## Symbolic Feature Processing
 
-Create exactly one `shared_curve_split.json` per dataset run. Both targets and
-all three model families must use the same train/validation/test curve IDs.
-Never split scalar frequency rows independently.
+The current global and segmented Python trainers share
+`surrogate_model/symbolic_feature_transform.py`.
 
-### First R dataset run
+The transform is fitted on the training partition only:
 
-The old run directories were deleted and had different target semantics. The
-first new dataset should therefore be `run1`, not a continuation of old run3.
-During implementation:
+1. read the recommended base-10-log feature indices from dataset metadata;
+2. apply `log10` to the five positive scale-sensitive inputs, including
+   frequency;
+3. detect and remove columns that are exactly constant in the training split;
+4. store the complete transform specification in `training_metadata.json`;
+5. require evaluators to reuse that stored transform without refitting it.
 
-1. set the central default to `run1`;
-2. create `datasets/run1/dataset_config.json`;
-3. retain the current material, sampling, frequency grid, split ratios, and
-   model hyperparameters unless the user explicitly changes them;
-4. record the target schema in the run config and manifest.
+For `run1`, two fixed material columns are removed and the PySR input width is
+reduced from eight to six. Transformed variables have explicit names such as
+`log10_f`, so exported equations cannot be mistaken for formulas operating on
+raw values. Evaluators retain a separate physical-frequency array for plots
+and boundary diagnostics.
 
-The intended initial frequency grid remains 100–4950 Hz with 128 points.
+Older training runs without transform metadata remain evaluable through the
+identity-transform compatibility path.
 
-### Symbolic datasets
+## Current Progress Summary
 
-Expand the paired teacher curves into scalar rows once and retain both targets:
+| Area | Re | Im | Current state |
+|---|---|---|---|
+| Paired teacher dataset | Complete | Complete | Full `run1` generated and inspected |
+| Shared curve split | Complete | Complete | Same split hash used by all families |
+| Scalar global dataset | Complete | Complete | Paired targets in one MAT file |
+| Scalar segmented dataset | Complete | Complete | Paired targets and eight segment IDs |
+| MLP code contract | Complete | Complete | Independent target loading and smoke training verified |
+| Full MLP training | Pending | Pending | No formal full `run1` result yet |
+| Global SR full run | Baseline available | Complete | Re still needs a run with the current feature transform |
+| Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
+| Validation-only candidate selection | Complete | Complete | Full validation rows used before final test evaluation |
+| Raw unclipped evaluation | Complete | Complete | Dynamic plot limits support negative values |
+
+## Latest Global SR Results
+
+Global SR trains one equation over the complete 100-4950 Hz range.
+
+### Re baseline
+
+The available Re result predates the shared log-scale feature transform. It is
+valid as a baseline but is not configuration-matched to the latest Im run.
 
 ```text
-X_symbolic        : [n_curves * n_frequency_points, 8]
-y_re_symbolic     : [n_curves * n_frequency_points, 1]
-y_im_symbolic     : [n_curves * n_frequency_points, 1]
-source_curve_index
-segment_index
-freq_grid
-symbolic_dataset_info
+Training: surrogate_model/global_symbolic_regression/artifacts/re/train/20260809_run1
+Eval:     surrogate_model/global_symbolic_regression/artifacts/re/eval/20260809_run1_best_loss_02
+
+Test RMSE:          0.089386
+Test MAE:           0.059882
+Test max abs error: 0.407179
+Test R2:            0.773368
 ```
 
-The eighth feature remains frequency. Segmented and global datasets may be
-separate files as today, but each file should contain both target arrays.
-
-## Training Strategy
-
-### Common target selector
-
-Add one explicit target selector to every generation/training/evaluation entry
-point that needs it:
+### Im with current feature transform
 
 ```text
-target = re | im
+Training: surrogate_model/global_symbolic_regression/artifacts/im/train/20260809_run1_log10_i100_p12
+Eval:     surrogate_model/global_symbolic_regression/artifacts/im/eval/20260809_run1_log10_i100_p12_best_loss
+
+Iterations:         100
+Populations:        12
+Population size:    80
+Max complexity:     24
+Train rows:         89600
+Validation rows:    19200
+Test rows:          19200
+Test RMSE:          0.079741
+Test MAE:           0.057977
+Test max abs error: 0.350998
+Test R2:            0.467469
 ```
 
-Reject missing, unknown, or mismatched target metadata. Store `target`,
-`dataset_run`, dataset path, and shared split hash in every training and
-evaluation summary.
+The Im global equation now captures the main low-frequency dip and recovery,
+but still underfits material-dependent trough depth, peak position, and the
+high-frequency downturn. A simple per-frequency training-mean baseline reaches
+test RMSE `0.077103` and R2 `0.502130`, so the global symbolic model remains
+below that baseline.
 
-### MLP
+## Latest Segmented SR Results
 
-Train two independent networks with the existing architecture and optimizer:
+The configured frequency domains are:
 
 ```text
-X -> Y_re
-X -> Y_im
+100-700, 700-1000, 1000-1300, 1300-1650,
+1650-2000, 2000-3000, 3000-4000, 4000-4950 Hz
 ```
 
-Do not combine them into one 256-output network in the first migration. Keeping
-two 128-output networks preserves the mature single-target training behavior
-and makes errors attributable to one component.
-
-The MLP loader must select `Y_re` or `Y_im`, then reuse the existing
-standardization, shared curve split, training loop, and inverse transform.
-
-### Segmented SR
-
-For each target, train one PySR equation per configured frequency segment. With
-eight segments this produces 16 equations in total: eight for `R_real`, eight
-for `R_imag`. Keep the existing PySR search settings for the first full run.
-
-Candidate selection remains validation-only and is performed independently for
-each target and segment. Boundary diagnostics must also be reported separately
-for Re and Im.
-
-### Global SR
-
-Train two global PySR equations over the full frequency domain:
+Each target has eight independent PySR equations. The latest formal runs use:
 
 ```text
-R_real = g_re(phi, h, sigma, alpha_infinity, lambda, lambda_prime, k0_prime, f)
-R_imag = g_im(phi, h, sigma, alpha_infinity, lambda, lambda_prime, k0_prime, f)
+Iterations per segment: 100
+Populations:            12
+Population size:        80
+Max complexity:         24
+Training data:          all rows in each segment's train curves
+Candidate selection:    full validation partition, independently per segment
+Final reporting:        full test partition after candidate selection
+Output postprocessing:  none
 ```
 
-Keep the existing PySR settings for the first run. Candidate selection remains
-validation-only and independent for the two targets.
+### Re
+
+```text
+Training: surrogate_model/segmented_symbolic_regression/artifacts/re/train/20260809_run1_log10_i100_p12
+Eval:     surrogate_model/segmented_symbolic_regression/artifacts/re/eval/20260809_run1_log10_i100_p12_best_loss
+
+Validation RMSE:    0.035596
+Validation R2:      0.964944
+Test RMSE:          0.034924
+Test MAE:           0.023899
+Test max abs error: 0.267284
+Test R2:            0.965403
+```
+
+### Im
+
+```text
+Training: surrogate_model/segmented_symbolic_regression/artifacts/im/train/20260809_run1_log10_i100_p12
+Eval:     surrogate_model/segmented_symbolic_regression/artifacts/im/eval/20260809_run1_log10_i100_p12_best_loss
+
+Validation RMSE:    0.031412
+Validation R2:      0.926237
+Test RMSE:          0.032371
+Test MAE:           0.020815
+Test max abs error: 0.286863
+Test R2:            0.912239
+```
+
+Increasing Im from 60 to 100 iterations improved test RMSE from `0.035293` to
+`0.032371` and test R2 from `0.895681` to `0.912239`. It improved within-segment
+fit but did not solve boundary discontinuities.
+
+## Known Segmented Boundary Problem
+
+The segmented models are accurate within most frequency domains, but the eight
+equations are trained independently and have no continuity constraint.
+
+For the latest test results:
+
+```text
+Re largest mean absolute predicted boundary change: 0.077895 at 3000 Hz
+Re largest maximum excess boundary change:          0.375519
+Im largest mean absolute predicted boundary change: 0.055364 at 3000 Hz
+Im largest maximum excess boundary change:          0.404880
+```
+
+Teacher changes across the same adjacent samples are much smaller. Increasing
+iterations improves segment-local regression but is not a direct solution to
+cross-segment continuity. Do not add smoothing silently: any overlap, blending,
+continuity penalty, or joint boundary-selection rule must be explicit and must
+be evaluated against the unmodified test targets.
+
+Boundary diagnostics are stored in each evaluation directory as
+`boundary_transition_metrics.csv`.
 
 ## Evaluation Contract
 
-Do not clip either component. The previous physical clamp to `[0, 1]` must be
-removed from both SR evaluators.
+Every formal evaluation must:
 
-Report per target and per final test split:
+- select candidates using validation data only;
+- report final metrics once on the shared test curves;
+- keep Re and Im selection independent;
+- report RMSE, MAE, maximum absolute error, R2, and prediction range;
+- generate predicted-versus-teacher scatter and error-versus-frequency plots;
+- generate full-curve comparisons with dynamic combined teacher/prediction
+  vertical limits;
+- preserve raw predictions without clipping or smoothing;
+- record dataset run, target, dataset path, split file, and split hash.
 
-- RMSE
-- MAE
-- maximum absolute error
-- R2
-- raw prediction minimum and maximum
-- error versus frequency
-- predicted-versus-teacher scatter
-- random and worst-case curve comparisons
+An optional paired diagnostic may combine predictions from the same model
+family, dataset run, split, and source rows into a complex reflection error.
+This paired diagnostic has not yet been implemented as a formal pipeline step.
 
-After both component models are available, an optional paired diagnostic may
-report complex reflection error:
+## Runtime Environment
 
-```text
-R_error = (R_real_pred - R_real_true) + i*(R_imag_pred - R_imag_true)
-complex_RMSE = sqrt(mean(abs(R_error).^2))
-```
-
-This diagnostic must use predictions from the same model family, same dataset
-run, same split hash, and same source rows. Do not derive or evaluate any other
-target from the predicted components.
-
-## Artifact Layout And Short Naming
-
-Keep target names in short parent directories instead of repeating them in
-every long filename:
+The active PySR environment is available at:
 
 ```text
-MLP/artifacts/re/20260809_run1/
-MLP/artifacts/im/20260809_run1/
-
-segmented_symbolic_regression/artifacts/re/train/20260809_run1/
-segmented_symbolic_regression/artifacts/re/eval/20260809_run1_c21/
-segmented_symbolic_regression/artifacts/im/train/20260809_run1/
-segmented_symbolic_regression/artifacts/im/eval/20260809_run1_c21/
-
-global_symbolic_regression/artifacts/re/train/20260809_run1/
-global_symbolic_regression/artifacts/re/eval/20260809_run1_c21/
-global_symbolic_regression/artifacts/im/train/20260809_run1/
-global_symbolic_regression/artifacts/im/eval/20260809_run1_c21/
+surrogate_model/segmented_symbolic_regression/.venv_py311
 ```
 
-Rules:
-
-- use `YYYYMMDD_runN` for normal training directories;
-- append only necessary selectors such as `_c21` or `_limited`;
-- store full hyperparameters in JSON metadata, not path names;
-- validate the predicted PySR internal path length before launching;
-- never recreate descriptive run names containing the complete parameter list.
-
-## Implemented Migration And Next Execution
-
-Items 1-8 are implemented. Item 9 passed for teacher generation, scalar
-expansion, shared splitting, and both MLP targets; PySR execution remains to
-be verified after its environment is recreated. The next execution steps are:
-
-1. recreate/install the PySR Python and Julia environment;
-2. run `run_active_dataset_generation.ps1` to generate the full paired `run1`
-   teacher data, shared split, and both symbolic MAT files;
-3. synchronize and inspect the manifest;
-4. run full MLP Re and Im training;
-5. run segmented and global PySR searches independently for `--target re` and
-   `--target im`;
-6. evaluate validation-selected candidates on the final shared test curves and
-   update this handoff with measured results.
-
-## Files Expected To Change
-
-At minimum inspect and update:
+Verified components:
 
 ```text
-jcal_reflection.m                         (target naming/documentation only if needed)
-surrogate_model/dataset_run_config.json
-surrogate_model/dataset_run_config.py
-surrogate_model/resolve_dataset_run_config.m
-surrogate_model/create_dataset_run.py
-surrogate_model/sync_dataset_manifest.py
-surrogate_model/generate_shared_curve_split.py
-surrogate_model/data_generation/generate_teacher_dataset.m
-surrogate_model/data_generation/inspect_teacher_dataset.m
-surrogate_model/MLP/mlp_train_surrogate_baseline.m
-surrogate_model/segmented_symbolic_regression/generate_segmented_symbolic_dataset.m
-surrogate_model/segmented_symbolic_regression/inspect_segmented_symbolic_dataset.m
-surrogate_model/segmented_symbolic_regression/segmented_run_paths.py
-surrogate_model/segmented_symbolic_regression/train_segmented_symbolic_models.py
-surrogate_model/segmented_symbolic_regression/evaluate_segmented_symbolic_candidates.py
-surrogate_model/global_symbolic_regression/global_run_paths.py
-surrogate_model/global_symbolic_regression/train_global_symbolic_model.py
-surrogate_model/global_symbolic_regression/evaluate_global_symbolic_candidates.py
+Python 3.11 environment
+PySR 1.5.10
+Julia 1.11.9
+SymbolicRegression 1.11.3
 ```
 
-## Acceptance Criteria Before Full Training
+The Python trainers currently use deterministic serial PySR execution. PySR
+warns for segments with more than 10,000 rows and recommends batching. The
+formal runs intentionally used all training rows; batching remains a possible
+future search-speed experiment, not part of the reported results.
 
-- No surrogate dataset or active model path uses the old target variable.
-- `R_real` and `R_imag` numerically equal `real(Reflect)` and `imag(Reflect)` on
-  a small checked sample.
-- Both arrays are finite and have identical curve/frequency dimensions.
-- One shared curve split is used by every target and model family.
-- MLP, segmented SR, and global SR can each complete a small Re run and a small
-  Im run without overwriting one another.
-- Evaluation is raw and unclipped.
-- Artifact paths follow the short naming policy.
-- Training metadata makes target/run/split mismatches fail loudly.
+## Artifact Layout
 
-## Non-Goals For The First Migration
+Use short target parent directories and keep detailed parameters in metadata:
 
-- changing the JCAL equations;
-- changing the seven input features;
-- tuning MLP or PySR hyperparameters;
-- training one joint multi-target MLP;
-- coupling Re and Im candidate selection;
-- recreating legacy datasets or artifacts;
-- deriving or evaluating absorption coefficient.
+```text
+surrogate_model/MLP/artifacts/re/<run>/
+surrogate_model/MLP/artifacts/im/<run>/
+
+surrogate_model/global_symbolic_regression/artifacts/re/train/<run>/
+surrogate_model/global_symbolic_regression/artifacts/re/eval/<run>/
+surrogate_model/global_symbolic_regression/artifacts/im/train/<run>/
+surrogate_model/global_symbolic_regression/artifacts/im/eval/<run>/
+
+surrogate_model/segmented_symbolic_regression/artifacts/re/train/<run>/
+surrogate_model/segmented_symbolic_regression/artifacts/re/eval/<run>/
+surrogate_model/segmented_symbolic_regression/artifacts/im/train/<run>/
+surrogate_model/segmented_symbolic_regression/artifacts/im/eval/<run>/
+```
+
+Do not infer target, split, or transform semantics from directory names alone;
+validate `training_metadata.json` and the evaluation summary.
+
+## Next Priorities
+
+1. Run full `run1` MLP training and evaluation for both Re and Im.
+2. Retrain global Re with the current feature transform and configuration so
+   it is directly comparable to global Im.
+3. Decide on an explicit segmented-boundary strategy: overlapping domains with
+   blending, continuity-aware candidate selection, or a continuity penalty.
+4. Add a paired complex-reflection diagnostic after both targets from a model
+   family are available on identical test rows.
+5. Consider batching or a curve/frequency-balanced search subset only as a
+   controlled PySR speed experiment; always select on full validation data and
+   report on full test data.
+
+## Invariants For Future Work
+
+- The targets are always the real and imaginary parts of `Reflect`.
+- Re and Im share one teacher call, material matrix, frequency grid, and curve
+  split.
+- Scalar symbolic rows retain their source-curve IDs.
+- No evaluator splits scalar frequency rows independently.
+- No target output is clipped.
+- Feature transforms are fitted on training data and persisted in metadata.
+- Evaluation reuses the training transform exactly.
+- Test data never participates in candidate selection.
+- Re and Im artifacts never overwrite one another.
+- Target, dataset-run, or split-hash mismatches fail loudly.

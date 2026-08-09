@@ -44,6 +44,10 @@ from shared_split_utils import (  # noqa: E402
     subset_symbolic_data,
     validate_training_split,
 )
+from symbolic_feature_transform import (  # noqa: E402
+    apply_feature_transform,
+    identity_feature_transform,
+)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -458,8 +462,8 @@ def plot_curve_comparisons(
 
     for ax, curve_id in zip(axes.flatten(), curve_ids):
         mask = data["source_curve_index"] == curve_id
-        order = np.argsort(data["X"][mask, -1])
-        freq = data["X"][mask, -1][order]
+        order = np.argsort(data["frequency_hz"][mask])
+        freq = data["frequency_hz"][mask][order]
         y_true = data["y"][mask][order]
         y_pred = y_pred_all[mask][order]
         ax.plot(freq, y_true, label="Teacher", linewidth=1.8)
@@ -467,7 +471,7 @@ def plot_curve_comparisons(
         ax.set_title(f"Curve {int(curve_id)}")
         ax.set_xlabel("Frequency (Hz)")
         ax.set_ylabel(data["target_name"])
-        ax.set_ylim(-0.05, 1.05)
+        set_dynamic_curve_ylim(ax, y_true, y_pred)
         ax.grid(True, alpha=0.3)
 
     for ax in axes.flatten()[len(curve_ids):]:
@@ -478,6 +482,18 @@ def plot_curve_comparisons(
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     fig.savefig(figures_dir / "selected_curve_comparisons.png", dpi=180)
     plt.close(fig)
+
+
+def set_dynamic_curve_ylim(ax: Any, y_true: np.ndarray, y_pred: np.ndarray) -> None:
+    values = np.concatenate((np.asarray(y_true).reshape(-1), np.asarray(y_pred).reshape(-1)))
+    values = values[np.isfinite(values)]
+    if values.size == 0:
+        return
+    lower = float(np.min(values))
+    upper = float(np.max(values))
+    span = upper - lower
+    padding = max(0.05 * span, 1e-6)
+    ax.set_ylim(lower - padding, upper + padding)
 
 
 def evaluate_selected_candidate(
@@ -515,11 +531,23 @@ def main() -> None:
     figures_dir.mkdir(parents=True, exist_ok=True)
 
     data = read_symbolic_dataset(args.dataset_file, args.target, resolved_dataset_run)
+    frequency_index = data["feature_names"].index("f")
+    data["frequency_hz"] = data["X"][:, frequency_index].copy()
     num_curve_samples = int(np.unique(data["source_curve_index"]).size)
     shared_split = resolve_and_load_shared_split(
         resolved_dataset_run, args.split_file, num_curve_samples
     )
     validate_training_split(args.training_dir, shared_split, expected_target=args.target, expected_dataset_run=resolved_dataset_run)
+    with (args.training_dir / "training_metadata.json").open("r", encoding="utf-8") as file:
+        training_metadata = json.load(file)
+    feature_transform = training_metadata.get("feature_transform")
+    if feature_transform is None:
+        feature_transform = identity_feature_transform(data["feature_names"])
+    original_feature_names = list(data["feature_names"])
+    data["X"] = apply_feature_transform(
+        data["X"], original_feature_names, feature_transform
+    )
+    data["feature_names"] = feature_transform["transformed_feature_names"]
     validation_data = subset_symbolic_data(
         data,
         source_curve_mask(data["source_curve_index"], shared_split, "validation"),
@@ -566,6 +594,8 @@ def main() -> None:
         "global_name": data["segment_names"][0],
         "global_bounds_hz": data["segment_bounds"][0].tolist(),
         "feature_names": data["feature_names"],
+        "original_feature_names": original_feature_names,
+        "feature_transform": feature_transform,
         "pysr_variable_names": variable_names,
         "overall_metrics": selected_metrics,
         "validation_selection_metrics": validation_metrics,
@@ -575,7 +605,7 @@ def main() -> None:
     with (args.output_dir / "selected_global_summary.json").open("w", encoding="utf-8") as file:
         json.dump(selected_summary, file, indent=2)
 
-    freq_values = test_data["X"][:, -1]
+    freq_values = test_data["frequency_hz"]
     plot_selected_scatter(test_data["y"], y_pred_all, figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
     plot_error_vs_frequency(freq_values, y_pred_all - test_data["y"], figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
     plot_curve_comparisons(test_data, y_pred_all, figures_dir, args.num_curves, args.random_seed)
