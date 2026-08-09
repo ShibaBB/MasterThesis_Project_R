@@ -1,0 +1,30 @@
+# Python and Julia environments
+surrogate_model/segmented_symbolic_regression/.venv/
+surrogate_model/segmented_symbolic_regression/.venv_py311/
+surrogate_model/symbolic_regression/.venv/
+surrogate_model/symbolic_regression/.venv_py311/
+surrogate_model/**/.venv/
+surrogate_model/**/.venv_py311/
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# PySR volatile training files
+surrogate_model/**/artifacts/**/pysr_runs/**/checkpoint.pkl
+surrogate_model/**/artifacts/**/pysr_runs/**/*.bak
+surrogate_model/**/artifacts/**/pysr_runs/**/hall_of_fame.csv.bak
+surrogate_model/**/checkpoint.pkl
+surrogate_model/**/*.bak
+
+# Local scratch outputs used to avoid OneDrive file-locking during training
+surrogate_model/**/artifacts/**/_scratch/
+surrogate_model/**/artifacts/**/tmp/
+
+# MATLAB autosave and transient files
+*.asv
+*.m~
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

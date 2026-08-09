@@ -1,0 +1,23 @@
+Surrogate Baseline Metrics Report
+Fiber: Wool
+Total Samples: 50
+Frequency Range: 100.00 Hz to 2000.00 Hz
+Frequency Points: 64
+
+Train Metrics
+MSE  : 1.51701097e-04
+RMSE : 1.23167001e-02
+MAE  : 8.98634363e-03
+R2   : 0.96309412
+
+Validation Metrics
+MSE  : 4.17233445e-04
+RMSE : 2.04262938e-02
+MAE  : 1.51674878e-02
+R2   : 0.91729802
+
+Test Metrics
+MSE  : 3.36932426e-04
+RMSE : 1.83557197e-02
+MAE  : 1.33548798e-02
+R2   : 0.85873377

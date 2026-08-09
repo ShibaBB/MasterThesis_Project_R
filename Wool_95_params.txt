@@ -1,0 +1,20 @@
+Inferred Parameters with Standard Deviation (SD) and Bounds
+Fiber Type: Wool
+Porosity: 95
+
+Parameter Name                 Value           SD             
+Airflow Resistivity            2.471301e+04 4.715904e+03
+Tortuosity                     1.424014e+00 7.503009e-02
+Viscous Characteristic Length  1.258964e-04 3.422514e-05
+Thermal Characteristic Length  2.916143e-04 3.824248e-05
+Static Thermal Permeability    1.677573e-09 9.703841e-11
+Sigma Noise                    7.254069e-02 2.935776e-02
+
+Parameter Constraints (Lower Bound, Upper Bound):
+Parameter Name                 Lower Bound     Upper Bound    
+Airflow Resistivity            7.402381e+03 4.626488e+04
+Tortuosity                     1.000000e+00 2.050000e+00
+Viscous Characteristic Length  5.757821e-05 2.060986e-04
+Thermal Characteristic Length  1.151564e-04 4.121973e-04
+Static Thermal Permeability    1.000000e-10 1.000000e-08
+Sigma Noise                    1.000000e-06 1.000000e+00

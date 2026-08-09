@@ -1,0 +1,25 @@
+Surrogate Dataset Inspection Report
+Fiber: Wool
+Samples: 50
+Features: 7
+Outputs: 64
+Frequency Range: 100.00 Hz to 2000.00 Hz
+Frequency Points: 64
+
+Feature Summary
+phi | min=9.200000e-01 | max=9.200000e-01 | mean=9.200000e-01 | std=0.000000e+00
+h | min=3.000000e-02 | max=3.000000e-02 | mean=3.000000e-02 | std=1.051401e-17
+sigma | min=1.528640e+04 | max=9.379966e+04 | mean=5.496876e+04 | std=2.311901e+04
+alpha_infinity | min=1.015585e+00 | max=2.076828e+00 | mean=1.541393e+00 | std=3.158416e-01
+lambda | min=4.126670e-05 | max=1.452002e-04 | mean=9.403574e-05 | std=3.104250e-05
+lambda_prime | min=8.249352e-05 | max=2.908005e-04 | mean=1.880170e-04 | std=6.193191e-05
+k0_prime | min=2.509510e-10 | max=9.859693e-09 | mean=5.052109e-09 | std=2.882498e-09
+
+Alpha Summary
+Global alpha min  : 1.896394e-02
+Global alpha max  : 9.998602e-01
+Global alpha mean : 6.120125e-01
+Global alpha std  : 2.547720e-01
+
+Porosity Counts
+92 : 50

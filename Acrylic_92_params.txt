@@ -1,0 +1,20 @@
+Inferred Parameters with Standard Deviation (SD) and Bounds
+Fiber Type: Acrylic
+Porosity: 92
+
+Parameter Name                 Value           SD             
+Airflow_Resistivity            5.923208e+04 2.256955e+03
+Tortuosity                     2.079707e+00 5.208170e-04
+Viscous_Characteristic_Length  4.796416e-05 9.470724e-07
+Thermal_Characteristic_Length  2.182776e-04 4.162451e-05
+Static_Thermal_Permeability    9.086741e-10 3.383931e-11
+Sigma_Noise                    4.030537e-02 1.964927e-03
+
+Parameter Constraints (Lower Bound, Upper Bound):
+Parameter Name                 Lower Bound     Upper Bound    
+Airflow_Resistivity            1.516606e+04 2.426569e+05
+Tortuosity                     1.000000e+00 2.080000e+00
+Viscous_Characteristic_Length  2.553060e-05 1.472830e-04
+Thermal_Characteristic_Length  5.106119e-05 2.945660e-04
+Static_Thermal_Permeability    1.000000e-10 1.000000e-08
+Sigma_Noise                    1.000000e-06 1.000000e+00

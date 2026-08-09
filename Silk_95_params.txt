@@ -1,0 +1,20 @@
+Inferred Parameters with Standard Deviation (SD) and Bounds
+Fiber Type: Silk
+Porosity: 95
+
+Parameter Name                 Value           SD             
+Airflow_Resistivity            3.421330e+05 1.143310e+05
+Tortuosity                     2.026713e+00 5.695210e-02
+Viscous_Characteristic_Length  1.476434e-05 1.081797e-06
+Thermal_Characteristic_Length  1.158361e-04 5.592404e-06
+Static_Thermal_Permeability    4.909698e-10 2.830350e-11
+Sigma_Noise                    2.297804e-01 3.251169e-02
+
+Parameter Constraints (Lower Bound, Upper Bound):
+Parameter Name                 Lower Bound     Upper Bound    
+Airflow_Resistivity            5.263915e+04 7.402381e+05
+Tortuosity                     1.000000e+00 2.050000e+00
+Viscous_Characteristic_Length  1.439455e-05 7.728699e-05
+Thermal_Characteristic_Length  2.878911e-05 1.545740e-04
+Static_Thermal_Permeability    1.000000e-10 1.000000e-08
+Sigma_Noise                    1.000000e-06 1.000000e+00

@@ -1,0 +1,25 @@
+Symbolic Dataset Inspection Report
+Fiber: Wool
+Curve Samples: 1000
+Symbolic Samples: 64000
+Features: 8
+Frequency Range: 100.00 Hz to 2000.00 Hz
+
+Feature Summary
+phi | min=9.200000e-01 | max=9.200000e-01 | mean=9.200000e-01 | std=6.639186e-14
+h | min=3.000000e-02 | max=3.000000e-02 | mean=3.000000e-02 | std=1.217438e-14
+sigma | min=1.523716e+04 | max=9.477212e+04 | mean=5.497644e+04 | std=2.298432e+04
+alpha_infinity | min=1.000541e+00 | max=2.079042e+00 | mean=1.539991e+00 | std=3.117685e-01
+lambda | min=4.091716e-05 | max=1.472180e-04 | mean=9.406566e-05 | std=3.072578e-05
+lambda_prime | min=8.171142e-05 | max=2.944019e-04 | mean=1.881294e-04 | std=6.144819e-05
+k0_prime | min=1.082108e-10 | max=9.991675e-09 | mean=5.049856e-09 | std=2.857950e-09
+f | min=1.000000e+02 | max=2.000000e+03 | mean=1.050000e+03 | std=5.571252e+02
+
+Target Summary
+Alpha min  : 9.893628e-03
+Alpha max  : 9.999993e-01
+Alpha mean : 6.124290e-01
+Alpha std  : 2.556512e-01
+
+Segment Summary
+global_100_2000 | count=64000 | f_min=100.00 | f_max=2000.00 | alpha_mean=6.124290e-01 | alpha_std=2.556512e-01
