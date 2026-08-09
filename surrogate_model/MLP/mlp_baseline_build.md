@@ -2,6 +2,12 @@
 
 > 读一下我surrogate model文件夹下的surrogate_model_building_strategy.md，顺便读一下其中提到的需要调用的文件，先不开始搭模型，解读一下这个strategy的内容，分析一下接下来要怎么一步一步操作
 
+> **Legacy notice for MasterThesis_Project_R:** this build log describes the
+> superseded target pipeline. The new implementation trains independent
+> `R_real = real(Reflect)` and `R_imag = imag(Reflect)` models. Use
+> `MLP/README.md` and `surrogate_model/current_project_handoff.md` as the
+> authoritative specification.
+
 <details><summary>10 previous messages</summary>
 
 > 我先把 `surrogate_model/surrogate_model_building_strategy.md` 和它直接提到的相关文件读一遍，梳理这份 strategy 的目标、依赖和执行顺序，再给你一个按步骤推进的操作方案。

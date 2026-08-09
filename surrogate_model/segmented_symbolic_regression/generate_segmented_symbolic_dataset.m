@@ -66,7 +66,7 @@ end
 
 %% Load teacher dataset
 dataset = load(teacher_dataset_file);
-required_variables = {'X', 'Y', 'freq_grid', 'dataset_info', 'sample_metadata'};
+required_variables = {'X', 'Y_re', 'Y_im', 'freq_grid', 'dataset_info', 'sample_metadata'};
 for i = 1:numel(required_variables)
     if ~isfield(dataset, required_variables{i})
         error('Teacher dataset is missing required variable: %s', required_variables{i});
@@ -74,7 +74,8 @@ for i = 1:numel(required_variables)
 end
 
 X_curve = dataset.X;
-Y_curve = dataset.Y;
+Y_re_curve = dataset.Y_re;
+Y_im_curve = dataset.Y_im;
 freq_grid = dataset.freq_grid(:);
 dataset_info = dataset.dataset_info;
 sample_metadata = dataset.sample_metadata;
@@ -91,12 +92,20 @@ if numel(freq_grid) ~= run_config.n_freq || min(freq_grid) ~= run_config.freq_mi
         min(freq_grid), max(freq_grid), numel(freq_grid));
 end
 
-if size(X_curve, 1) ~= size(Y_curve, 1)
-    error('Teacher dataset X and Y must have the same number of rows.');
+if size(X_curve, 1) ~= size(Y_re_curve, 1) || ~isequal(size(Y_re_curve), size(Y_im_curve))
+    error('Teacher X, Y_re, and Y_im must have aligned curve dimensions.');
 end
 
-if size(Y_curve, 2) ~= numel(freq_grid)
-    error('Teacher dataset Y column count must match numel(freq_grid).');
+if size(Y_re_curve, 2) ~= numel(freq_grid)
+    error('Teacher paired-target column count must match numel(freq_grid).');
+end
+if any(~isfinite(Y_re_curve), 'all') || any(~isfinite(Y_im_curve), 'all')
+    error('Teacher reflection targets contain non-finite values.');
+end
+if ~isfield(dataset_info, 'target_names') || ...
+        ~isequal(cellstr(string(dataset_info.target_names(:))), {'R_real'; 'R_imag'}) || ...
+        ~strcmp(char(string(dataset_info.complex_source)), 'Reflect')
+    error('Teacher dataset does not declare the paired Reflect target contract.');
 end
 
 num_curve_samples = size(X_curve, 1);
@@ -110,7 +119,8 @@ X_repeated = repelem(X_curve, num_freq, 1);
 freq_column = repmat(freq_grid, num_curve_samples, 1);
 
 X_symbolic = [X_repeated, freq_column];
-y_symbolic = reshape(Y_curve.', [], 1);
+y_re_symbolic = reshape(Y_re_curve.', [], 1);
+y_im_symbolic = reshape(Y_im_curve.', [], 1);
 
 source_curve_index = repelem((1:num_curve_samples).', num_freq, 1);
 source_porosityfolder = strings(num_symbolic_samples, 1);
@@ -143,14 +153,17 @@ symbolic_dataset_info.n_freq = num_freq;
 symbolic_dataset_info.num_curve_samples = num_curve_samples;
 symbolic_dataset_info.num_symbolic_samples = num_symbolic_samples;
 symbolic_dataset_info.feature_names = feature_names;
-symbolic_dataset_info.target_name = dataset_info.target_name;
+symbolic_dataset_info.target_names = {'R_real', 'R_imag'};
+symbolic_dataset_info.complex_source = 'Reflect';
+symbolic_dataset_info.target_definition = dataset_info.target_definition;
 symbolic_dataset_info.segment_bounds_hz = segment_bounds_hz;
 symbolic_dataset_info.segment_names = segment_names(:);
 symbolic_dataset_info.recommended_log10_feature_indices = [3, 5, 6, 7, 8];
 
 save(output_file, ...
     'X_symbolic', ...
-    'y_symbolic', ...
+    'y_re_symbolic', ...
+    'y_im_symbolic', ...
     'freq_grid', ...
     'source_curve_index', ...
     'source_porosityfolder', ...

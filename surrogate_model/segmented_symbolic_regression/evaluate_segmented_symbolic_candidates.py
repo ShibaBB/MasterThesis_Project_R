@@ -45,15 +45,13 @@ from shared_split_utils import (  # noqa: E402
     validate_training_split,
 )
 
-DEFAULT_TRAINING_ROOT = SCRIPT_DIR / "artifacts" / "wool_segmented_symbolic_pysr_runs"
-DEFAULT_OUTPUT_ROOT = SCRIPT_DIR / "artifacts" / "wool_segmented_symbolic_candidate_evaluation_runs"
-OUTPUT_LOWER_BOUND = 0.0
-OUTPUT_UPPER_BOUND = 1.0
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Evaluate PySR candidate equations and generate diagnostic plots."
+    )
+    parser.add_argument(
+        "--target", required=True, choices=("re", "im"),
+        help="Reflection-coefficient component to evaluate.",
     )
     parser.add_argument(
         "--dataset-run",
@@ -75,7 +73,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--training-root",
         type=Path,
-        default=DEFAULT_TRAINING_ROOT,
+        default=None,
         help="Parent directory used to find the latest training run when --training-dir is omitted.",
     )
     parser.add_argument(
@@ -87,7 +85,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-root",
         type=Path,
-        default=DEFAULT_OUTPUT_ROOT,
+        default=None,
         help="Parent directory for automatically named evaluation runs.",
     )
     parser.add_argument(
@@ -136,6 +134,7 @@ def unique_path(base_path: Path) -> Path:
 
 
 def resolve_training_dir(args: argparse.Namespace, dataset_run: str) -> Path:
+    training_root = args.training_root or SCRIPT_DIR / "artifacts" / args.target / "train"
     if args.training_dir is not None:
         candidate_run = training_dataset_run(args.training_dir)
         if dataset_run != "custom" and candidate_run != dataset_run:
@@ -145,15 +144,15 @@ def resolve_training_dir(args: argparse.Namespace, dataset_run: str) -> Path:
             )
         return args.training_dir
 
-    if not args.training_root.exists():
+    if not training_root.exists():
         raise FileNotFoundError(
             "No --training-dir was provided and the default training root does not exist: "
-            f"{args.training_root}"
+            f"{training_root}"
         )
 
     candidates = [
         path
-        for path in args.training_root.iterdir()
+        for path in training_root.iterdir()
         if path.is_dir()
         and (path / "equations").exists()
         and (dataset_run == "custom" or training_dataset_run(path) == dataset_run)
@@ -161,7 +160,7 @@ def resolve_training_dir(args: argparse.Namespace, dataset_run: str) -> Path:
     if not candidates:
         raise FileNotFoundError(
             f"No training runs for dataset run {dataset_run!r} with an equations "
-            f"directory were found under: {args.training_root}"
+            f"directory were found under: {training_root}"
         )
 
     return max(candidates, key=lambda path: path.stat().st_mtime)
@@ -171,11 +170,10 @@ def resolve_output_dir(args: argparse.Namespace) -> Path:
     if args.output_dir is not None:
         return args.output_dir
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    training_name = sanitize_name(args.training_dir.name)
-    selection_tag = sanitize_name(args.selection_rule)
-    run_tag = sanitize_name(args.dataset_run)
-    return unique_path(args.output_root / f"{timestamp}_{run_tag}_{training_name}_{selection_tag}")
+    output_root = args.output_root or SCRIPT_DIR / "artifacts" / args.target / "eval"
+    timestamp = datetime.now().strftime("%Y%m%d")
+    selector = f"c{args.max_complexity}" if args.selection_rule == "max_complexity" else sanitize_name(args.selection_rule)
+    return unique_path(output_root / f"{timestamp}_{sanitize_name(args.dataset_run)}_{selector}")
 
 
 def decode_matlab_string(file: h5py.File, value: Any) -> str:
@@ -203,15 +201,33 @@ def decode_matlab_string_array(file: h5py.File, dataset: h5py.Dataset) -> list[s
     return values
 
 
-def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
+def read_symbolic_dataset(dataset_file: Path, target: str, dataset_run: str) -> dict[str, Any]:
     if not dataset_file.exists():
         raise FileNotFoundError(f"Symbolic dataset file not found: {dataset_file}")
 
     with h5py.File(dataset_file, "r") as file:
         info_group = file["symbolic_dataset_info"]
+        missing_targets = [key for key in ("y_re_symbolic", "y_im_symbolic") if key not in file]
+        if missing_targets:
+            raise ValueError(f"Symbolic dataset is missing paired target arrays {missing_targets}.")
+        target_key = {"re": "y_re_symbolic", "im": "y_im_symbolic"}[target]
+        if target_key not in file:
+            raise ValueError(f"Symbolic dataset is missing target array {target_key}.")
+        target_names = decode_matlab_string_array(file, info_group["target_names"])
+        complex_source = decode_matlab_string(file, info_group["complex_source"])
+        recorded_run = decode_matlab_string(file, info_group["dataset_run"])
+        if target_names != ["R_real", "R_imag"] or complex_source != "Reflect":
+            raise ValueError("Symbolic dataset metadata does not match paired Reflect targets.")
+        if dataset_run != "custom" and recorded_run != dataset_run:
+            raise ValueError(f"Dataset metadata run {recorded_run!r} does not match {dataset_run!r}.")
+        row_count = np.array(file["X_symbolic"]).shape[1]
+        if any(np.array(file[key]).size != row_count for key in ("y_re_symbolic", "y_im_symbolic")):
+            raise ValueError("Paired symbolic target arrays are not aligned with X_symbolic.")
         return {
             "X": np.array(file["X_symbolic"]).T,
-            "y": np.array(file["y_symbolic"]).reshape(-1),
+            "y": np.array(file[target_key]).reshape(-1),
+            "target": target,
+            "target_name": {"re": "R_real", "im": "R_imag"}[target],
             "segment_index": np.array(file["segment_index"]).reshape(-1).astype(int),
             "source_curve_index": np.array(file["source_curve_index"]).reshape(-1).astype(int),
             "freq_grid": np.array(file["freq_grid"]).reshape(-1),
@@ -260,20 +276,11 @@ def regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, floa
         "mae": float(mean_absolute_error(y_true, y_pred)),
         "max_abs_error": float(np.max(np.abs(y_true - y_pred))),
         "r2": float(r2_score(y_true, y_pred)),
+        "true_min": float(np.min(y_true)),
+        "true_max": float(np.max(y_true)),
+        "prediction_min": float(np.min(y_pred)),
+        "prediction_max": float(np.max(y_pred)),
     }
-
-
-def clip_predictions(y_pred: np.ndarray) -> np.ndarray:
-    return np.clip(y_pred, OUTPUT_LOWER_BOUND, OUTPUT_UPPER_BOUND)
-
-
-def count_values_clipped(y_pred: np.ndarray) -> int:
-    return int(
-        np.sum(
-            np.isfinite(y_pred)
-            & ((y_pred < OUTPUT_LOWER_BOUND) | (y_pred > OUTPUT_UPPER_BOUND))
-        )
-    )
 
 
 def build_predictor(expression: str, variable_names: list[str]) -> Any:
@@ -322,19 +329,17 @@ def evaluate_segment_candidates(
         expression = str(equation_row["expression_for_eval"])
         try:
             raw_y_pred = predict_expression(expression, X_seg, variable_names)
-            y_pred = clip_predictions(raw_y_pred)
+            y_pred = raw_y_pred
             metrics = regression_metrics(y_seg, y_pred)
             status = "ok"
             predictions[candidate_index] = y_pred
             raw_prediction_min = float(np.min(raw_y_pred))
             raw_prediction_max = float(np.max(raw_y_pred))
-            num_clipped = count_values_clipped(raw_y_pred)
         except Exception as exc:  # Keep evaluating other candidates.
             metrics = {"rmse": math.inf, "mae": math.inf, "max_abs_error": math.inf, "r2": -math.inf}
             status = f"failed: {exc}"
             raw_prediction_min = math.nan
             raw_prediction_max = math.nan
-            num_clipped = 0
 
         rows.append(
             {
@@ -349,7 +354,6 @@ def evaluate_segment_candidates(
                 "eval_status": status,
                 "raw_prediction_min": raw_prediction_min,
                 "raw_prediction_max": raw_prediction_max,
-                "num_clipped": num_clipped,
                 **metrics,
             }
         )
@@ -410,7 +414,7 @@ def plot_complexity_vs_error(metrics: pd.DataFrame, figures_dir: Path) -> None:
         plt.close(fig)
 
 
-def plot_selected_scatter(y_true: np.ndarray, y_pred: np.ndarray, figures_dir: Path, max_points: int, seed: int) -> None:
+def plot_selected_scatter(y_true: np.ndarray, y_pred: np.ndarray, figures_dir: Path, max_points: int, seed: int, target_name: str) -> None:
     rng = np.random.default_rng(seed)
     indices = np.arange(y_true.size)
     if indices.size > max_points:
@@ -421,16 +425,16 @@ def plot_selected_scatter(y_true: np.ndarray, y_pred: np.ndarray, figures_dir: P
     lower = min(float(np.min(y_true[indices])), float(np.min(y_pred[indices])))
     upper = max(float(np.max(y_true[indices])), float(np.max(y_pred[indices])))
     ax.plot([lower, upper], [lower, upper], color="black", linewidth=1)
-    ax.set_xlabel("Teacher alpha")
-    ax.set_ylabel("Symbolic alpha")
-    ax.set_title("Selected formulas: predicted vs true")
+    ax.set_xlabel(f"Teacher {target_name}")
+    ax.set_ylabel(f"Symbolic {target_name}")
+    ax.set_title(f"Selected formulas: {target_name} predicted vs true")
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     fig.savefig(figures_dir / "selected_predicted_vs_true.png", dpi=180)
     plt.close(fig)
 
 
-def plot_error_vs_frequency(freq: np.ndarray, error: np.ndarray, figures_dir: Path, max_points: int, seed: int) -> None:
+def plot_error_vs_frequency(freq: np.ndarray, error: np.ndarray, figures_dir: Path, max_points: int, seed: int, target_name: str) -> None:
     rng = np.random.default_rng(seed)
     indices = np.arange(freq.size)
     if indices.size > max_points:
@@ -441,7 +445,7 @@ def plot_error_vs_frequency(freq: np.ndarray, error: np.ndarray, figures_dir: Pa
     ax.axhline(0.0, color="black", linewidth=1)
     ax.set_xlabel("Frequency (Hz)")
     ax.set_ylabel("Prediction error")
-    ax.set_title("Selected formulas: error vs frequency")
+    ax.set_title(f"Selected formulas: {target_name} error vs frequency")
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     fig.savefig(figures_dir / "selected_error_vs_frequency.png", dpi=180)
@@ -474,7 +478,7 @@ def plot_curve_comparisons(
         ax.plot(freq, y_pred, label="Symbolic", linewidth=1.5, linestyle="--")
         ax.set_title(f"Curve {int(curve_id)}")
         ax.set_xlabel("Frequency (Hz)")
-        ax.set_ylabel("alpha")
+        ax.set_ylabel(data["target_name"])
         ax.set_ylim(-0.05, 1.05)
         ax.grid(True, alpha=0.3)
 
@@ -509,7 +513,7 @@ def evaluate_selected_combination(
             row["expression_for_eval"], data["X"][mask], variable_names
         )
         raw_y_pred_all[mask] = raw_prediction
-        y_pred_all[mask] = clip_predictions(raw_prediction)
+        y_pred_all[mask] = raw_prediction
         selected_rows.append(row.to_dict())
 
     selected_df = pd.DataFrame(selected_rows)
@@ -517,14 +521,10 @@ def evaluate_selected_combination(
 
 
 def prediction_diagnostics(y_pred: np.ndarray) -> dict[str, float | int]:
-    below_zero = y_pred < 0.0
-    above_one = y_pred > 1.0
     return {
         "prediction_min": float(np.min(y_pred)),
         "prediction_max": float(np.max(y_pred)),
-        "count_below_zero": int(np.sum(below_zero)),
-        "count_above_one": int(np.sum(above_one)),
-        "fraction_outside_0_1": float(np.mean(below_zero | above_one)),
+        "finite_count": int(np.sum(np.isfinite(y_pred))),
     }
 
 
@@ -584,16 +584,18 @@ def main() -> None:
     args.dataset_run = resolved_dataset_run
     args.training_dir = resolve_training_dir(args, resolved_dataset_run)
     args.output_dir = resolve_output_dir(args)
+    if args.output_dir.exists() and any(args.output_dir.iterdir()):
+        raise FileExistsError(f"Refusing to overwrite non-empty evaluation directory: {args.output_dir}")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     figures_dir = args.output_dir / "figures"
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    data = read_symbolic_dataset(args.dataset_file)
+    data = read_symbolic_dataset(args.dataset_file, args.target, resolved_dataset_run)
     num_curve_samples = int(np.unique(data["source_curve_index"]).size)
     shared_split = resolve_and_load_shared_split(
         resolved_dataset_run, args.split_file, num_curve_samples
     )
-    validate_training_split(args.training_dir, shared_split)
+    validate_training_split(args.training_dir, shared_split, expected_target=args.target, expected_dataset_run=resolved_dataset_run)
     validation_data = subset_symbolic_data(
         data,
         source_curve_mask(data["source_curve_index"], shared_split, "validation"),
@@ -639,18 +641,15 @@ def main() -> None:
     selected_summary = {
         "dataset_file": str(args.dataset_file),
         "dataset_run": resolved_dataset_run,
+        "target": args.target,
+        "target_name": data["target_name"],
         "shared_split_file": shared_split["split_file"],
         "shared_split_hash": shared_split["split_hash"],
         "training_dir": str(args.training_dir),
         "candidate_selection_split": "validation",
         "final_evaluation_split": "test",
         "selection_rule": args.selection_rule,
-        "output_postprocessing": {
-            "method": "clip",
-            "lower_bound": OUTPUT_LOWER_BOUND,
-            "upper_bound": OUTPUT_UPPER_BOUND,
-            "num_values_clipped": count_values_clipped(raw_y_pred_all),
-        },
+        "output_postprocessing": {"method": "none"},
         "selected_candidates": selected,
         "feature_names": data["feature_names"],
         "pysr_variable_names": variable_names,
@@ -664,8 +663,8 @@ def main() -> None:
         json.dump(selected_summary, file, indent=2)
 
     freq_values = test_data["X"][:, -1]
-    plot_selected_scatter(test_data["y"], y_pred_all, figures_dir, args.max_plot_points, args.random_seed)
-    plot_error_vs_frequency(freq_values, y_pred_all - test_data["y"], figures_dir, args.max_plot_points, args.random_seed)
+    plot_selected_scatter(test_data["y"], y_pred_all, figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
+    plot_error_vs_frequency(freq_values, y_pred_all - test_data["y"], figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
     plot_curve_comparisons(test_data, y_pred_all, figures_dir, args.num_curves, args.random_seed)
 
     print("Symbolic candidate evaluation complete.")
@@ -681,7 +680,6 @@ def main() -> None:
         "Prediction diagnostics: "
         f"raw_range=[{raw_physical_diagnostics['prediction_min']:.6f}, "
         f"{raw_physical_diagnostics['prediction_max']:.6f}], "
-        f"clipped_values={count_values_clipped(raw_y_pred_all)}, "
         f"final_range=[{physical_diagnostics['prediction_min']:.6f}, "
         f"{physical_diagnostics['prediction_max']:.6f}]"
     )

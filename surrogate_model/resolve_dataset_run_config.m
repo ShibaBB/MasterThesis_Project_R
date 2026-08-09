@@ -40,6 +40,15 @@ end
 if ~isfield(config, 'run_id') || ~strcmp(char(string(config.run_id)), dataset_run)
     error('Dataset config run_id must match its datasets/%s directory.', dataset_run);
 end
+if ~isfield(config, 'target_schema') || ...
+        ~isequal(cellstr(string(config.target_schema.target_names)), {'R_real'; 'R_imag'}) || ...
+        ~strcmp(char(string(config.target_schema.complex_source)), 'Reflect') || ...
+        ~strcmp(char(string(config.target_schema.target_keys.re)), 'Y_re') || ...
+        ~strcmp(char(string(config.target_schema.target_keys.im)), 'Y_im') || ...
+        ~strcmp(char(string(config.target_schema.symbolic_target_keys.re)), 'y_re_symbolic') || ...
+        ~strcmp(char(string(config.target_schema.symbolic_target_keys.im)), 'y_im_symbolic')
+    error('Dataset config must define the paired Reflect R_real/R_imag target schema.');
+end
 
 required_generation = {'material', 'porosity_cases', 'sampling_method', 'random_seed', 'curve_samples', 'frequency_grid_hz'};
 for i = 1:numel(required_generation)
@@ -98,8 +107,8 @@ config.config_file = config_file;
 config.paths = struct();
 config.paths.run_dir = run_dir;
 config.paths.manifest_file = fullfile(run_dir, 'dataset_manifest.json');
-config.paths.teacher_dataset_file = fullfile(run_dir, 'MLP', sprintf('%s_surrogate_dataset.mat', material));
+config.paths.teacher_dataset_file = fullfile(run_dir, 'MLP', sprintf('%s_R.mat', material));
 config.paths.shared_split_file = fullfile(run_dir, 'shared_curve_split.json');
-config.paths.segmented_dataset_file = fullfile(run_dir, 'segmented_SR', sprintf('%s_symbolic_segmented.mat', material));
-config.paths.global_dataset_file = fullfile(run_dir, 'global_SR', sprintf('%s_symbolic_global.mat', material));
+config.paths.segmented_dataset_file = fullfile(run_dir, 'segmented_SR', sprintf('%s_R_segmented.mat', material));
+config.paths.global_dataset_file = fullfile(run_dir, 'global_SR', sprintf('%s_R_global.mat', material));
 end

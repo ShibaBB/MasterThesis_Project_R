@@ -13,12 +13,21 @@ project_root = fileparts(surrogate_root);
 
 %% Configuration
 addpath(surrogate_root);
-run_config = resolve_dataset_run_config();
+requested_dataset_run = '';
+target = '';
+if exist('surrogate_training_config', 'var')
+    if isfield(surrogate_training_config, 'dataset_run'), requested_dataset_run = surrogate_training_config.dataset_run; end
+    if isfield(surrogate_training_config, 'target'), target = lower(char(string(surrogate_training_config.target))); end
+end
+if ~ismember(target, {'re', 'im'})
+    error('surrogate_training_config.target is required and must be ''re'' or ''im''.');
+end
+run_config = resolve_dataset_run_config(requested_dataset_run);
 dataset_file = run_config.paths.teacher_dataset_file;
 shared_split_file = run_config.paths.shared_split_file;
 
-experiment_name = sprintf('%s_baseline', char(string(run_config.run_id)));
-artifacts_root = fullfile(surrogate_root, 'MLP', 'artifacts', 'wool_baseline_mlp_runs');
+experiment_name = sprintf('%s_%s', char(string(run_config.run_id)), target);
+artifacts_root = fullfile(surrogate_root, 'MLP', 'artifacts', target);
 artifacts_dir = '';
 figures_dir = fullfile(artifacts_dir, 'figures');
 artifacts_dir_overridden = false;
@@ -76,8 +85,8 @@ if exist('surrogate_training_config', 'var')
 end
 
 if ~artifacts_dir_overridden
-    timestamp = char(datetime('now', 'Format', 'yyyyMMdd_HHmmss'));
-    run_folder_name = sprintf('%s_%s', timestamp, sanitize_run_name(experiment_name));
+    timestamp = char(datetime('now', 'Format', 'yyyyMMdd'));
+    run_folder_name = sprintf('%s_%s', timestamp, char(string(run_config.run_id)));
     artifacts_dir = unique_run_directory(artifacts_root, run_folder_name);
 elseif directory_contains_files(artifacts_dir)
     error(['Refusing to overwrite an existing MLP artifact directory: %s. ', ...
@@ -116,7 +125,7 @@ end
 
 %% Load dataset
 dataset = load(dataset_file);
-required_variables = {'X', 'Y', 'freq_grid', 'dataset_info', 'sample_metadata'};
+required_variables = {'X', 'Y_re', 'Y_im', 'freq_grid', 'dataset_info', 'sample_metadata'};
 for i = 1:numel(required_variables)
     if ~isfield(dataset, required_variables{i})
         error('Dataset file is missing required variable: %s', required_variables{i});
@@ -124,10 +133,23 @@ for i = 1:numel(required_variables)
 end
 
 X = dataset.X;
-Y = dataset.Y;
+if strcmp(target, 're')
+    Y = dataset.Y_re;
+    target_name = 'R_real';
+else
+    Y = dataset.Y_im;
+    target_name = 'R_imag';
+end
 freq_grid = dataset.freq_grid;
 dataset_info = dataset.dataset_info;
 sample_metadata = dataset.sample_metadata;
+
+if ~isfield(dataset_info, 'target_names') || ...
+        ~isequal(cellstr(string(dataset_info.target_names(:))), {'R_real'; 'R_imag'}) || ...
+        ~strcmp(char(string(dataset_info.complex_source)), 'Reflect') || ...
+        ~strcmp(char(string(dataset_info.dataset_run)), char(string(run_config.run_id)))
+    error('Teacher target/run metadata does not match the paired Reflect contract.');
+end
 
 if size(X, 1) ~= size(Y, 1)
     error('X and Y must have the same number of rows.');
@@ -225,6 +247,9 @@ model_artifact.preprocessing = preprocessing;
 model_artifact.metrics = metrics;
 model_artifact.dataset_file = dataset_file;
 model_artifact.dataset_info = dataset_info;
+model_artifact.target = target;
+model_artifact.target_name = target_name;
+model_artifact.dataset_run = char(string(run_config.run_id));
 model_artifact.experiment_name = experiment_name;
 model_artifact.artifacts_dir = artifacts_dir;
 model_artifact.split_indices = split_indices;
@@ -249,14 +274,14 @@ save(fullfile(artifacts_dir, 'surrogate_baseline_predictions.mat'), ...
     'freq_grid', 'evaluation', '-v7.3');
 
 write_metrics_report(fullfile(artifacts_dir, 'metrics_report.txt'), ...
-    metrics, dataset_info, num_samples, shared_split_info);
+    metrics, dataset_info, num_samples, shared_split_info, target, target_name);
 
 %% Generate diagnostic plots
 plot_training_history(training_info, figures_dir);
-plot_prediction_scatter(Y_test_raw, Y_test_pred, figures_dir, scatter_max_points);
+plot_prediction_scatter(Y_test_raw, Y_test_pred, figures_dir, scatter_max_points, target_name);
 plot_mean_error_vs_frequency(freq_grid, Y_test_raw, Y_test_pred, figures_dir);
-plot_random_curve_comparisons(freq_grid, Y_test_raw, Y_test_pred, figures_dir, num_random_curve_plots, shared_split_info.split_seed);
-plot_worst_case_curves(freq_grid, Y_test_raw, Y_test_pred, test_curve_mae, figures_dir, num_worst_case_plots);
+plot_random_curve_comparisons(freq_grid, Y_test_raw, Y_test_pred, figures_dir, num_random_curve_plots, shared_split_info.split_seed, target_name);
+plot_worst_case_curves(freq_grid, Y_test_raw, Y_test_pred, test_curve_mae, figures_dir, num_worst_case_plots, target_name);
 plot_curve_error_histogram(test_curve_mae, figures_dir);
 
 fprintf('\nTraining complete.\n');
@@ -468,6 +493,11 @@ function metrics = compute_regression_metrics(y_true, y_pred)
     metrics.mse = mean(residual.^2, 'all');
     metrics.rmse = sqrt(metrics.mse);
     metrics.mae = mean(abs(residual), 'all');
+    metrics.max_absolute_error = max(abs(residual), [], 'all');
+    metrics.true_min = min(y_true, [], 'all');
+    metrics.true_max = max(y_true, [], 'all');
+    metrics.prediction_min = min(y_pred, [], 'all');
+    metrics.prediction_max = max(y_pred, [], 'all');
 
     denominator = sum((y_true - mean(y_true, 1)).^2, 'all');
     numerator = sum((y_true - y_pred).^2, 'all');
@@ -479,7 +509,7 @@ function metrics = compute_regression_metrics(y_true, y_pred)
     end
 end
 
-function write_metrics_report(report_file, metrics, dataset_info, num_samples, shared_split_info)
+function write_metrics_report(report_file, metrics, dataset_info, num_samples, shared_split_info, target, target_name)
     fid = fopen(report_file, 'w');
     if fid == -1
         error('Could not open metrics report for writing: %s', report_file);
@@ -488,6 +518,7 @@ function write_metrics_report(report_file, metrics, dataset_info, num_samples, s
     cleanup_obj = onCleanup(@() fclose(fid));
 
     fprintf(fid, 'Surrogate Baseline Metrics Report\n');
+    fprintf(fid, 'Target Selector: %s\nTarget Name: %s\n', target, target_name);
     fprintf(fid, 'Fiber: %s\n', dataset_info.fiberfolder);
     fprintf(fid, 'Total Samples: %d\n', num_samples);
     fprintf(fid, 'Frequency Range: %.2f Hz to %.2f Hz\n', dataset_info.freq_min, dataset_info.freq_max);
@@ -512,7 +543,10 @@ function write_metrics_report(report_file, metrics, dataset_info, num_samples, s
     fprintf(fid, 'MSE  : %.8e\n', metrics.test.mse);
     fprintf(fid, 'RMSE : %.8e\n', metrics.test.rmse);
     fprintf(fid, 'MAE  : %.8e\n', metrics.test.mae);
+    fprintf(fid, 'MaxAE: %.8e\n', metrics.test.max_absolute_error);
     fprintf(fid, 'R2   : %.8f\n', metrics.test.r2);
+    fprintf(fid, 'True range: [%.8e, %.8e]\n', metrics.test.true_min, metrics.test.true_max);
+    fprintf(fid, 'Prediction range: [%.8e, %.8e]\n', metrics.test.prediction_min, metrics.test.prediction_max);
 end
 
 function plot_training_history(training_info, figures_dir)
@@ -539,7 +573,7 @@ function plot_training_history(training_info, figures_dir)
     close(fig);
 end
 
-function plot_prediction_scatter(y_true, y_pred, figures_dir, scatter_max_points)
+function plot_prediction_scatter(y_true, y_pred, figures_dir, scatter_max_points, target_name)
     y_true_vec = y_true(:);
     y_pred_vec = y_pred(:);
     n_points = numel(y_true_vec);
@@ -559,8 +593,8 @@ function plot_prediction_scatter(y_true, y_pred, figures_dir, scatter_max_points
     max_val = max([y_true_vec; y_pred_vec]);
     plot([min_val, max_val], [min_val, max_val], 'k--', 'LineWidth', 1.25);
 
-    xlabel('True Absorption');
-    ylabel('Predicted Absorption');
+    xlabel(sprintf('True %s', target_name), 'Interpreter', 'none');
+    ylabel(sprintf('Predicted %s', target_name), 'Interpreter', 'none');
     title('Predicted vs True Scatter');
     axis tight;
     grid on;
@@ -587,7 +621,7 @@ function plot_mean_error_vs_frequency(freq_grid, y_true, y_pred, figures_dir)
     close(fig);
 end
 
-function plot_random_curve_comparisons(freq_grid, y_true, y_pred, figures_dir, num_random_curve_plots, random_seed)
+function plot_random_curve_comparisons(freq_grid, y_true, y_pred, figures_dir, num_random_curve_plots, random_seed, target_name)
     n_test = size(y_true, 1);
     num_to_plot = min(num_random_curve_plots, n_test);
 
@@ -602,7 +636,7 @@ function plot_random_curve_comparisons(freq_grid, y_true, y_pred, figures_dir, n
         plot(freq_grid, y_true(selected_idx(i), :), 'k-', 'LineWidth', 1.5, 'DisplayName', 'True');
         hold on;
         plot(freq_grid, y_pred(selected_idx(i), :), 'r--', 'LineWidth', 1.5, 'DisplayName', 'Predicted');
-        ylabel('\alpha');
+        ylabel(target_name, 'Interpreter', 'none');
         title(sprintf('Random Test Curve %d', selected_idx(i)));
         grid on;
         if i == 1
@@ -615,7 +649,7 @@ function plot_random_curve_comparisons(freq_grid, y_true, y_pred, figures_dir, n
     close(fig);
 end
 
-function plot_worst_case_curves(freq_grid, y_true, y_pred, curve_mae, figures_dir, num_worst_case_plots)
+function plot_worst_case_curves(freq_grid, y_true, y_pred, curve_mae, figures_dir, num_worst_case_plots, target_name)
     [~, sorted_idx] = sort(curve_mae, 'descend');
     num_to_plot = min(num_worst_case_plots, numel(sorted_idx));
 
@@ -628,7 +662,7 @@ function plot_worst_case_curves(freq_grid, y_true, y_pred, curve_mae, figures_di
         plot(freq_grid, y_true(idx, :), 'k-', 'LineWidth', 1.5, 'DisplayName', 'True');
         hold on;
         plot(freq_grid, y_pred(idx, :), 'r--', 'LineWidth', 1.5, 'DisplayName', 'Predicted');
-        ylabel('\alpha');
+        ylabel(target_name, 'Interpreter', 'none');
         title(sprintf('Worst-Case Curve %d | Curve MAE = %.4e', idx, curve_mae(idx)));
         grid on;
         if i == 1

@@ -62,6 +62,19 @@ def load_dataset_run_config(dataset_run: str | None = None) -> dict[str, Any]:
             f"Dataset config run_id {config.get('run_id')!r} does not match directory {dataset_run!r}."
         )
 
+    target_schema = config.get("target_schema", {})
+    expected_targets = ["R_real", "R_imag"]
+    if target_schema.get("target_names") != expected_targets:
+        raise ValueError(f"Dataset config target_names must be {expected_targets}.")
+    if target_schema.get("complex_source") != "Reflect":
+        raise ValueError("Dataset targets must be derived from the JCAL Reflect output.")
+    if target_schema.get("target_keys") != {"re": "Y_re", "im": "Y_im"}:
+        raise ValueError("Dataset target_keys must map re/im to Y_re/Y_im.")
+    if target_schema.get("symbolic_target_keys") != {
+        "re": "y_re_symbolic", "im": "y_im_symbolic"
+    }:
+        raise ValueError("Symbolic target keys must map re/im to paired symbolic arrays.")
+
     generation = config.get("generation", {})
     frequency = generation.get("frequency_grid_hz", {})
     required_generation = ("material", "porosity_cases", "sampling_method", "random_seed", "curve_samples")
@@ -105,10 +118,10 @@ def load_dataset_run_config(dataset_run: str | None = None) -> dict[str, Any]:
     config["paths"] = {
         "run_dir": run_dir,
         "manifest": run_dir / "dataset_manifest.json",
-        "teacher_dataset": run_dir / "MLP" / f"{material}_surrogate_dataset.mat",
+        "teacher_dataset": run_dir / "MLP" / f"{material}_R.mat",
         "shared_split": run_dir / "shared_curve_split.json",
-        "segmented_dataset": run_dir / "segmented_SR" / f"{material}_symbolic_segmented.mat",
-        "global_dataset": run_dir / "global_SR" / f"{material}_symbolic_global.mat",
+        "segmented_dataset": run_dir / "segmented_SR" / f"{material}_R_segmented.mat",
+        "global_dataset": run_dir / "global_SR" / f"{material}_R_global.mat",
     }
     config["segment_frequency_point_counts"] = segment_counts
     return config

@@ -1,7 +1,7 @@
 """Create a future dataset-run configuration without editing model code.
 
 Example:
-    python surrogate_model/create_dataset_run.py run4 --from-run run3 \
+    python surrogate_model/create_dataset_run.py run2 --from-run run1 \
         --random-seed 45 --set-default
 """
 
@@ -88,6 +88,7 @@ def main() -> None:
         "status": "configured_not_generated",
         "description": config["description"],
         "config_path": config_file.relative_to(SURROGATE_ROOT.parent).as_posix(),
+        "target_schema": config["target_schema"],
         "generation": {
             "material": material,
             "porosity_cases": generation["porosity_cases"],
@@ -98,7 +99,7 @@ def main() -> None:
             "frequency_range_hz": [frequency["min"], frequency["max"]],
         },
         "teacher_dataset": {
-            "path": f"surrogate_model/datasets/{args.dataset_run}/MLP/{material}_surrogate_dataset.mat",
+            "path": f"surrogate_model/datasets/{args.dataset_run}/MLP/{material}_R.mat",
             "status": "not_generated",
         },
         "shared_curve_split": {
@@ -109,12 +110,12 @@ def main() -> None:
         "derived_datasets": [
             {
                 "model_branch": "segmented_SR",
-                "path": f"surrogate_model/datasets/{args.dataset_run}/segmented_SR/{material}_symbolic_segmented.mat",
+                "path": f"surrogate_model/datasets/{args.dataset_run}/segmented_SR/{material}_R_segmented.mat",
                 "status": "not_generated",
             },
             {
                 "model_branch": "global_SR",
-                "path": f"surrogate_model/datasets/{args.dataset_run}/global_SR/{material}_symbolic_global.mat",
+                "path": f"surrogate_model/datasets/{args.dataset_run}/global_SR/{material}_R_global.mat",
                 "status": "not_generated",
             },
         ],

@@ -35,7 +35,6 @@ from shared_split_utils import (  # noqa: E402
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_OUTPUT_ROOT = SCRIPT_DIR / "artifacts" / "wool_global_symbolic_pysr_runs"
 VENV_JULIA_EXE = (
     Path(sys.executable).resolve().parent.parent
     / "julia_env"
@@ -69,6 +68,12 @@ def parse_args() -> argparse.Namespace:
         description="Train one PySR symbolic-regression model over the full frequency range."
     )
     parser.add_argument(
+        "--target",
+        required=True,
+        choices=("re", "im"),
+        help="Reflection-coefficient component to train.",
+    )
+    parser.add_argument(
         "--dataset-run",
         default=default_dataset_run(),
         help="Dataset run under surrogate_model/datasets (default comes from the central dataset_run_config.json).",
@@ -88,7 +93,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-root",
         type=Path,
-        default=DEFAULT_OUTPUT_ROOT,
+        default=None,
         help="Parent directory for automatically named training runs.",
     )
     parser.add_argument(
@@ -145,19 +150,10 @@ def resolve_output_dir(args: argparse.Namespace) -> Path:
     if args.output_dir is not None:
         return args.output_dir
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    sample_tag = (
-        "all"
-        if args.max_samples is None
-        else f"cap{args.max_samples}"
-    )
-    config_tag = (
-        f"{sanitize_name(args.dataset_run)}_i{args.niterations}_p{args.populations}_"
-        f"ps{args.population_size}_s{args.maxsize}_{sample_tag}"
-    )
-    run_label = sanitize_name(args.run_name)[:24]
-    run_suffix = f"_{run_label}" if run_label else ""
-    return unique_path(args.output_root / f"{timestamp}_{config_tag}{run_suffix}")
+    output_root = args.output_root or SCRIPT_DIR / "artifacts" / args.target / "train"
+    timestamp = datetime.now().strftime("%Y%m%d")
+    suffix = "_limited" if args.max_samples is not None else ""
+    return unique_path(output_root / f"{timestamp}_{sanitize_name(args.dataset_run)}{suffix}")
 
 
 def validate_output_path_length(output_dir: Path, global_name: str) -> None:
@@ -207,13 +203,20 @@ def read_numeric_dataset(dataset: h5py.Dataset) -> np.ndarray:
     return np.array(dataset).T
 
 
-def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
+def read_symbolic_dataset(dataset_file: Path, target: str, dataset_run: str) -> dict[str, Any]:
     if not dataset_file.exists():
         raise FileNotFoundError(f"Symbolic dataset file not found: {dataset_file}")
 
     with h5py.File(dataset_file, "r") as file:
+        missing_targets = [key for key in ("y_re_symbolic", "y_im_symbolic") if key not in file]
+        if missing_targets:
+            raise ValueError(f"Symbolic dataset is missing paired target arrays {missing_targets}.")
         x_symbolic = read_numeric_dataset(file["X_symbolic"])
-        y_symbolic = np.array(file["y_symbolic"]).reshape(-1)
+        target_key = {"re": "y_re_symbolic", "im": "y_im_symbolic"}[target]
+        if target_key not in file:
+            raise ValueError(f"Symbolic dataset is missing target array {target_key}.")
+        y_symbolic = np.array(file[target_key]).reshape(-1)
+        paired_shape = np.array(file["y_re_symbolic"]).size, np.array(file["y_im_symbolic"]).size
         segment_index = np.array(file["segment_index"]).reshape(-1).astype(int)
         source_curve_index = np.array(file["source_curve_index"]).reshape(-1).astype(int)
 
@@ -221,6 +224,9 @@ def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
         feature_names = decode_matlab_string_array(file, info_group["feature_names"])
         segment_bounds = np.array(info_group["segment_bounds_hz"]).T
         segment_names = decode_matlab_string_array(file, info_group["segment_names"])
+        target_names = decode_matlab_string_array(file, info_group["target_names"])
+        complex_source = decode_matlab_string(file, info_group["complex_source"])
+        recorded_run = decode_matlab_string(file, info_group["dataset_run"])
 
         fiberfolder = decode_matlab_string(file, info_group["fiberfolder"])
         num_curve_samples = int(np.array(info_group["num_curve_samples"]).reshape(-1)[0])
@@ -228,10 +234,16 @@ def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
 
     if x_symbolic.shape[0] != y_symbolic.shape[0]:
         raise ValueError("X_symbolic row count does not match y_symbolic length.")
+    if paired_shape != (x_symbolic.shape[0], x_symbolic.shape[0]):
+        raise ValueError("Paired symbolic target arrays are not aligned with X_symbolic.")
     if x_symbolic.shape[0] != segment_index.shape[0]:
         raise ValueError("X_symbolic row count does not match segment_index length.")
     if x_symbolic.shape[0] != source_curve_index.shape[0]:
         raise ValueError("X_symbolic row count does not match source_curve_index length.")
+    if target_names != ["R_real", "R_imag"] or complex_source != "Reflect":
+        raise ValueError("Symbolic dataset metadata does not match paired Reflect targets.")
+    if dataset_run != "custom" and recorded_run != dataset_run:
+        raise ValueError(f"Dataset metadata run {recorded_run!r} does not match {dataset_run!r}.")
 
     unique_indices = np.unique(segment_index)
     if unique_indices.tolist() != [1] or len(segment_names) != 1 or segment_bounds.shape != (1, 2):
@@ -243,6 +255,8 @@ def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
     return {
         "X": x_symbolic,
         "y": y_symbolic,
+        "target": target,
+        "target_name": {"re": "R_real", "im": "R_imag"}[target],
         "segment_index": segment_index,
         "source_curve_index": source_curve_index,
         "feature_names": feature_names,
@@ -317,6 +331,10 @@ def regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, floa
         "mae": float(mae),
         "max_abs_error": max_abs_error,
         "r2": float(r2),
+        "true_min": float(np.min(y_true)),
+        "true_max": float(np.max(y_true)),
+        "prediction_min": float(np.min(y_pred)),
+        "prediction_max": float(np.max(y_pred)),
     }
 
 
@@ -383,6 +401,8 @@ def train_global_model(
 
     selected_equation = {
         "global_name": global_name,
+        "target": data["target"],
+        "target_name": data["target_name"],
         "lower_hz": float(bounds[0]),
         "upper_hz": float(bounds[1]),
         "shared_split_file": data["shared_split"]["split_file"],
@@ -421,17 +441,21 @@ def main() -> None:
         os.environ.setdefault("PYTHON_JULIAPKG_EXE", str(args.julia_exe))
 
     args.output_dir = resolve_output_dir(args)
-    data = read_symbolic_dataset(args.dataset_file)
+    data = read_symbolic_dataset(args.dataset_file, args.target, resolved_dataset_run)
     data["shared_split"] = resolve_and_load_shared_split(
         resolved_dataset_run, args.split_file, data["num_curve_samples"]
     )
     validate_output_path_length(args.output_dir, data["segment_names"][0])
+    if args.output_dir.exists() and any(args.output_dir.iterdir()):
+        raise FileExistsError(f"Refusing to overwrite non-empty training directory: {args.output_dir}")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     data["pysr_variable_names"] = make_pysr_variable_names(data["feature_names"])
 
     metadata = {
         "dataset_file": str(args.dataset_file),
         "dataset_run": resolved_dataset_run,
+        "target": args.target,
+        "target_name": data["target_name"],
         "shared_split_file": data["shared_split"]["split_file"],
         "shared_split_hash": data["shared_split"]["split_hash"],
         "fiberfolder": data["fiberfolder"],

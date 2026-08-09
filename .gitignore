@@ -21,6 +21,9 @@ surrogate_model/**/*.bak
 surrogate_model/**/artifacts/**/_scratch/
 surrogate_model/**/artifacts/**/tmp/
 
+# Deterministic interface-test outputs; formal run datasets/artifacts remain trackable
+surrogate_model/datasets/*/smoke/
+
 # MATLAB autosave and transient files
 *.asv
 *.m~

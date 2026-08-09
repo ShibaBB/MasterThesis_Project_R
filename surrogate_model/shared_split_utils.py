@@ -139,7 +139,13 @@ def source_curve_mask(
     return np.isin(source_curve_index, split[key])
 
 
-def validate_training_split(training_dir: Path, split: dict[str, Any]) -> None:
+def validate_training_split(
+    training_dir: Path,
+    split: dict[str, Any],
+    *,
+    expected_target: str | None = None,
+    expected_dataset_run: str | None = None,
+) -> None:
     metadata_file = training_dir / "training_metadata.json"
     if not metadata_file.exists():
         raise FileNotFoundError(f"Training metadata not found: {metadata_file}")
@@ -156,6 +162,16 @@ def validate_training_split(training_dir: Path, split: dict[str, Any]) -> None:
         raise ValueError(
             "Training/evaluation split mismatch: "
             f"training={training_hash}, evaluation={split['split_hash']}."
+        )
+    if expected_target is not None and metadata.get("target") != expected_target:
+        raise ValueError(
+            f"Training/evaluation target mismatch: training={metadata.get('target')!r}, "
+            f"evaluation={expected_target!r}."
+        )
+    if expected_dataset_run not in (None, "custom") and metadata.get("dataset_run") != expected_dataset_run:
+        raise ValueError(
+            f"Training/evaluation dataset-run mismatch: training={metadata.get('dataset_run')!r}, "
+            f"evaluation={expected_dataset_run!r}."
         )
 
 

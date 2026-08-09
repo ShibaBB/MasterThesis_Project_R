@@ -1,4 +1,10 @@
-# Surrogate Model Strategy 1
+# Surrogate Model Strategy 1 (Legacy)
+
+> **Not authoritative for MasterThesis_Project_R.** This document describes
+> the superseded target workflow. The R repository trains separate
+> `R_real = real(Reflect)` and `R_imag = imag(Reflect)` models. Follow
+> `MLP/README.md` and `surrogate_model/current_project_handoff.md`; do not carry
+> the target, output-range, or evaluation recommendations below into new code.
 
 ## 1. Purpose of This Version
 

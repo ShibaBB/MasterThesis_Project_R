@@ -1,58 +1,57 @@
 # Dataset Runs
 
-This folder stores comparison datasets by run.
+The `run1` configuration and manifest exist, but the full generated MAT files
+and shared split do not yet exist in this repository.
 
-Use one `run*` folder at a time when comparing MLP, segmented SR, and global SR.
-This keeps all models tied to the same teacher data.
+The first new reflection-coefficient dataset should be `run1`. A run must own:
 
-## Active Run
-
-`run3` is the active configured run. It uses Wool porosity 92, 1000 LHS
-teacher samples, seed 44, and 128 frequency points over 100-4950 Hz. Its
-`dataset_config.json` is the single source for teacher generation and both SR
-domain definitions. Teacher data, the shared split, and both segmented/global
-SR datasets are generated. The manifest status is `generated`.
-
-Use `../DATASET_RUN_WORKFLOW.md` for the generation protocol.
-
-## Completed Historical Run
-
-`run2` is the latest completed historical comparison run. It was generated with Wool porosity 92,
-1000 LHS teacher samples, 64 frequency points over 100-2000 Hz, and random seed
-43. It contains:
-
-- `MLP/Wool_surrogate_dataset.mat`
-  - Curve-format teacher dataset.
-  - Used directly by the MLP baseline.
-- `segmented_SR/Wool_symbolic_segmented.mat`
-  - Scalar frequency-expanded dataset derived from the run2 teacher dataset.
-  - Uses the current segmented SR frequency split.
-- `global_SR/Wool_symbolic_global.mat`
-  - Scalar frequency-expanded dataset derived from the run2 teacher dataset.
-  - Uses one global `100-2000 Hz` segment.
-- `dataset_manifest.json`
-  - Records the source/derived dataset relationship.
-- `shared_curve_split.json`
-  - Defines the common 1-based source curve indices used by every model.
-  - Current sizes: 700 train, 150 validation, and 150 test curves.
-  - SR rows are selected through `source_curve_index`; scalar rows are never
-    independently randomized across splits.
-  - The split hash excludes frequency range and frequency count. A compatible
-    teacher dataset may therefore change from the current frequency grid to a
-    later grid such as 100-4950 Hz without changing curve membership.
-
-Generate the split after creating a new teacher dataset run:
-
-```powershell
-python surrogate_model/generate_shared_curve_split.py --dataset-run run3
+```text
+dataset_config.json
+dataset_manifest.json
+shared_curve_split.json
+MLP/<material>_R.mat
+segmented_SR/<material>_R_segmented.mat
+global_SR/<material>_R_global.mat
 ```
 
-If source curve count or source curve identities change, create a new dataset
-run and regenerate its split. Training and evaluation artifacts record both
-the resolved split path and SHA-256 split hash.
+The exact filenames may be finalized during implementation, but they must stay
+short and be resolved from the central run configuration.
 
-`run1` is retained as the earlier baseline run. Do not mix models trained on
-run1 with models trained on run2 in a horizontal comparison.
+## Teacher Dataset Contract
 
-For future experiments, use `create_dataset_run.py`; core model scripts should
-not be edited merely to advance from run3 to run4 or run5.
+The teacher MAT file should contain:
+
+```text
+X         [n_curves, 7]
+Y_re      [n_curves, n_frequency_points]
+Y_im      [n_curves, n_frequency_points]
+freq_grid
+dataset_info
+sample_metadata
+```
+
+`Y_re` and `Y_im` must be generated from the same complex `Reflect` values,
+not from separate sampling jobs. One shared curve split applies to both.
+
+## Symbolic Dataset Contract
+
+Both segmented and global scalar datasets should retain:
+
+```text
+X_symbolic, y_re_symbolic, y_im_symbolic,
+source_curve_index, segment_index, freq_grid, symbolic_dataset_info
+```
+
+Training scripts select one target explicitly with `re|im`.
+
+## Manifest Requirements
+
+The manifest should record:
+
+- dataset run and source paths;
+- target schema and definitions;
+- source curve count and frequency grid;
+- shared split path and hash;
+- generation state of teacher, segmented, and global datasets.
+
+Do not mark a run complete until both Re and Im arrays are present and valid.

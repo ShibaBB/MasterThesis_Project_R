@@ -1,5 +1,5 @@
 %% Surrogate Dataset Generation
-% This script generates training data for the first surrogate-model baseline.
+% This script generates paired real/imaginary reflection-coefficient targets.
 % The current version is configured for Wool and starts from porosity 92,
 % while keeping the workflow compatible with porosities 92 to 99.
 
@@ -98,7 +98,8 @@ samples_per_case = samples_per_porosity * ones(num_porosity_cases, 1);
 samples_per_case(1:remainder_samples) = samples_per_case(1:remainder_samples) + 1;
 
 X = zeros(n_samples, 7);
-Y = zeros(n_samples, n_freq);
+Y_re = zeros(n_samples, n_freq);
+Y_im = zeros(n_samples, n_freq);
 
 sample_metadata = struct( ...
     'fiberfolder', cell(n_samples, 1), ...
@@ -109,7 +110,7 @@ sample_metadata = struct( ...
     'relative_humidity', zeros(n_samples, 1));
 
 parameter_names = {'phi', 'h', 'sigma', 'alpha_infinity', 'lambda', 'lambda_prime', 'k0_prime'};
-target_name = 'alpha';
+target_names = {'R_real', 'R_imag'};
 
 %% Generate dataset
 row_start = 1;
@@ -148,13 +149,14 @@ for p_idx = 1:num_porosity_cases
         lambda_prime = param_samples(local_idx, 4);
         k0_prime = param_samples(local_idx, 5);
 
-        [~, ~, alpha, ~, ~, ~, ~] = jcal_reflection( ...
+        [Reflect, ~, ~, ~, ~, ~, ~] = jcal_reflection( ...
             h, phi, sigma, alpha_infinity, lambda, lambda_prime, k0_prime, freq_grid, airProperties);
 
         global_idx = row_start + local_idx - 1;
 
         X(global_idx, :) = [phi, h, sigma, alpha_infinity, lambda, lambda_prime, k0_prime];
-        Y(global_idx, :) = alpha(:).';
+        Y_re(global_idx, :) = real(Reflect(:)).';
+        Y_im(global_idx, :) = imag(Reflect(:)).';
 
         sample_metadata(global_idx).fiberfolder = fiberfolder;
         sample_metadata(global_idx).porosityfolder = porosityfolder;
@@ -188,9 +190,16 @@ dataset_info.samples_per_case = samples_per_case;
 dataset_info.sampling_method = sampling_method;
 dataset_info.random_seed = random_seed;
 dataset_info.parameter_names = parameter_names;
-dataset_info.target_name = target_name;
+dataset_info.target_names = target_names;
+dataset_info.complex_source = 'Reflect';
+dataset_info.target_definition = struct( ...
+    'R_real', 'real(Reflect)', ...
+    'R_imag', 'imag(Reflect)');
 
-save(output_file, 'X', 'Y', 'freq_grid', 'dataset_info', 'sample_metadata');
+if any(~isfinite(Y_re), 'all') || any(~isfinite(Y_im), 'all')
+    error('Generated reflection targets contain non-finite values.');
+end
+save(output_file, 'X', 'Y_re', 'Y_im', 'freq_grid', 'dataset_info', 'sample_metadata', '-v7.3');
 
 fprintf('Saved dataset to %s\n', output_file);
 

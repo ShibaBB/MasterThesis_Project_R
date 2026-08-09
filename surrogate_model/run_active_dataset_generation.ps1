@@ -12,16 +12,21 @@ $RunId = [string]$ActiveConfig.default_dataset_run
 $RunDir = Join-Path $SurrogateRoot (Join-Path 'datasets' $RunId)
 $RunConfig = Get-Content -Raw -LiteralPath (Join-Path $RunDir 'dataset_config.json') | ConvertFrom-Json
 $Material = [string]$RunConfig.generation.material
-$TeacherFile = Join-Path $RunDir (Join-Path 'MLP' ($Material + '_surrogate_dataset.mat'))
+$TeacherFile = Join-Path $RunDir (Join-Path 'MLP' ($Material + '_R.mat'))
 $SplitFile = Join-Path $RunDir 'shared_curve_split.json'
-$SegmentedFile = Join-Path $RunDir (Join-Path 'segmented_SR' ($Material + '_symbolic_segmented.mat'))
-$GlobalFile = Join-Path $RunDir (Join-Path 'global_SR' ($Material + '_symbolic_global.mat'))
+$SegmentedFile = Join-Path $RunDir (Join-Path 'segmented_SR' ($Material + '_R_segmented.mat'))
+$GlobalFile = Join-Path $RunDir (Join-Path 'global_SR' ($Material + '_R_global.mat'))
 
 Push-Location $ProjectRoot
 try {
     & $PythonExe (Join-Path $SurrogateRoot 'sync_dataset_manifest.py') --check
     if ($LASTEXITCODE -ne 0) { throw 'Dataset-run configuration validation failed.' }
     if ($ValidateOnly) { return }
+
+    & $PythonExe -c "import h5py, numpy, scipy"
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Dataset generation requires h5py, numpy, and scipy. Install surrogate_model/requirements-pysr.txt in the project Python environment.'
+    }
 
     if (Test-Path -LiteralPath $TeacherFile) {
         Write-Output "Skipping existing teacher dataset: $TeacherFile"

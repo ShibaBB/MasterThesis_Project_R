@@ -40,16 +40,28 @@ def read_curve_inputs(dataset_file: Path) -> np.ndarray:
         raise FileNotFoundError(f"Teacher dataset not found: {dataset_file}")
     try:
         with h5py.File(dataset_file, "r") as file:
-            if "X" not in file:
-                raise ValueError(f"Teacher dataset has no X matrix: {dataset_file}")
+            missing = [key for key in ("X", "Y_re", "Y_im", "freq_grid", "dataset_info") if key not in file]
+            if missing:
+                raise ValueError(f"Teacher dataset is missing paired-target variables {missing}: {dataset_file}")
             X = np.asarray(file["X"]).T
+            y_re = np.asarray(file["Y_re"]).T
+            y_im = np.asarray(file["Y_im"]).T
     except OSError:
-        matlab_data = loadmat(dataset_file, variable_names=["X"])
-        if "X" not in matlab_data:
-            raise ValueError(f"Teacher dataset has no X matrix: {dataset_file}")
+        matlab_data = loadmat(dataset_file, variable_names=["X", "Y_re", "Y_im", "freq_grid", "dataset_info"])
+        missing = [key for key in ("X", "Y_re", "Y_im", "freq_grid", "dataset_info") if key not in matlab_data]
+        if missing:
+            raise ValueError(f"Teacher dataset is missing paired-target variables {missing}: {dataset_file}")
         X = np.asarray(matlab_data["X"])
+        y_re = np.asarray(matlab_data["Y_re"])
+        y_im = np.asarray(matlab_data["Y_im"])
     if X.ndim != 2 or X.shape[1] < 1:
         raise ValueError(f"Unexpected teacher X shape: {X.shape}")
+    if y_re.ndim != 2 or y_re.shape != y_im.shape or y_re.shape[0] != X.shape[0]:
+        raise ValueError(
+            f"Teacher paired targets are not aligned: X={X.shape}, Y_re={y_re.shape}, Y_im={y_im.shape}"
+        )
+    if not np.isfinite(y_re).all() or not np.isfinite(y_im).all():
+        raise ValueError("Teacher paired targets contain non-finite values.")
     return X
 
 
@@ -134,6 +146,8 @@ def main() -> None:
         "split_strategy": "stratified_by_phi_then_shuffled",
         "stratification_feature": "phi",
         "frequency_grid_independent": True,
+        "target_names": ["R_real", "R_imag"],
+        "complex_source": "Reflect",
         "frequency_grid_note": (
             "The split is defined over source curves only. Frequency range and "
             "frequency count may change without changing curve membership."
