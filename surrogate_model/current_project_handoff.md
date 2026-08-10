@@ -1,6 +1,6 @@
 # MasterThesis Project R - Current Handoff
 
-Last updated: 2026-08-09.
+Last updated: 2026-08-10.
 
 ## Project Purpose
 
@@ -32,9 +32,10 @@ GitHub:     https://github.com/ShibaBB/MasterThesis_Project_R
 ```
 
 The repository history contains the paired-target implementation, the full
-`run1` datasets, formal PySR artifacts, dynamic evaluation-axis fix, shared
-symbolic feature transform, and the training/evaluation updates described in
-this handoff. Use `git log -1` and `git status` to verify the exact checkout.
+`run1` datasets, formal MLP and PySR artifacts, dynamic evaluation-axis fix,
+shared symbolic feature transform, and the training/evaluation updates
+described in this handoff. Use `git log -1` and `git status` to verify the exact
+checkout.
 
 The previously tracked obsolete artifact files were removed. New artifacts are
 generated independently under short `re/` and `im/` directories.
@@ -118,30 +119,88 @@ identity-transform compatibility path.
 | Scalar global dataset | Complete | Complete | Paired targets in one MAT file |
 | Scalar segmented dataset | Complete | Complete | Paired targets and eight segment IDs |
 | MLP code contract | Complete | Complete | Independent target loading and smoke training verified |
-| Full MLP training | Pending | Pending | No formal full `run1` result yet |
-| Global SR full run | Baseline available | Complete | Re still needs a run with the current feature transform |
+| Full MLP training | Complete | Complete | Formal full `run1` training and evaluation completed |
+| Global SR full run | Complete | Complete | Both targets now use the current feature transform and matched search settings |
 | Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
-| Validation-only candidate selection | Complete | Complete | Full validation rows used before final test evaluation |
+| Validation-only SR candidate selection | Complete | Complete | Full validation rows used before final test evaluation |
 | Raw unclipped evaluation | Complete | Complete | Dynamic plot limits support negative values |
+
+All three model families now run end to end for both targets. The MLP is the
+clear accuracy baseline. Both symbolic-regression families remain substantially
+less accurate and are the main focus of the next optimization phase.
+
+## Latest MLP Results
+
+The MLP branch trains one independent 128-output network per target. Both
+formal runs used the shared `run1` curve split, training-only preprocessing,
+Adam, a `[128, 128, 64]` hidden-layer layout, a maximum of 400 epochs, and
+validation patience of 25. Test data was used only for final metrics and plots.
+
+### Re
+
+```text
+Artifacts: surrogate_model/MLP/artifacts/re/20260810_run1
+
+Output network iteration: 2370 (237 epochs)
+Validation RMSE:         0.003727
+Validation R2:           0.998446
+Test RMSE:               0.003426
+Test MAE:                0.002314
+Test max abs error:      0.032793
+Test R2:                 0.998623
+Prediction range:        [-0.173306, 0.985038]
+```
+
+### Im
+
+```text
+Artifacts: surrogate_model/MLP/artifacts/im/20260810_run1
+
+Output network iteration: 2810 (281 epochs)
+Validation RMSE:         0.002899
+Validation R2:           0.998678
+Test RMSE:               0.002914
+Test MAE:                0.001914
+Test max abs error:      0.031752
+Test R2:                 0.998547
+Prediction range:        [-0.643229, 0.205147]
+```
+
+The MLP predictions cover the negative target regions without clipping and
+generalize closely from validation to test. They provide the current reference
+accuracy for evaluating future symbolic-regression improvements.
 
 ## Latest Global SR Results
 
 Global SR trains one equation over the complete 100-4950 Hz range.
 
-### Re baseline
-
-The available Re result predates the shared log-scale feature transform. It is
-valid as a baseline but is not configuration-matched to the latest Im run.
+### Re with current feature transform
 
 ```text
-Training: surrogate_model/global_symbolic_regression/artifacts/re/train/20260809_run1
-Eval:     surrogate_model/global_symbolic_regression/artifacts/re/eval/20260809_run1_best_loss_02
+Training: surrogate_model/global_symbolic_regression/artifacts/re/train/20260810_run1_log10_i100_p12
+Eval:     surrogate_model/global_symbolic_regression/artifacts/re/eval/20260810_run1_log10_i100_p12_best_loss
 
-Test RMSE:          0.089386
-Test MAE:           0.059882
-Test max abs error: 0.407179
-Test R2:            0.773368
+Iterations:         100
+Populations:        12
+Population size:    80
+Max complexity:     24
+Train rows:         89600
+Validation rows:    19200
+Test rows:          19200
+Validation RMSE:    0.081930
+Validation R2:      0.814286
+Test RMSE:          0.080918
+Test MAE:           0.062006
+Test max abs error: 0.329674
+Test R2:            0.814274
+Prediction range:   [0.050088, 1.255914]
 ```
+
+The prior identity-transform Re baseline had test RMSE `0.089386` and R2
+`0.773368`. The current transform and larger matched search improve RMSE by
+about 9.5 percent and reduce maximum error, but the selected equation still
+misses the negative Re region and overshoots above one. Predictions remain raw
+and unclipped by design.
 
 ### Im with current feature transform
 
@@ -222,6 +281,21 @@ Increasing Im from 60 to 100 iterations improved test RMSE from `0.035293` to
 `0.032371` and test R2 from `0.895681` to `0.912239`. It improved within-segment
 fit but did not solve boundary discontinuities.
 
+## Current Cross-Family Comparison
+
+```text
+Family          Re test RMSE   Re test R2   Im test RMSE   Im test R2
+MLP             0.003426       0.998623     0.002914       0.998547
+Segmented SR    0.034924       0.965403     0.032371       0.912239
+Global SR       0.080918       0.814274     0.079741       0.467469
+```
+
+The MLP RMSE is roughly one order of magnitude lower than segmented SR for both
+targets. Segmentation is substantially better than one global equation, but it
+still trails the MLP and introduces boundary discontinuities. Global SR is the
+weakest family, especially for Im, and requires improvements beyond simply
+increasing the number of search iterations.
+
 ## Known Segmented Boundary Problem
 
 The segmented models are accurate within most frequency domains, but the eight
@@ -249,7 +323,8 @@ Boundary diagnostics are stored in each evaluation directory as
 
 Every formal evaluation must:
 
-- select candidates using validation data only;
+- use validation data only for model decisions: early stopping for MLP and
+  candidate selection for symbolic regression;
 - report final metrics once on the shared test curves;
 - keep Re and Im selection independent;
 - report RMSE, MAE, maximum absolute error, R2, and prediction range;
@@ -274,6 +349,7 @@ surrogate_model/segmented_symbolic_regression/.venv_py311
 Verified components:
 
 ```text
+MATLAB R2025b with Deep Learning Toolbox
 Python 3.11 environment
 PySR 1.5.10
 Julia 1.11.9
@@ -309,11 +385,17 @@ validate `training_metadata.json` and the evaluation summary.
 
 ## Next Priorities
 
-1. Run full `run1` MLP training and evaluation for both Re and Im.
-2. Retrain global Re with the current feature transform and configuration so
-   it is directly comparable to global Im.
-3. Decide on an explicit segmented-boundary strategy: overlapping domains with
-   blending, continuity-aware candidate selection, or a continuity penalty.
+1. Optimize global SR for both targets. Investigate feature/operator design,
+   search configuration, loss weighting across curves and frequencies, and
+   controlled search subsets or batching. Always select on full validation
+   data and compare against the current formal runs and simple baselines.
+2. Optimize segmented SR for both within-segment accuracy and cross-segment
+   continuity. Evaluate explicit overlapping domains with blending,
+   continuity-aware candidate selection, or a continuity penalty; do not add
+   hidden smoothing or postprocessing.
+3. Preserve the current MLP results as the accuracy reference while optimizing
+   interpretable symbolic models. Any SR improvement must be reported on the
+   same shared split and raw test targets.
 4. Add a paired complex-reflection diagnostic after both targets from a model
    family are available on identical test rows.
 5. Consider batching or a curve/frequency-balanced search subset only as a
