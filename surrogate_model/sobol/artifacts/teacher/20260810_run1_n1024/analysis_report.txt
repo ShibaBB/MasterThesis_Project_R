@@ -1,0 +1,28 @@
+JCAL Teacher Sobol Validation
+Dataset run: run1
+Base sample size: 1024
+Teacher curve evaluations: 7168
+
+RE agreement
+S1 RMSE: 0.004840 | ST RMSE: 0.007870
+S1 correlation: 0.999826 | ST correlation: 0.999645
+Top-ST parameter agreement: 100.00%
+
+IM agreement
+S1 RMSE: 0.003436 | ST RMSE: 0.003490
+S1 correlation: 0.999935 | ST correlation: 0.999947
+Top-ST parameter agreement: 100.00%
+
+RE teacher global functional indices
+sigma                S1= 0.740368 ST= 0.849552 | MLP ST= 0.845436
+alpha_infinity       S1= 0.085297 ST= 0.171057 | MLP ST= 0.172717
+lambda               S1= 0.028534 ST= 0.078213 | MLP ST= 0.077086
+lambda_prime         S1= 0.006251 ST= 0.006380 | MLP ST= 0.006371
+k0_prime             S1= 0.025506 ST= 0.032073 | MLP ST= 0.034221
+
+IM teacher global functional indices
+sigma                S1= 0.702619 ST= 0.840944 | MLP ST= 0.839779
+alpha_infinity       S1= 0.100149 ST= 0.215920 | MLP ST= 0.214859
+lambda               S1= 0.028652 ST= 0.096305 | MLP ST= 0.095085
+lambda_prime         S1= 0.005291 ST= 0.004819 | MLP ST= 0.004604
+k0_prime             S1= 0.016913 ST= 0.025709 | MLP ST= 0.025838

@@ -122,6 +122,8 @@ identity-transform compatibility path.
 | Full MLP training | Complete | Complete | Formal full `run1` training and evaluation completed |
 | Global SR full run | Complete | Complete | Both targets now use the current feature transform and matched search settings |
 | Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
+| MLP Sobol pilot | Complete | Complete | Frequency-resolved S1/ST at N=4096 |
+| Teacher Sobol validation | Complete | Complete | Shared-design N=1024 check confirms MLP sensitivity structure |
 | Validation-only SR candidate selection | Complete | Complete | Full validation rows used before final test evaluation |
 | Raw unclipped evaluation | Complete | Complete | Dynamic plot limits support negative values |
 
@@ -296,6 +298,65 @@ still trails the MLP and introduces boundary discontinuities. Global SR is the
 weakest family, especially for Im, and requires improvements beyond simply
 increasing the number of search iterations.
 
+## Frequency-Resolved Sobol Sensitivity
+
+Sensitivity-analysis code and artifacts are isolated under
+`surrogate_model/sobol`; no Sobol output is written into any model-family
+directory. The analysis fixes the two constant `run1` inputs (`phi=0.92` and
+`h=0.03 m`) and varies the five sampled material parameters independently over
+the same raw linear-uniform bounds used by teacher generation. Frequency is an
+output axis, not an uncertain material parameter.
+
+The formal MLP pilot uses nested base sample sizes `1024`, `2048`, and `4096`,
+estimates Jansen first-order and total-effect indices at all 128 frequencies,
+and reports both full-range and eight-segment variance-weighted functional
+indices:
+
+```text
+Code:      surrogate_model/sobol/run_mlp_sobol_pilot.m
+Artifacts: surrogate_model/sobol/artifacts/mlp/20260810_run1_n4096
+```
+
+A JCAL teacher run validates the first `N=1024` points of the identical
+scrambled Sobol design, requiring 7,168 teacher material-curve evaluations:
+
+```text
+Code:      surrogate_model/sobol/run_teacher_sobol_validation.m
+Artifacts: surrogate_model/sobol/artifacts/teacher/20260810_run1_n1024
+
+Re MLP-teacher S1 RMSE:                0.004840
+Re MLP-teacher ST RMSE:                0.007870
+Re flattened ST correlation:           0.999645
+Re top-ST parameter agreement:         100% of frequency points
+Im MLP-teacher S1 RMSE:                0.003436
+Im MLP-teacher ST RMSE:                0.003490
+Im flattened ST correlation:           0.999947
+Im top-ST parameter agreement:         100% of frequency points
+```
+
+Teacher variance-weighted full-range total-effect indices are:
+
+```text
+Parameter          Re ST      Im ST
+sigma              0.849552   0.840944
+alpha_infinity     0.171057   0.215920
+lambda             0.078213   0.096305
+k0_prime           0.032073   0.025709
+lambda_prime       0.006380   0.004819
+```
+
+The global ordering hides strong local structure. For Re, `k0_prime` reaches
+ST `0.710769` near 482 Hz, `sigma` dominates most middle frequencies, and
+`alpha_infinity` reaches ST `0.722313` near 3422 Hz. For Im, `k0_prime` reaches
+ST `0.435505` at 100 Hz; high-frequency `alpha_infinity` and `lambda` effects
+are largely interaction-driven. The MLP pilot is reliable for screening, but
+teacher values remain authoritative, especially for Re `k0_prime` above 4 kHz
+where the emulator-index discrepancy is largest.
+
+Neither the current SR equations nor their omitted variables were used to
+define these sensitivities. Sobol results describe the teacher input-output
+mapping and should guide, not replace, validation-based SR model selection.
+
 ## Known Segmented Boundary Problem
 
 The segmented models are accurate within most frequency domains, but the eight
@@ -385,14 +446,18 @@ validate `training_metadata.json` and the evaluation summary.
 
 ## Next Priorities
 
-1. Optimize global SR for both targets. Investigate feature/operator design,
-   search configuration, loss weighting across curves and frequencies, and
-   controlled search subsets or batching. Always select on full validation
-   data and compare against the current formal runs and simple baselines.
-2. Optimize segmented SR for both within-segment accuracy and cross-segment
-   continuity. Evaluate explicit overlapping domains with blending,
-   continuity-aware candidate selection, or a continuity penalty; do not add
-   hidden smoothing or postprocessing.
+1. Optimize global SR using the teacher Sobol results. Ensure the search can
+   express the dominant `sigma` response and the interaction-driven effects of
+   `alpha_infinity` and `lambda`; treat frequency-local `k0_prime` effects as a
+   known limitation of a single global equation. Investigate operator design,
+   search configuration, loss weighting, and controlled subsets or batching.
+2. Optimize segmented SR using the segment functional indices rather than one
+   global feature ranking. Preserve `k0_prime` in low-frequency searches,
+   emphasize `alpha_infinity` and interactions in the sensitive mid/high
+   bands, and test any removal of low-ST `lambda_prime` through validation
+   ablation rather than deleting it from the shared dataset. Address boundary
+   continuity with explicit overlap/blending, continuity-aware selection, or a
+   continuity penalty; do not add hidden smoothing or postprocessing.
 3. Preserve the current MLP results as the accuracy reference while optimizing
    interpretable symbolic models. Any SR improvement must be reported on the
    same shared split and raw test targets.

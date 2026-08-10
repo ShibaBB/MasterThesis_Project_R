@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "created_local": "2026-08-10T15:32:02",
+  "timezone": "Europe/Berlin",
+  "method": "JCAL teacher Jansen Sobol validation",
+  "dataset_run": "run1",
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\MLP\\Wool_R.mat",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "mlp_sobol_file": "C:\\MasterThesis_Project_R\\surrogate_model\\sobol\\artifacts\\mlp\\20260810_run1_n4096\\sobol_results.mat",
+  "base_sample_size": 1024,
+  "parameter_names": [
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime"
+  ],
+  "lower_bounds": [
+    15166.058283373122,
+    1,
+    4.0848954695950278E-5,
+    8.1697909391900556E-5,
+    1E-10
+  ],
+  "upper_bounds": [
+    94787.864271082028,
+    2.08,
+    0.00014728300070535427,
+    0.00029456600141070853,
+    1E-8
+  ],
+  "fixed_inputs": {
+    "phi": 0.92,
+    "h_m": 0.03
+  },
+  "input_distribution": "independent linear-uniform in raw physical units",
+  "sobol_skip": 1024,
+  "scramble_method": "MatousekAffineOwen",
+  "sampling_seed": 2.026081E+7,
+  "bootstrap_replicates": 100,
+  "bootstrap_seed": 2.026082E+7,
+  "teacher_curve_evaluations": 7168,
+  "output_postprocessing": "none"
+}
