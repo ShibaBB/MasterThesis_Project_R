@@ -1,6 +1,6 @@
 # MasterThesis Project R - Current Handoff
 
-Last updated: 2026-08-10.
+Last updated: 2026-08-14.
 
 ## Project Purpose
 
@@ -357,6 +357,116 @@ Neither the current SR equations nor their omitted variables were used to
 define these sensitivities. Sobol results describe the teacher input-output
 mapping and should guide, not replace, validation-based SR model selection.
 
+## Sobol-Guided SR Optimization Plan
+
+The next optimization phase should use one shared principle: Sobol indices set
+feature and interaction priorities, but they do not select the final equation.
+Every feature-set decision must be tested against a matched all-parameter
+control with the same training rows, search budget, random seed, validation
+partition, and raw target. Frequency remains available to every SR model.
+
+### Segmented SR Strategy
+
+Segmented SR is the most direct consumer of the frequency-resolved sensitivity
+results because each local equation can use a different material feature set.
+Use the following priorities for both feature-subset experiments and operator
+design:
+
+| Frequency segment (Hz) | Re parameter priority | Im parameter priority |
+|---|---|---|
+| 100-700 | primary: `sigma`, `k0_prime`; secondary: `alpha_infinity` | primary: `sigma`; secondary: `k0_prime` |
+| 700-1000 | primary: `sigma`, `k0_prime`; secondary: `alpha_infinity`, `lambda` | primary: `sigma`; secondary: `alpha_infinity`, `lambda` |
+| 1000-1300 | primary: `sigma`; secondary: `k0_prime`, `lambda`, `alpha_infinity` | primary: `sigma`, `alpha_infinity`; secondary: `lambda` |
+| 1300-1650 | primary: `sigma`; secondary: `lambda`, `alpha_infinity` | primary: `alpha_infinity`, `sigma`; secondary: `lambda` |
+| 1650-2000 | primary: `sigma`, `lambda`; secondary: `alpha_infinity` | primary: `sigma`, `alpha_infinity`; secondary: `lambda` |
+| 2000-3000 | primary: `sigma`, `alpha_infinity`; secondary: `lambda` | primary: `sigma`, `alpha_infinity`; secondary: `lambda` |
+| 3000-4000 | primary: `alpha_infinity`, `sigma`; secondary: `lambda`, `k0_prime` | primary: `sigma`; interaction priority: `alpha_infinity`, `lambda` |
+| 4000-4950 | primary: `sigma`, `alpha_infinity`, `k0_prime`, `lambda`; diagnostic: `lambda_prime` | primary: `sigma`, `alpha_infinity`, `lambda`; secondary: `k0_prime`; diagnostic: `lambda_prime` |
+
+For every target and segment, run at least these two matched branches:
+
+```text
+A. all five varying material parameters plus frequency
+B. Sobol-prioritized subset plus frequency
+```
+
+Do not remove a parameter from the shared dataset. Branch B only limits the
+features exposed to that particular PySR search. In bands where `ST-S1` is
+large, retain multiplication/division and nonlinear operators so PySR can
+represent interactions even when a parameter has a small first-order index.
+`lambda_prime` has the lowest global ST, but its removal is accepted only when
+the validation result is non-inferior; its high-frequency local effect remains
+a diagnostic.
+
+Use two optimization phases:
+
+1. improve within-segment validation accuracy with the current fixed domains;
+2. address continuity through explicit overlapping domains and smooth
+   blending, or through continuity-aware joint candidate selection.
+
+For phase 2, never choose adjacent formulas independently if the selection
+objective includes continuity. Define the validation-only joint objective in
+metadata, report its accuracy and boundary terms separately, and preserve the
+unblended predictions as a diagnostic. Test data must not choose overlap width,
+blend shape, boundary penalty, or candidate combination.
+
+### Global SR Strategy: Smooth Frequency-Local Features
+
+The selected direction for Global SR is to retain one full-range equation but
+add explicit smooth frequency-local features. The goal is to let a material
+parameter have a strong effect in one frequency region and a negligible effect
+elsewhere without requiring PySR to discover the entire gating function from
+primitive operators.
+
+Start from the current six transformed base features and define fixed smooth
+overlapping gates in `log10_f`, for example normalized Gaussian or raised-cosine
+basis functions:
+
+```text
+g_k(f) >= 0
+sum_k g_k(f) = 1
+g_k is smooth across adjacent frequency regions
+```
+
+Use the existing eight domains as the first gate centers/supports, but make the
+gates overlap so this is a single continuous global representation rather than
+hard piecewise selection. Create only Sobol-supported material/gate products:
+
+```text
+z_parameter,k = transformed_parameter * g_k(log10_f)
+```
+
+Examples include low-frequency `log10_k0_prime * g_low`, mid/high-frequency
+`alpha_infinity * g_k`, and high-frequency `log10_lambda * g_k`. Always retain
+the ungated base features and `log10_f`, so the model can still learn a compact
+global trend. Do not use the numerical Sobol ST curve itself as a feature; use
+Sobol only to decide which generic parameter/gate products to expose.
+
+Run the following matched Global experiments in order:
+
+```text
+G0. current transformed six-feature Global SR baseline
+G1. base features plus Sobol-supported smooth gated interactions
+G2. validation ablations of individual gate families that were selected in G1
+```
+
+Keep the G0/G1 search budget and random seed matched for the first comparison.
+Only increase iterations, populations, or complexity after isolating the effect
+of the local features. Candidate selection remains validation-only. In addition
+to overall validation RMSE, report validation RMSE per current frequency domain
+so a global improvement cannot hide a severe local regression.
+
+Engineered gates make PySR's internal complexity count optimistic because each
+gate appears as one input variable. Export every gate definition and report
+both the PySR expression complexity and an expanded complexity that includes
+the gate construction. Final equations must be reproducible from raw physical
+inputs, the persisted base transform, and the persisted gate specification.
+
+The smooth-gated Global model remains a distinct single-equation experiment.
+If it evolves into separately fitted local equations or independently selected
+gate experts, classify it as a soft-segmented model instead of replacing the
+pure Global SR result silently.
+
 ## Known Segmented Boundary Problem
 
 The segmented models are accurate within most frequency domains, but the eight
@@ -446,24 +556,21 @@ validate `training_metadata.json` and the evaluation summary.
 
 ## Next Priorities
 
-1. Optimize global SR using the teacher Sobol results. Ensure the search can
-   express the dominant `sigma` response and the interaction-driven effects of
-   `alpha_infinity` and `lambda`; treat frequency-local `k0_prime` effects as a
-   known limitation of a single global equation. Investigate operator design,
-   search configuration, loss weighting, and controlled subsets or batching.
-2. Optimize segmented SR using the segment functional indices rather than one
-   global feature ranking. Preserve `k0_prime` in low-frequency searches,
-   emphasize `alpha_infinity` and interactions in the sensitive mid/high
-   bands, and test any removal of low-ST `lambda_prime` through validation
-   ablation rather than deleting it from the shared dataset. Address boundary
-   continuity with explicit overlap/blending, continuity-aware selection, or a
-   continuity penalty; do not add hidden smoothing or postprocessing.
-3. Preserve the current MLP results as the accuracy reference while optimizing
+1. Implement the matched Segmented SR all-parameter versus Sobol-prioritized
+   feature experiments described above, keeping the current domains and search
+   budget fixed for the first comparison.
+2. Implement the Global SR smooth frequency-gate transform and run G0 versus
+   G1 with matched search settings. Persist gate definitions and expanded
+   complexity metadata; do not use the teacher ST curves themselves as inputs.
+3. After identifying the best accuracy-oriented segmented candidates, run a
+   separate validation-only continuity experiment with explicit overlap and
+   blending or joint boundary-aware candidate selection.
+4. Preserve the current MLP results as the accuracy reference while optimizing
    interpretable symbolic models. Any SR improvement must be reported on the
    same shared split and raw test targets.
-4. Add a paired complex-reflection diagnostic after both targets from a model
+5. Add a paired complex-reflection diagnostic after both targets from a model
    family are available on identical test rows.
-5. Consider batching or a curve/frequency-balanced search subset only as a
+6. Consider batching or a curve/frequency-balanced search subset only as a
    controlled PySR speed experiment; always select on full validation data and
    report on full test data.
 
