@@ -1,0 +1,70 @@
+{
+  "segment_id": 8,
+  "segment_name": "upperhigh_4000_4950",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 4000.0,
+  "upper_hz": 4950.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "frequency_enhanced_f1",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "equation": "log10_sigma * -0.039726034",
+  "complexity": 3,
+  "loss": 0.0021929736,
+  "score": 0.06146155501118377,
+  "n_rows_used": 21250,
+  "n_train": 17500,
+  "n_validation": 3750,
+  "train_metrics": {
+    "rmse": 0.046829197332046796,
+    "mae": 0.0328279875824771,
+    "max_abs_error": 0.30944276405199794,
+    "r2": 0.11566832794057902,
+    "true_min": -0.3323871617258307,
+    "true_max": 0.14284831049856567,
+    "prediction_min": -0.19769945493314262,
+    "prediction_max": -0.16616280748871856
+  },
+  "validation_metrics": {
+    "rmse": 0.04423506561900557,
+    "mae": 0.032857593077632787,
+    "max_abs_error": 0.22511194609525814,
+    "r2": 0.09029582317895624,
+    "true_min": -0.3076094856388623,
+    "true_max": 0.052376708258041464,
+    "prediction_min": -0.19765992281867673,
+    "prediction_max": -0.16750480312893198
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260815_run1_frequency_f1\\equations\\upperhigh_4000_4950_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260815_run1_frequency_f1\\models\\upperhigh_4000_4950_pysr_model.pkl"
+}

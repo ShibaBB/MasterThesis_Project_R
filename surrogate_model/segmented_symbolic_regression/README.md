@@ -29,7 +29,23 @@ artifacts/im/train/20260809_run1/
 artifacts/im/eval/20260809_run1_c21/
 ```
 
-Paired scalar generation and both target loaders were smoke-tested. A full
-PySR search has not been launched and requires a configured Python/Julia PySR
-environment. The old overview, strategy, and branch handoff describe the superseded target
-workflow and are not authoritative. Use `../current_project_handoff.md`.
+Formal full-run Re and Im models now exist. The next active work is the matched
+teacher-Sobol-guided feature experiment documented in
+[`SOBOL_PHASE1.md`](SOBOL_PHASE1.md). The old overview, strategy, and branch
+handoff describe the superseded target workflow and are not authoritative. Use
+`../current_project_handoff.md` for the current project state.
+
+The completed local-frequency representation experiment is documented in
+[`FREQUENCY_F1.md`](FREQUENCY_F1.md). It reused F0 and added local polynomial
+frequency features without forcing their use. Re improved materially; the full
+Im F1 model did not generalize, and shape acceptance remains undecided.
+
+The validation-only Hall-of-Fame reselection and its fixed gates are documented
+in [`CURVE_AWARE_F1_SELECTION.md`](CURVE_AWARE_F1_SELECTION.md). It retains F0
+for any segment where no existing F1 candidate passes every value and shape
+gate; neither F0 nor F1 is retrained.
+
+Further segmented optimization is currently paused. The preserved checkpoint
+is the curve-aware F0/F1 hybrid. Per-segment grammar tuning and boundary
+continuity remain explicit deferred tasks; active work has moved to
+Sobol-guided Global SR.

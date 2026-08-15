@@ -1,0 +1,335 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\segmented_SR\\Wool_R_segmented.mat",
+  "dataset_run": "run1",
+  "target": "im",
+  "target_name": "R_imag",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "fiberfolder": "Wool",
+  "num_curve_samples": 1000,
+  "num_symbolic_samples": 128000,
+  "original_feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "feature_policy": {
+    "schema_version": 1,
+    "name": "teacher_sobol_phase1_segment_features",
+    "source": "teacher Sobol run1 N=1024",
+    "branch": "all",
+    "target": "im",
+    "frequency_always_retained": true,
+    "selection_stage": "after_training_fitted_base_transform",
+    "per_segment": {
+      "low_100_700": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "midlow_700_1000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "midhigh_1000_1300": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "highlow_1300_1650": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "high_1650_2000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "upperlow_2000_3000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "uppermid_3000_4000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "upperhigh_4000_4950": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    }
+  },
+  "segment_names": [
+    "low_100_700",
+    "midlow_700_1000",
+    "midhigh_1000_1300",
+    "highlow_1300_1650",
+    "high_1650_2000",
+    "upperlow_2000_3000",
+    "uppermid_3000_4000",
+    "upperhigh_4000_4950"
+  ],
+  "segment_bounds": [
+    [
+      100.0,
+      700.0
+    ],
+    [
+      700.0,
+      1000.0
+    ],
+    [
+      1000.0,
+      1300.0
+    ],
+    [
+      1300.0,
+      1650.0
+    ],
+    [
+      1650.0,
+      2000.0
+    ],
+    [
+      2000.0,
+      3000.0
+    ],
+    [
+      3000.0,
+      4000.0
+    ],
+    [
+      4000.0,
+      4950.0
+    ]
+  ],
+  "search_contract": {
+    "binary_operators": [
+      "+",
+      "-",
+      "*",
+      "/"
+    ],
+    "unary_operators": [
+      "log",
+      "sqrt"
+    ],
+    "deterministic": true,
+    "parallelism": "serial",
+    "output_postprocessing": "none",
+    "partitions_accessed_during_training": [
+      "train",
+      "validation"
+    ],
+    "test_partition_accessed": false
+  },
+  "training_args": {
+    "target": "im",
+    "dataset_run": "run1",
+    "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\segmented_SR\\Wool_R_segmented.mat",
+    "split_file": null,
+    "output_root": null,
+    "output_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260814_run1_sobol_phase1_all",
+    "run_name": "",
+    "random_seed": 42,
+    "feature_branch": "all",
+    "max_samples_per_segment": null,
+    "niterations": 100,
+    "populations": 12,
+    "population_size": 80,
+    "maxsize": 24,
+    "model_selection": "best",
+    "procs": 0,
+    "julia_exe": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\julia_env\\pyjuliapkg\\install\\bin\\julia.exe",
+    "overwrite": false
+  }
+}

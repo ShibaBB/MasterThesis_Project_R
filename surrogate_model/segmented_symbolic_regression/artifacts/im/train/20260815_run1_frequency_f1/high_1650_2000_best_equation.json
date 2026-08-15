@@ -1,0 +1,73 @@
+{
+  "segment_id": 5,
+  "segment_name": "high_1650_2000",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 1650.0,
+  "upper_hz": 2000.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "frequency_enhanced_f1",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "equation": "(((log10_sigma + (log10_lambda - (local_t3 + log(alpha_infinity)))) * 0.3512068) * ((log10_lambda + log10_sigma) - 1.2845589)) - 0.16332275",
+  "complexity": 18,
+  "loss": 0.00092579145,
+  "score": 0.12614592923292223,
+  "n_rows_used": 7650,
+  "n_train": 6300,
+  "n_validation": 1350,
+  "train_metrics": {
+    "rmse": 0.03042682296393321,
+    "mae": 0.02093321755913662,
+    "max_abs_error": 0.214836772273491,
+    "r2": 0.8732030872013196,
+    "true_min": -0.43759999690295454,
+    "true_max": 0.1659111531023228,
+    "prediction_min": -0.3296031687073787,
+    "prediction_max": 0.2719067222726588
+  },
+  "validation_metrics": {
+    "rmse": 0.02791039941140108,
+    "mae": 0.019814119644880467,
+    "max_abs_error": 0.11914245098219657,
+    "r2": 0.8687992708783652,
+    "true_min": -0.40003336605212997,
+    "true_max": 0.08606610122713822,
+    "prediction_min": -0.3249564658137909,
+    "prediction_max": 0.10851235188009059
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260815_run1_frequency_f1\\equations\\high_1650_2000_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260815_run1_frequency_f1\\models\\high_1650_2000_pysr_model.pkl"
+}

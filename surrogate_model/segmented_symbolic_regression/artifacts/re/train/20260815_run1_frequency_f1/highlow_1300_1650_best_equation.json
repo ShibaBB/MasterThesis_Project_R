@@ -1,0 +1,73 @@
+{
+  "segment_id": 4,
+  "segment_name": "highlow_1300_1650",
+  "target": "re",
+  "target_name": "R_real",
+  "lower_hz": 1300.0,
+  "upper_hz": 1650.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "frequency_enhanced_f1",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "equation": "(log10_sigma * 0.74289185) - 3.1875346",
+  "complexity": 5,
+  "loss": 0.00088960305,
+  "score": 0.30861299676955034,
+  "n_rows_used": 7650,
+  "n_train": 6300,
+  "n_validation": 1350,
+  "train_metrics": {
+    "rmse": 0.029826220673470027,
+    "mae": 0.01932848343711802,
+    "max_abs_error": 0.34293923310380864,
+    "r2": 0.9662863115674343,
+    "true_min": -0.16790819986349745,
+    "true_max": 0.5295439338991517,
+    "prediction_min": -0.08022729979258525,
+    "prediction_max": 0.5095199264919708
+  },
+  "validation_metrics": {
+    "rmse": 0.028522921205663687,
+    "mae": 0.020237980541398873,
+    "max_abs_error": 0.15034265416991638,
+    "r2": 0.9684544045331004,
+    "true_min": -0.12179783660446854,
+    "true_max": 0.5275390762338282,
+    "prediction_min": -0.05513147412194064,
+    "prediction_max": 0.5087806610105492
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260815_run1_frequency_f1\\equations\\highlow_1300_1650_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260815_run1_frequency_f1\\models\\highlow_1300_1650_pysr_model.pkl"
+}

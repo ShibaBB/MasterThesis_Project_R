@@ -1,0 +1,58 @@
+{
+  "segment_id": 4,
+  "segment_name": "highlow_1300_1650",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 1300.0,
+  "upper_hz": 1650.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "sobol_subset",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_f"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    5
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_f"
+  ],
+  "equation": "(((alpha_infinity + ((log10_f - log10_lambda) + (-28.154942 / log10_f))) / ((log(log10_sigma * 0.38639197) * log10_sigma) - 1.4268901)) + -1.1150055) / log10_sigma",
+  "complexity": 22,
+  "loss": 0.0011526211,
+  "score": 0.09713154217659678,
+  "n_rows_used": 7650,
+  "n_train": 6300,
+  "n_validation": 1350,
+  "train_metrics": {
+    "rmse": 0.03395027708545433,
+    "mae": 0.02498408996276895,
+    "max_abs_error": 0.18810469429590893,
+    "r2": 0.788694466583028,
+    "true_min": -0.5746785453582995,
+    "true_max": 0.10079215967492405,
+    "prediction_min": -0.6654919084240952,
+    "prediction_max": -0.012736309139758928
+  },
+  "validation_metrics": {
+    "rmse": 0.03419259561340197,
+    "mae": 0.025778534074836722,
+    "max_abs_error": 0.1483012104904878,
+    "r2": 0.695971537060869,
+    "true_min": -0.5013626275974356,
+    "true_max": 0.03573182164252723,
+    "prediction_min": -0.5254858833615297,
+    "prediction_max": -0.07622795154821224
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260814_run1_sobol_phase1_sobol_subset\\equations\\highlow_1300_1650_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260814_run1_sobol_phase1_sobol_subset\\models\\highlow_1300_1650_pysr_model.pkl"
+}

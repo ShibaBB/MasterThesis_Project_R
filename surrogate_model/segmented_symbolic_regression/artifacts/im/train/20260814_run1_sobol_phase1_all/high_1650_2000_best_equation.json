@@ -1,0 +1,64 @@
+{
+  "segment_id": 5,
+  "segment_name": "high_1650_2000",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 1650.0,
+  "upper_hz": 2000.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "all",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "equation": "(log(((log10_lambda * -6.3114676) / log10_sigma) / log10_sigma) * ((log10_sigma / log10_lambda) + alpha_infinity)) - 0.2551493",
+  "complexity": 16,
+  "loss": 0.00113934,
+  "score": 0.11073153136165505,
+  "n_rows_used": 7650,
+  "n_train": 6300,
+  "n_validation": 1350,
+  "train_metrics": {
+    "rmse": 0.033754113191324014,
+    "mae": 0.022171207099221366,
+    "max_abs_error": 0.2084824790370766,
+    "r2": 0.8439553550783152,
+    "true_min": -0.43759999690295454,
+    "true_max": 0.1659111531023228,
+    "prediction_min": -0.27827179618944736,
+    "prediction_max": 0.1472959935939504
+  },
+  "validation_metrics": {
+    "rmse": 0.03178147992378294,
+    "mae": 0.021522521952375046,
+    "max_abs_error": 0.15130032111929168,
+    "r2": 0.8298811733551317,
+    "true_min": -0.40003336605212997,
+    "true_max": 0.08606610122713822,
+    "prediction_min": -0.2740200620923291,
+    "prediction_max": 0.0556812847441146
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260814_run1_sobol_phase1_all\\equations\\high_1650_2000_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260814_run1_sobol_phase1_all\\models\\high_1650_2000_pysr_model.pkl"
+}

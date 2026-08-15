@@ -124,6 +124,9 @@ identity-transform compatibility path.
 | Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
 | MLP Sobol pilot | Complete | Complete | Frequency-resolved S1/ST at N=4096 |
 | Teacher Sobol validation | Complete | Complete | Shared-design N=1024 check confirms MLP sensitivity structure |
+| Segmented SR Sobol feature experiment | Complete | Complete | Matched all-feature/subset runs and validation-only hybrid selection completed |
+| Segmented SR frequency F1 | Complete | Complete | F0 reused; local frequency features evaluated on validation/test and shape diagnostics |
+| Segmented SR curve-aware F1 reselection | Complete | Complete | Existing Hall-of-Fame candidates gated against F0; no retraining |
 | Validation-only SR candidate selection | Complete | Complete | Full validation rows used before final test evaluation |
 | Raw unclipped evaluation | Complete | Complete | Dynamic plot limits support negative values |
 
@@ -283,13 +286,147 @@ Increasing Im from 60 to 100 iterations improved test RMSE from `0.035293` to
 `0.032371` and test R2 from `0.895681` to `0.912239`. It improved within-segment
 fit but did not solve boundary discontinuities.
 
+## Segmented SR Sobol Phase-One Results
+
+The matched phase-one experiment completed on 2026-08-14. For each target,
+the `all` and `sobol_subset` branches used the same run1 rows, split, random
+seed 42, 100 iterations, 12 populations, population size 80, max complexity
+24, operator set, and validation-only candidate selection. The training stage
+did not access test rows.
+
+The full Sobol-subset branch was not superior as a single replacement:
+
+```text
+Target/branch       Validation RMSE   Test RMSE   Test R2
+Re all              0.035596          0.034924    0.965403
+Re Sobol subset     0.038239          0.039506    0.955730
+Im all              0.031412          0.032371    0.912239
+Im Sobol subset     0.031752          0.032854    0.909605
+```
+
+Validation-only per-segment selection retained the Sobol subset only where it
+won its matched comparison:
+
+```text
+Re: 100-700 Hz uses sobol_subset; the other seven segments use all.
+Im: 1300-1650 and 4000-4950 Hz use sobol_subset; the other six use all.
+```
+
+The resulting validation-selected hybrid metrics are:
+
+```text
+Target   Validation RMSE   Validation R2   Test RMSE   Test R2
+Re       0.035577          0.964981        0.034823    0.965604
+Im       0.030429          0.930782        0.030686    0.921142
+```
+
+Relative to the matched all-feature baseline, the hybrid changes Re test RMSE
+by only about -0.29 percent, but improves Im test RMSE by about 5.21 percent.
+This supports local validation-based feature restriction rather than replacing
+every segment with its Sobol subset. The phase-one feature decision remains
+separate from the later continuity/blending experiment.
+
+Formal artifacts:
+
+```text
+surrogate_model/segmented_symbolic_regression/artifacts/re/comparison/20260814_run1_sobol_phase1
+surrogate_model/segmented_symbolic_regression/artifacts/im/comparison/20260814_run1_sobol_phase1
+```
+
+## Segmented SR Frequency-Representation F1 Results
+
+The F1 experiment completed on 2026-08-15 without retraining F0. It froze the
+phase-one validation-selected material features, retained `log10_f`, and added
+segment-local `local_t`, `local_t2`, and `local_t3`. Frequency use was optional
+and candidate selection remained validation RMSE only. Shape metrics were
+diagnostics and did not influence candidate selection.
+
+```text
+Target/model   Validation RMSE   Test RMSE   Test R2
+Re F0 hybrid   0.035577          0.034823    0.965604
+Re F1          0.032830          0.032171    0.970643
+Im F0 hybrid   0.030429          0.030686    0.921142
+Im F1          0.030213          0.031974    0.914382
+```
+
+Re F1 improves validation RMSE by 7.72 percent and test RMSE by 7.61 percent.
+Its first-difference RMSE improves in all eight validation segments, although
+second-difference error worsens in six, so it is not yet accepted as the final
+shape model. Seven of eight selected Re equations use some frequency feature;
+the 1650-2000 Hz equation still ignores frequency.
+
+Im F1 improves validation RMSE by only 0.71 percent but worsens test RMSE by
+4.20 percent. Several Im formulas use local polynomial terminals inside
+division or logarithm expressions, producing excessive curvature. Therefore
+the complete Im F1 replacement is rejected on generalization evidence, and no
+shape-acceptance decision has been made.
+
+A validation-RMSE-only F0/F1 per-segment diagnostic would select six F1 Re
+segments and three F1 Im segments. Its test RMSE is `0.032079` for Re and
+`0.030103` for Im. This diagnostic is not the final model because shape has not
+yet been included in the acceptance rule.
+
+Formal artifacts:
+
+```text
+surrogate_model/segmented_symbolic_regression/artifacts/re/comparison/20260815_run1_frequency_f1
+surrogate_model/segmented_symbolic_regression/artifacts/im/comparison/20260815_run1_frequency_f1
+surrogate_model/segmented_symbolic_regression/artifacts/frequency_f1_manifests/20260815_120054_run1_frequency_f1.json
+```
+
+### Curve-Aware F1 Hall-of-Fame Reselection
+
+On 2026-08-15, every existing F1 Hall-of-Fame candidate was rescored on full
+validation curves. F0 remained the segment fallback. An F1 candidate had to
+pass gates on overall and per-curve RMSE, first and second differences,
+prediction bounds, mean curve range, and excess turning points. No model was
+retrained, and choices were frozen before test evaluation.
+
+```text
+Target/model          Validation RMSE   Test RMSE   Test R2
+Re F0 hybrid          0.035577          0.034823    0.965604
+Re curve-aware hybrid 0.034318          0.033009    0.969094
+Im F0 hybrid          0.030429          0.030686    0.921142
+Im curve-aware hybrid 0.027730          0.030104    0.924101
+```
+
+Re retained F1 only at 100-700, 1300-1650, 3000-4000, and 4000-4950 Hz.
+Im retained F1 only at 700-1000 and 3000-4000 Hz. All other segments reverted
+to their phase-one F0 winner. Among the retained Re segments, three improve
+second-difference error; 3000-4000 Hz worsens it by 7.4 percent, within the
+declared 10 percent gate. Both retained Im segments improve value, first-
+difference, and second-difference errors. Cross-segment boundary discontinuity
+is unchanged as a separate unresolved problem.
+
+```text
+surrogate_model/segmented_symbolic_regression/artifacts/re/comparison/20260815_run1_frequency_f1_curve_aware
+surrogate_model/segmented_symbolic_regression/artifacts/im/comparison/20260815_run1_frequency_f1_curve_aware
+```
+
+### Segmented SR Pause Decision
+
+Segmented SR optimization is paused after the curve-aware F0/F1 reselection.
+This is a deliberate project-scope decision, not a claim that the segmented
+model is finished. Each of the eight frequency domains still needs individual
+formula/grammar tuning, and any final segmented model would also require a
+separate validation-only treatment of the seven frequency-boundary handoffs.
+Those two work streams are deferred because their cost is high and neither is
+a direct substitute for improving the single-equation Global SR model.
+
+The curve-aware hybrid above is the current segmented checkpoint to preserve.
+Do not resume segmented training implicitly. If this branch is revisited,
+start from its persisted F0/F1 candidates and declared shape gates, then treat
+within-segment fitting and cross-segment continuity as separate experiments.
+The active optimization target now moves to Sobol-guided Global SR.
+
 ## Current Cross-Family Comparison
 
 ```text
-Family          Re test RMSE   Re test R2   Im test RMSE   Im test R2
-MLP             0.003426       0.998623     0.002914       0.998547
-Segmented SR    0.034924       0.965403     0.032371       0.912239
-Global SR       0.080918       0.814274     0.079741       0.467469
+Family                    Re test RMSE   Re test R2   Im test RMSE   Im test R2
+MLP                       0.003426       0.998623     0.002914       0.998547
+Segmented SR baseline     0.034924       0.965403     0.032371       0.912239
+Segmented curve-aware F1  0.033009       0.969094     0.030104       0.924101
+Global SR                 0.080918       0.814274     0.079741       0.467469
 ```
 
 The MLP RMSE is roughly one order of magnitude lower than segmented SR for both
@@ -556,21 +693,23 @@ validate `training_metadata.json` and the evaluation summary.
 
 ## Next Priorities
 
-1. Implement the matched Segmented SR all-parameter versus Sobol-prioritized
-   feature experiments described above, keeping the current domains and search
-   budget fixed for the first comparison.
-2. Implement the Global SR smooth frequency-gate transform and run G0 versus
+1. Implement the Global SR smooth frequency-gate transform and run G0 versus
    G1 with matched search settings. Persist gate definitions and expanded
    complexity metadata; do not use the teacher ST curves themselves as inputs.
-3. After identifying the best accuracy-oriented segmented candidates, run a
-   separate validation-only continuity experiment with explicit overlap and
-   blending or joint boundary-aware candidate selection.
+2. Compare Global G0/G1 on overall validation RMSE and validation RMSE in each
+   of the existing eight frequency domains. Keep candidate selection validation
+   only and evaluate the frozen winner once on test data.
+3. If G1 selects gated feature families, run validation ablations before
+   increasing PySR iterations, populations, or expression complexity.
 4. Preserve the current MLP results as the accuracy reference while optimizing
    interpretable symbolic models. Any SR improvement must be reported on the
    same shared split and raw test targets.
 5. Add a paired complex-reflection diagnostic after both targets from a model
    family are available on identical test rows.
-6. Consider batching or a curve/frequency-balanced search subset only as a
+6. Keep further segmented work deferred. If explicitly resumed, separately
+   address constrained within-segment frequency grammar and validation-only
+   boundary continuity/blending.
+7. Consider batching or a curve/frequency-balanced search subset only as a
    controlled PySR speed experiment; always select on full validation data and
    report on full test data.
 

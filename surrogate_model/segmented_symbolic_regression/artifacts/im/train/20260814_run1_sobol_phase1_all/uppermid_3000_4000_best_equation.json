@@ -1,0 +1,64 @@
+{
+  "segment_id": 7,
+  "segment_name": "uppermid_3000_4000",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 3000.0,
+  "upper_hz": 4000.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "all",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "equation": "(((1.2042943 / (log10_sigma - 3.4701078)) - 0.9861883) * log(((log10_sigma / (log10_lambda * -0.37972823)) - log(alpha_infinity)) + -1.0434848)) - 0.14583057",
+  "complexity": 21,
+  "loss": 0.0013300302,
+  "score": 0.15885018954263502,
+  "n_rows_used": 22950,
+  "n_train": 18900,
+  "n_validation": 4050,
+  "train_metrics": {
+    "rmse": 0.036469577521365835,
+    "mae": 0.023966780777475213,
+    "max_abs_error": 0.2316430628973417,
+    "r2": 0.8359412348140943,
+    "true_min": -0.2740013217626394,
+    "true_max": 0.2200546949535816,
+    "prediction_min": -0.293648440799862,
+    "prediction_max": 0.24562293223293807
+  },
+  "validation_metrics": {
+    "rmse": 0.03776605899100984,
+    "mae": 0.02456322807138397,
+    "max_abs_error": 0.21041242920726363,
+    "r2": 0.8030952074814245,
+    "true_min": -0.27139550862246464,
+    "true_max": 0.19211874147932115,
+    "prediction_min": -0.2872918441343503,
+    "prediction_max": 0.09172205674388062
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260814_run1_sobol_phase1_all\\equations\\uppermid_3000_4000_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260814_run1_sobol_phase1_all\\models\\uppermid_3000_4000_pysr_model.pkl"
+}

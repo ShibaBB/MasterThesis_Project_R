@@ -48,6 +48,11 @@ from symbolic_feature_transform import (  # noqa: E402
     apply_feature_transform,
     identity_feature_transform,
 )
+from sobol_feature_policy import (  # noqa: E402
+    build_feature_policy,
+    validate_stored_feature_policy,
+)
+from frequency_feature_engineering import apply_local_frequency_features  # noqa: E402
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -316,13 +321,17 @@ def read_equations(training_dir: Path, segment_name: str) -> pd.DataFrame:
 def evaluate_segment_candidates(
     data: dict[str, Any],
     training_dir: Path,
-    variable_names: list[str],
+    feature_policy: dict[str, Any],
     segment_id: int,
 ) -> tuple[pd.DataFrame, dict[int, np.ndarray]]:
     segment_name = data["segment_names"][segment_id - 1]
     equations = read_equations(training_dir, segment_name)
     mask = data["segment_index"] == segment_id
-    X_seg = data["X"][mask]
+    feature_spec = feature_policy["per_segment"][segment_name]
+    feature_names = feature_spec["feature_names"]
+    feature_indices = feature_spec["feature_indices_0based"]
+    variable_names = make_pysr_variable_names(feature_names)
+    X_seg = data["X"][mask][:, feature_indices]
     y_seg = data["y"][mask]
 
     rows: list[dict[str, Any]] = []
@@ -349,6 +358,9 @@ def evaluate_segment_candidates(
             {
                 "segment_id": segment_id,
                 "segment_name": segment_name,
+                "feature_branch": feature_policy["branch"],
+                "feature_names": ";".join(feature_names),
+                "num_features": len(feature_names),
                 "candidate_index": candidate_index,
                 "complexity": int(equation_row["complexity"]),
                 "pysr_loss": float(equation_row["loss"]),
@@ -512,7 +524,7 @@ def evaluate_selected_combination(
     data: dict[str, Any],
     metrics: pd.DataFrame,
     selected: dict[str, int],
-    variable_names: list[str],
+    feature_policy: dict[str, Any],
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     raw_y_pred_all = np.full_like(data["y"], np.nan, dtype=float)
     y_pred_all = np.full_like(data["y"], np.nan, dtype=float)
@@ -525,8 +537,13 @@ def evaluate_selected_combination(
             & (metrics["candidate_index"] == candidate_index)
         ].iloc[0]
         mask = data["segment_index"] == segment_id
+        feature_spec = feature_policy["per_segment"][segment_name]
+        feature_indices = feature_spec["feature_indices_0based"]
+        variable_names = make_pysr_variable_names(feature_spec["feature_names"])
         raw_prediction = predict_expression(
-            row["expression_for_eval"], data["X"][mask], variable_names
+            row["expression_for_eval"],
+            data["X"][mask][:, feature_indices],
+            variable_names,
         )
         raw_y_pred_all[mask] = raw_prediction
         y_pred_all[mask] = raw_prediction
@@ -534,6 +551,85 @@ def evaluate_selected_combination(
 
     selected_df = pd.DataFrame(selected_rows)
     return raw_y_pred_all, y_pred_all, selected_df
+
+
+def selected_segment_metrics(
+    data: dict[str, Any], y_pred: np.ndarray, split_name: str
+) -> pd.DataFrame:
+    rows: list[dict[str, Any]] = []
+    for segment_id, segment_name in enumerate(data["segment_names"], start=1):
+        mask = data["segment_index"] == segment_id
+        rows.append(
+            {
+                "split": split_name,
+                "segment_id": segment_id,
+                "segment_name": segment_name,
+                "n_rows": int(np.sum(mask)),
+                **regression_metrics(data["y"][mask], y_pred[mask]),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def selected_segment_shape_metrics(
+    data: dict[str, Any], y_pred: np.ndarray, split_name: str
+) -> pd.DataFrame:
+    """Score within-curve frequency shape without using it for candidate selection."""
+    rows: list[dict[str, Any]] = []
+    for segment_id, segment_name in enumerate(data["segment_names"], start=1):
+        segment_mask = data["segment_index"] == segment_id
+        first_true: list[np.ndarray] = []
+        first_pred: list[np.ndarray] = []
+        second_true: list[np.ndarray] = []
+        second_pred: list[np.ndarray] = []
+        trough_errors_hz: list[float] = []
+        peak_errors_hz: list[float] = []
+        prediction_ranges: list[float] = []
+
+        for curve_id in np.unique(data["source_curve_index"][segment_mask]):
+            mask = segment_mask & (data["source_curve_index"] == curve_id)
+            order = np.argsort(data["frequency_hz"][mask])
+            frequency = data["frequency_hz"][mask][order]
+            y_true = data["y"][mask][order]
+            curve_pred = y_pred[mask][order]
+            if frequency.size < 3:
+                continue
+            first_true.append(np.diff(y_true))
+            first_pred.append(np.diff(curve_pred))
+            second_true.append(np.diff(y_true, n=2))
+            second_pred.append(np.diff(curve_pred, n=2))
+            trough_errors_hz.append(
+                abs(float(frequency[np.argmin(curve_pred)] - frequency[np.argmin(y_true)]))
+            )
+            peak_errors_hz.append(
+                abs(float(frequency[np.argmax(curve_pred)] - frequency[np.argmax(y_true)]))
+            )
+            prediction_ranges.append(float(np.ptp(curve_pred)))
+
+        first_true_array = np.concatenate(first_true)
+        first_pred_array = np.concatenate(first_pred)
+        second_true_array = np.concatenate(second_true)
+        second_pred_array = np.concatenate(second_pred)
+        range_array = np.asarray(prediction_ranges)
+        rows.append(
+            {
+                "split": split_name,
+                "segment_id": segment_id,
+                "segment_name": segment_name,
+                "num_curves": int(len(prediction_ranges)),
+                "first_difference_rmse": float(
+                    np.sqrt(np.mean((first_pred_array - first_true_array) ** 2))
+                ),
+                "second_difference_rmse": float(
+                    np.sqrt(np.mean((second_pred_array - second_true_array) ** 2))
+                ),
+                "mean_trough_frequency_error_hz": float(np.mean(trough_errors_hz)),
+                "mean_peak_frequency_error_hz": float(np.mean(peak_errors_hz)),
+                "mean_prediction_range": float(np.mean(range_array)),
+                "flat_prediction_curve_fraction": float(np.mean(range_array <= 1e-12)),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def prediction_diagnostics(y_pred: np.ndarray) -> dict[str, float | int]:
@@ -624,6 +720,31 @@ def main() -> None:
         data["X"], original_feature_names, feature_transform
     )
     data["feature_names"] = feature_transform["transformed_feature_names"]
+    frequency_feature_engineering = training_metadata.get(
+        "frequency_feature_engineering"
+    )
+    if frequency_feature_engineering is not None:
+        data["X"], data["feature_names"] = apply_local_frequency_features(
+            data["X"],
+            data["feature_names"],
+            data["frequency_hz"],
+            data["segment_index"],
+            data["segment_names"],
+            frequency_feature_engineering,
+        )
+    stored_feature_policy = training_metadata.get("feature_policy")
+    if stored_feature_policy is None:
+        feature_policy = build_feature_policy(
+            args.target, "all", data["feature_names"], data["segment_names"]
+        )
+        feature_policy["legacy_training_metadata_fallback"] = True
+    else:
+        feature_policy = validate_stored_feature_policy(
+            stored_feature_policy,
+            args.target,
+            data["feature_names"],
+            data["segment_names"],
+        )
     validation_data = subset_symbolic_data(
         data,
         source_curve_mask(data["source_curve_index"], shared_split, "validation"),
@@ -632,14 +753,12 @@ def main() -> None:
         data,
         source_curve_mask(data["source_curve_index"], shared_split, "test"),
     )
-    variable_names = make_pysr_variable_names(data["feature_names"])
-
     all_metrics: list[pd.DataFrame] = []
     for segment_id in range(1, len(data["segment_names"]) + 1):
         segment_metrics, _ = evaluate_segment_candidates(
             validation_data,
             args.training_dir,
-            variable_names,
+            feature_policy,
             segment_id,
         )
         all_metrics.append(segment_metrics)
@@ -651,13 +770,34 @@ def main() -> None:
 
     selected = choose_candidates(metrics, args)
     _, validation_y_pred, _ = evaluate_selected_combination(
-        validation_data, metrics, selected, variable_names
+        validation_data, metrics, selected, feature_policy
     )
     validation_metrics = regression_metrics(validation_data["y"], validation_y_pred)
     raw_y_pred_all, y_pred_all, selected_df = evaluate_selected_combination(
-        test_data, metrics, selected, variable_names
+        test_data, metrics, selected, feature_policy
     )
     selected_df.to_csv(args.output_dir / "selected_candidates.csv", index=False)
+
+    segment_metrics = pd.concat(
+        [
+            selected_segment_metrics(validation_data, validation_y_pred, "validation"),
+            selected_segment_metrics(test_data, y_pred_all, "test"),
+        ],
+        ignore_index=True,
+    )
+    segment_metrics.to_csv(args.output_dir / "selected_segment_metrics.csv", index=False)
+    shape_metrics = pd.concat(
+        [
+            selected_segment_shape_metrics(
+                validation_data, validation_y_pred, "validation"
+            ),
+            selected_segment_shape_metrics(test_data, y_pred_all, "test"),
+        ],
+        ignore_index=True,
+    )
+    shape_metrics.to_csv(
+        args.output_dir / "selected_segment_shape_metrics.csv", index=False
+    )
 
     selected_metrics = regression_metrics(test_data["y"], y_pred_all)
     raw_physical_diagnostics = prediction_diagnostics(raw_y_pred_all)
@@ -682,7 +822,10 @@ def main() -> None:
         "feature_names": data["feature_names"],
         "original_feature_names": original_feature_names,
         "feature_transform": feature_transform,
-        "pysr_variable_names": variable_names,
+        "frequency_feature_engineering": frequency_feature_engineering,
+        "feature_policy": feature_policy,
+        "selected_segment_metrics": segment_metrics.to_dict(orient="records"),
+        "selected_segment_shape_metrics": shape_metrics.to_dict(orient="records"),
         "overall_metrics": selected_metrics,
         "validation_selection_metrics": validation_metrics,
         "raw_prediction_diagnostics": raw_physical_diagnostics,
