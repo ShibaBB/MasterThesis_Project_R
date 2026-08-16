@@ -1,0 +1,20 @@
+{
+  "log10_sigma": {
+    "center": 4.689187575130151,
+    "scale": 0.21494263391550147,
+    "method": "training_unique_curve_population_mean_std_ddof0",
+    "training_curve_count": 700
+  },
+  "log10_lambda": {
+    "center": -4.054707568194597,
+    "scale": 0.15659974937128981,
+    "method": "training_unique_curve_population_mean_std_ddof0",
+    "training_curve_count": 700
+  },
+  "alpha_infinity": {
+    "center": 1.5443664815485698,
+    "scale": 0.31107898330484357,
+    "method": "training_unique_curve_population_mean_std_ddof0",
+    "training_curve_count": 700
+  }
+}

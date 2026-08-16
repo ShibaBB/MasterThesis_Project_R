@@ -1,0 +1,18 @@
+{
+  "stage": "F3-A",
+  "stage_passed": true,
+  "selected_sigma_candidate": "sigma_bandpass_1250_2100",
+  "raw_best_sigma_candidate": "sigma_bandpass_1250_2100",
+  "plot_and_diagnostic_candidate": "sigma_bandpass_1250_2100",
+  "sigma_shows_full_validation_gain": true,
+  "conditional_material_diagnostic_performed": true,
+  "best_optional_material_diagnostic": "diagnostic_sigma_bandpass_1250_2100_plus_lambda",
+  "decision_reasons": [
+    "sigma_bandpass_1250_2100 improves full validation RMSE.",
+    "sigma_bandpass_1250_2100 improves the combined 1300-2000 Hz validation RMSE.",
+    "All declared regional RMSE guardrails remain within the 10% limit."
+  ],
+  "test_rows_accessed": false,
+  "next_stage_automatically_authorized": false,
+  "next_command_if_user_accepts": "执行 F3-B"
+}
