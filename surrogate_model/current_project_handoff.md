@@ -1,6 +1,18 @@
 # MasterThesis Project R - Current Handoff
 
-Last updated: 2026-08-14.
+Last updated: 2026-08-16.
+
+## Training Monitoring Convention
+
+For every long-running training job, keep the active conversation open until
+training and evaluation finish. Launch the job with persistent log capture,
+poll the live process and new log/artifact output about every 180-240 seconds,
+and proactively report major milestones: job start, completion of each search
+stage or target, formal training start/finish, evaluation/comparison completion,
+and any error or unexpected stall. Do not end the turn merely because a job is
+still running; if the user asks a question during training, answer it and then
+continue monitoring. Avoid repetitive messages when no meaningful state has
+changed.
 
 ## Project Purpose
 
@@ -121,6 +133,9 @@ identity-transform compatibility path.
 | MLP code contract | Complete | Complete | Independent target loading and smoke training verified |
 | Full MLP training | Complete | Complete | Formal full `run1` training and evaluation completed |
 | Global SR full run | Complete | Complete | Both targets now use the current feature transform and matched search settings |
+| Global SR Sobol feature experiment | Complete | Complete | Full-range matched all/subset runs; Re selects subset, Im retains all |
+| Global SR smooth frequency modulation | Complete | Complete | All base parameters retained; validation selects modulated Re and Im |
+| Global SR target-specific modulation F2 | Planned | Planned | Re and Im envelope optimization defined below; training not started |
 | Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
 | MLP Sobol pilot | Complete | Complete | Frequency-resolved S1/ST at N=4096 |
 | Teacher Sobol validation | Complete | Complete | Shared-design N=1024 check confirms MLP sensitivity structure |
@@ -231,6 +246,164 @@ but still underfits material-dependent trough depth, peak position, and the
 high-frequency downturn. A simple per-frequency training-mean baseline reaches
 test RMSE `0.077103` and R2 `0.502130`, so the global symbolic model remains
 below that baseline.
+
+### Full-range Global SR Sobol Phase-One Results
+
+The matched full-range experiment completed on 2026-08-15. Global SR remained
+one equation over the single 100-4950 Hz domain. For each target, `all` and
+`sobol_subset` used identical rows, split, seed 42, 100 iterations, 12
+populations, population size 80, max complexity 24, operators, and
+validation-only candidate selection. The subset retained `sigma`,
+`alpha_infinity`, `lambda`, `k0_prime`, and frequency while excluding
+`lambda_prime`.
+
+```text
+Target/branch       Validation RMSE   Test RMSE   Test R2
+Re all              0.081930          0.080918    0.814274
+Re Sobol subset     0.078143          0.077609    0.829153
+Im all              0.085952          0.079741    0.467469
+Im Sobol subset     0.089289          0.083572    0.415070
+```
+
+The frozen validation-only decision selects `sobol_subset` for Re and `all`
+for Im. Re validation RMSE improves by 4.62 percent and test RMSE by 4.09
+percent. Im subset validation RMSE worsens by 3.88 percent and is rejected;
+its test RMSE also worsens by 4.80 percent. There is no per-frequency-domain
+or hybrid decision.
+
+```text
+surrogate_model/global_symbolic_regression/artifacts/re/comparison/20260815_run1_sobol_phase1
+surrogate_model/global_symbolic_regression/artifacts/im/comparison/20260815_run1_sobol_phase1
+```
+
+### Global SR Smooth Frequency-Modulation Results
+
+The all-parameter modulation experiment completed on 2026-08-16. Each target
+retained all five transformed material parameters and `log10_f`, then added
+one smooth `parameter * envelope(log10_f)` terminal per material parameter.
+Envelope locations and shapes came from the teacher N=1024 pointwise and
+segment ST diagnostics; numerical ST values were not passed to PySR. Global SR
+remained one equation over the single 100-4950 Hz domain.
+
+The modulated runs matched the all-base control on rows, split, seed 42, 100
+iterations, 12 populations, population size 80, max complexity 24, operators,
+and validation-only candidate selection.
+
+```text
+Target/branch       Validation RMSE   Test RMSE   Test R2
+Re all              0.081930          0.080918    0.814274
+Re modulated        0.069979          0.069470    0.863110
+Im all              0.085952          0.079741    0.467469
+Im modulated        0.074101          0.070212    0.587141
+```
+
+Validation selects `sobol_modulated` for both targets. Relative to all-base,
+Re validation/test RMSE improves by 14.59/14.15 percent and Im by 13.79/11.95
+percent. Re candidate 15 has PySR complexity 24 and uses the modulated
+`alpha_infinity` terminal. Im candidate 12 has complexity 21 and uses the
+modulated `lambda_prime` and `k0_prime` terminals. All base parameters were
+available but final formulas were not forced to contain every variable.
+
+```text
+surrogate_model/global_symbolic_regression/artifacts/re/comparison/20260816_run1_sobol_modulated
+surrogate_model/global_symbolic_regression/artifacts/im/comparison/20260816_run1_sobol_modulated
+```
+
+### Global SR Residual Diagnosis And F2 Decision
+
+The next Global SR experiment will optimize the modulation representation
+before increasing iterations, populations, or expression complexity. Re and Im
+must be optimized independently because their selected F1 equations use
+different modulated terminals and their residual frequency structures differ.
+This remains one Global SR equation per target over the complete 100-4950 Hz
+domain; the frequency regions below are diagnostics and validation guardrails,
+not separate models or hard gates.
+
+The formal F1 test residuals provide the following frozen diagnosis. These test
+results motivated the experiment design, but they must not be used to select an
+F2 candidate.
+
+```text
+Frequency Hz   Re all -> F1 RMSE       Im all -> F1 RMSE
+100-700        0.098911 -> 0.071750     0.077226 -> 0.074939
+700-1000       0.046452 -> 0.044482     0.117717 -> 0.107067
+1000-1300      0.069617 -> 0.061875     0.094793 -> 0.098425
+1300-1650      0.088940 -> 0.081863     0.068902 -> 0.076753
+1650-2000      0.090925 -> 0.087258     0.078991 -> 0.060653
+2000-3000      0.089865 -> 0.069167     0.091592 -> 0.072555
+3000-4000      0.069452 -> 0.065518     0.055123 -> 0.061550
+4000-4950      0.074763 -> 0.069218     0.073946 -> 0.043200
+```
+
+Re has its lowest frequency-wise RMSE near 787 Hz and a low-error region around
+1 kHz, while its main remaining broad weakness is approximately 1300-2000 Hz.
+The selected Re equation uses only the `alpha_infinity` modulation terminal.
+Im has its largest frequency-wise RMSE near 787 Hz; F1 also regresses locally
+over 1000-1650 and 3000-4000 Hz, despite a large gain over 4000-4950 Hz. The
+selected Im equation uses the `k0_prime` and `lambda_prime` modulation terminals.
+The dark band in a prediction-error scatter plot is therefore treated as a
+frequency-local residual distribution (including bias and spread), not as a
+higher sampling probability: every teacher curve uses the same frequency grid.
+
+#### Re F2 modulation search
+
+Keep all five transformed material parameters and `log10_f` as base terminals.
+Replace the single Re `alpha_infinity` envelope with two independently available
+smooth terminals:
+
+```text
+alpha_infinity * g_alpha_onset(log10_f)
+alpha_infinity * g_alpha_high(log10_f)
+```
+
+`g_alpha_onset` is a high-pass envelope. Screen centers 1500, 1800, and 2100 Hz
+against log10-frequency transitions 0.12, 0.18, and 0.24. Hold the high lobe at
+the current 3422 Hz Gaussian with width 0.22 during this nine-branch screen.
+Then hold the selected onset envelope fixed and screen high-lobe widths 0.18,
+0.22, and 0.28. The purpose is to improve 1300-2000 Hz without sacrificing the
+current 700-1000 Hz behavior.
+
+#### Im F2 modulation search
+
+Keep all five transformed material parameters and `log10_f` as base terminals.
+Split the Im `k0_prime` low- and high-frequency behavior into independently
+available terminals. First hold its high-pass component at 3900 Hz with a 0.10
+log10-frequency transition and screen low-pass centers 600, 750, and 900 Hz
+against transitions 0.10, 0.16, and 0.22. This targets the residual maximum near
+787 Hz while preserving the strong 4000-4950 Hz result.
+
+With the selected `k0_prime` split fixed, run a matched `lambda_prime` ablation:
+
+```text
+L0: current 0.35 low-pass(700 Hz) + 1.00 high-pass(4000 Hz)
+L1: high-pass(4000 Hz) only
+L2: no lambda_prime modulation terminal; raw lambda_prime remains available
+```
+
+The Im guardrails specifically cover 1000-1650 and 3000-4000 Hz, where F1
+regressed, and 4000-4950 Hz, where its gain must be retained.
+
+#### F2 execution and selection contract
+
+1. Create separate Re and Im modulation specifications, manifests, run names,
+   and artifact directories. Never select one target's envelope from the other
+   target's metrics.
+2. Run each screening branch with the same rows, shared curve split, operators,
+   seed 42, 20 iterations, 6 populations, population size 40, and max complexity
+   24. Change only the declared envelope shape in a matched stage.
+3. Select on complete 100-4950 Hz validation RMSE. Regional validation RMSE,
+   regional bias, and the frequency-wise RMSE distribution are guardrails: no
+   declared diagnostic region may worsen by more than 10 percent relative to F1
+   without an explicit documented tradeoff. Test rows remain inaccessible.
+4. Retrain the frozen Re and Im winners with the formal budget of 100 iterations,
+   12 populations, population size 80, and max complexity 24. Compare each
+   formal winner against the corresponding F1 modulation checkpoint using full
+   validation RMSE, then open the test partition once for final reporting.
+5. Preserve raw targets and unclipped predictions. Persist exact envelope
+   constants, feature order, split hash, branch metrics, chosen equation, and
+   acceptance decision in metadata and the Re/Im comparison directories.
+
+As of this handoff update, F2 training has not started.
 
 ## Latest Segmented SR Results
 
@@ -426,7 +599,7 @@ Family                    Re test RMSE   Re test R2   Im test RMSE   Im test R2
 MLP                       0.003426       0.998623     0.002914       0.998547
 Segmented SR baseline     0.034924       0.965403     0.032371       0.912239
 Segmented curve-aware F1  0.033009       0.969094     0.030104       0.924101
-Global SR                 0.080918       0.814274     0.079741       0.467469
+Global SR modulated        0.069470      0.863110     0.070212       0.587141
 ```
 
 The MLP RMSE is roughly one order of magnitude lower than segmented SR for both
@@ -547,62 +720,30 @@ metadata, report its accuracy and boundary terms separately, and preserve the
 unblended predictions as a diagnostic. Test data must not choose overlap width,
 blend shape, boundary penalty, or candidate combination.
 
-### Global SR Strategy: Smooth Frequency-Local Features
+### Global SR Strategy: Full-Range Sobol Feature Subset
 
-The selected direction for Global SR is to retain one full-range equation but
-add explicit smooth frequency-local features. The goal is to let a material
-parameter have a strong effect in one frequency region and a negligible effect
-elsewhere without requiring PySR to discover the entire gating function from
-primitive operators.
+Global SR remains one equation over one frequency domain, 100-4950 Hz. Apply
+the same matched Phase 1 strategy previously used for Segmented SR, but make
+one whole-range decision per target instead of per-segment decisions.
 
-Start from the current six transformed base features and define fixed smooth
-overlapping gates in `log10_f`, for example normalized Gaussian or raised-cosine
-basis functions:
+Run two matched branches independently for Re and Im:
 
 ```text
-g_k(f) >= 0
-sum_k g_k(f) = 1
-g_k is smooth across adjacent frequency regions
+A. all five varying material parameters plus frequency
+B. full-range teacher-Sobol subset plus frequency
 ```
 
-Use the existing eight domains as the first gate centers/supports, but make the
-gates overlap so this is a single continuous global representation rather than
-hard piecewise selection. Create only Sobol-supported material/gate products:
+For run1, branch B retains `sigma`, `alpha_infinity`, `lambda`, and `k0_prime`
+and omits `lambda_prime`, whose teacher variance-weighted full-range ST is the
+lowest for both targets. Feature selection occurs after the training-fitted
+base transform and constant-column removal, and frequency remains available.
+The dataset itself is never modified.
 
-```text
-z_parameter,k = transformed_parameter * g_k(log10_f)
-```
-
-Examples include low-frequency `log10_k0_prime * g_low`, mid/high-frequency
-`alpha_infinity * g_k`, and high-frequency `log10_lambda * g_k`. Always retain
-the ungated base features and `log10_f`, so the model can still learn a compact
-global trend. Do not use the numerical Sobol ST curve itself as a feature; use
-Sobol only to decide which generic parameter/gate products to expose.
-
-Run the following matched Global experiments in order:
-
-```text
-G0. current transformed six-feature Global SR baseline
-G1. base features plus Sobol-supported smooth gated interactions
-G2. validation ablations of individual gate families that were selected in G1
-```
-
-Keep the G0/G1 search budget and random seed matched for the first comparison.
-Only increase iterations, populations, or complexity after isolating the effect
-of the local features. Candidate selection remains validation-only. In addition
-to overall validation RMSE, report validation RMSE per current frequency domain
-so a global improvement cannot hide a severe local regression.
-
-Engineered gates make PySR's internal complexity count optimistic because each
-gate appears as one input variable. Export every gate definition and report
-both the PySR expression complexity and an expanded complexity that includes
-the gate construction. Final equations must be reproducible from raw physical
-inputs, the persisted base transform, and the persisted gate specification.
-
-The smooth-gated Global model remains a distinct single-equation experiment.
-If it evolves into separately fitted local equations or independently selected
-gate experts, classify it as a soft-segmented model instead of replacing the
-pure Global SR result silently.
+A/B runs must match training rows, shared split, random seed, search budget,
+operators, and candidate-selection rule. Select one entire branch using only
+the complete 100-4950 Hz validation rows, then report the frozen winner on the
+test rows. There is no eight-frequency-domain comparison, frequency gating,
+local expert, or hybrid selection in this Global SR experiment.
 
 ## Known Segmented Boundary Problem
 
@@ -693,23 +834,23 @@ validate `training_metadata.json` and the evaluation summary.
 
 ## Next Priorities
 
-1. Implement the Global SR smooth frequency-gate transform and run G0 versus
-   G1 with matched search settings. Persist gate definitions and expanded
-   complexity metadata; do not use the teacher ST curves themselves as inputs.
-2. Compare Global G0/G1 on overall validation RMSE and validation RMSE in each
-   of the existing eight frequency domains. Keep candidate selection validation
-   only and evaluate the frozen winner once on test data.
-3. If G1 selects gated feature families, run validation ablations before
-   increasing PySR iterations, populations, or expression complexity.
-4. Preserve the current MLP results as the accuracy reference while optimizing
+1. Implement the Re F2 split-`alpha_infinity` modulation specification and run
+   its staged, matched validation-only screen exactly as defined above.
+2. Independently implement the Im F2 split-`k0_prime` screen, followed by the
+   matched `lambda_prime` ablation defined above.
+3. Freeze each target's winning envelope before its formal 100-iteration run;
+   do not increase max complexity or alter the symbolic grammar during F2.
+4. Preserve the current F1 smooth-modulation checkpoints as fixed controls and
+   keep all feature decisions whole-range and validation-only.
+5. Preserve the current MLP results as the accuracy reference while optimizing
    interpretable symbolic models. Any SR improvement must be reported on the
    same shared split and raw test targets.
-5. Add a paired complex-reflection diagnostic after both targets from a model
+6. Add a paired complex-reflection diagnostic after both targets from a model
    family are available on identical test rows.
-6. Keep further segmented work deferred. If explicitly resumed, separately
+7. Keep further segmented work deferred. If explicitly resumed, separately
    address constrained within-segment frequency grammar and validation-only
    boundary continuity/blending.
-7. Consider batching or a curve/frequency-balanced search subset only as a
+8. Consider batching or a curve/frequency-balanced search subset only as a
    controlled PySR speed experiment; always select on full validation data and
    report on full test data.
 
