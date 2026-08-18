@@ -1,0 +1,4 @@
+[2026-08-16T13:58:22.227829+00:00] Starting F3-B sigma-local terminal freeze and transform-level validation.
+[2026-08-16T13:58:22.231109+00:00] Reading only train and validation curve blocks for transform verification.
+[2026-08-16T13:58:22.981974+00:00] F3-B complete: stage_passed=True, replay_exact=True, f3a_terminal_exact=True, test_rows_accessed=False.
+[2026-08-16T13:58:22.981974+00:00] Artifacts written to C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\F3\F3-B\20260816T155822

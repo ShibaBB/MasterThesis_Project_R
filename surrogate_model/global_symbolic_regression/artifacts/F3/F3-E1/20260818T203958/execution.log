@@ -1,0 +1,10 @@
+[2026-08-18T18:40:00.499330+00:00] F3-E1 preflight frozen: seeds=42/123/456, saved A versus nested-constrained E1, budget=20/6/40/24, Plan B, validation-only.
+[2026-08-18T18:40:00.502328+00:00] Starting PySR run: branch=E1, seed=42.
+[2026-08-18T18:41:05.938866+00:00] Completed PySR run: branch=E1, seed=42, validation_RMSE=0.057826112.
+[2026-08-18T18:41:05.941074+00:00] Starting PySR run: branch=E1, seed=123.
+[2026-08-18T18:41:40.554133+00:00] Completed PySR run: branch=E1, seed=123, validation_RMSE=0.053016694.
+[2026-08-18T18:41:40.556133+00:00] Starting PySR run: branch=E1, seed=456.
+[2026-08-18T18:42:23.819440+00:00] Completed PySR run: branch=E1, seed=456, validation_RMSE=0.056030291.
+[2026-08-18T18:42:23.820438+00:00] All three E1 searches completed; comparing against saved branch A.
+[2026-08-18T18:42:24.171350+00:00] F3-E1 complete: stage_passed=False, decision=retain_original_unconstrained_search_configuration, test_rows_accessed=False.
+[2026-08-18T18:42:24.172348+00:00] Artifacts written to C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\F3\F3-E1\20260818T203958

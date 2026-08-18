@@ -1,0 +1,9 @@
+Complexity,Loss,Equation
+1,0.005673653,"0.00029692648"
+3,0.004281886,"z_sigma__f3_mid * 0.09106262"
+7,0.004280602,"(z_sigma__f3_mid / (z_sigma__f3_mid + -75.59365)) * -6.9405055"
+13,0.0042795255,"((0.12864648 / ((1.3896263 / z_sigma__f3_mid) - (z_sigma__f3_mid * -0.028377023))) * z_sigma__f3_mid) / z_sigma__f3_mid"
+16,0.0036699516,"z_sigma__f3_mid * (0.12719171 / (z_sigma__f3_mid / (z_sigma__f3_mid - ((z_sigma__f3_mid / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) * 0.24287058))))"
+18,0.0036675886,"(z_sigma__f3_mid * 0.1251747) / (z_sigma__f3_mid / (z_sigma__f3_mid - (sqrt(z_sigma__f3_mid * (z_sigma__f3_mid + z_sigma__f3_mid)) * (0.1680992 / z_sigma__f3_mid))))"
+22,0.0036641152,"(z_sigma__f3_mid + (((z_sigma__f3_mid * 1.6427937) / z_sigma__f3_mid) / ((2.1254945 / (z_sigma__f3_mid / (sqrt(z_sigma__f3_mid * z_sigma__f3_mid) * -3.4081094))) + z_sigma__f3_mid))) * 0.13406365"
+24,0.0036441262,"(0.13526303 / ((z_sigma__f3_mid / (((z_sigma__f3_mid - (sqrt(z_sigma__f3_mid * z_sigma__f3_mid) / z_sigma__f3_mid)) * -0.20843819) - ((z_sigma__f3_mid * 0.68377995) - -0.025578631))) * -0.9675698)) * z_sigma__f3_mid"

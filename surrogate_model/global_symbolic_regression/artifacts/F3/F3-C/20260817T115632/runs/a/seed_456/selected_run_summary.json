@@ -1,0 +1,160 @@
+{
+  "stage": "F3-C",
+  "branch": "a",
+  "seed": 456,
+  "search_target": "delta_Re = teacher - frozen_Re_F1",
+  "input_feature_names": [
+    "z_sigma__f3_mid"
+  ],
+  "pysr_variable_names": [
+    "z_sigma__f3_mid"
+  ],
+  "explicit_zero_fallback": true,
+  "selected_candidate_index": 6,
+  "selected_candidate_source": "pysr_hall_of_fame",
+  "selected_complexity": 17,
+  "selected_equation": "(z_sigma__f3_mid - (z_sigma__f3_mid * (((z_sigma__f3_mid - 6.570291) * 0.0052170097) / (-0.0046468284 - (z_sigma__f3_mid * z_sigma__f3_mid))))) * 0.103564985",
+  "selected_expression_for_eval": "(-0.0052170097*z_sigma__f3_mid*(z_sigma__f3_mid - 1*6.570291)/(-z_sigma__f3_mid*z_sigma__f3_mid - 0.0046468284) + z_sigma__f3_mid)*0.103564985",
+  "fit_wall_time_seconds": 26.912211800008663,
+  "train_metrics": {
+    "rmse": 0.06347128010622893,
+    "mae": 0.04360981589631308,
+    "max_abs_error": 0.47415527881852654,
+    "r2": 0.8910028828674124,
+    "bias": -0.001718371047996838,
+    "prediction_min": -0.15222638123699783,
+    "prediction_max": 1.0717607320402183
+  },
+  "validation_metrics": {
+    "rmse": 0.056030291013130555,
+    "mae": 0.0403853440870244,
+    "max_abs_error": 0.25412282499657063,
+    "r2": 0.9131438240926381,
+    "bias": 0.003273632649059922,
+    "prediction_min": -0.12054092090479952,
+    "prediction_max": 1.0714975457976574
+  },
+  "train_curve_summary": {
+    "curve_mean_rmse": 0.05240185626015446,
+    "curve_median_rmse": 0.04057442630406173,
+    "curve_p95_rmse": 0.13041460467616234,
+    "worst_curve_rmse": 0.23028773288986293,
+    "worst_curve_id": 459
+  },
+  "validation_curve_summary": {
+    "curve_mean_rmse": 0.04874101966526189,
+    "curve_median_rmse": 0.042015058833557814,
+    "curve_p95_rmse": 0.11511331900255936,
+    "worst_curve_rmse": 0.13845124031299236,
+    "worst_curve_id": 953
+  },
+  "validation_regional_metrics": [
+    {
+      "lower_hz": 100.0,
+      "upper_hz": 700.0,
+      "row_count": 2400,
+      "rmse": 0.07201276134105074,
+      "mae": 0.05651088818404346,
+      "bias": -0.014762580917032479
+    },
+    {
+      "lower_hz": 700.0,
+      "upper_hz": 1000.0,
+      "row_count": 1200,
+      "rmse": 0.04552502057079296,
+      "mae": 0.03221529120955306,
+      "bias": 0.02516745177701268
+    },
+    {
+      "lower_hz": 1000.0,
+      "upper_hz": 1300.0,
+      "row_count": 1200,
+      "rmse": 0.04080645459375868,
+      "mae": 0.027507351345573975,
+      "bias": 0.021679421569747368
+    },
+    {
+      "lower_hz": 1300.0,
+      "upper_hz": 1650.0,
+      "row_count": 1350,
+      "rmse": 0.026078501923696793,
+      "mae": 0.017775387808226906,
+      "bias": 0.007779969570077995
+    },
+    {
+      "lower_hz": 1650.0,
+      "upper_hz": 2000.0,
+      "row_count": 1350,
+      "rmse": 0.03627153727753544,
+      "mae": 0.020211739444544463,
+      "bias": 0.0005867974656151542
+    },
+    {
+      "lower_hz": 2000.0,
+      "upper_hz": 3000.0,
+      "row_count": 3900,
+      "rmse": 0.05407183414772691,
+      "mae": 0.03964556022446081,
+      "bias": 0.0033173531208911915
+    },
+    {
+      "lower_hz": 3000.0,
+      "upper_hz": 4000.0,
+      "row_count": 4050,
+      "rmse": 0.05930101108226055,
+      "mae": 0.045887007258550785,
+      "bias": -0.0019354833303465567
+    },
+    {
+      "lower_hz": 4000.0,
+      "upper_hz": 4950.0,
+      "row_count": 3750,
+      "rmse": 0.0632581013061393,
+      "mae": 0.04703003138646467,
+      "bias": 0.0068462900973222844
+    },
+    {
+      "lower_hz": 1300.0,
+      "upper_hz": 2000.0,
+      "row_count": 2700,
+      "rmse": 0.03158886416967141,
+      "mae": 0.018993563626385688,
+      "bias": 0.004183383517846575
+    }
+  ],
+  "search_contract": {
+    "niterations": 20,
+    "populations": 6,
+    "population_size": 40,
+    "max_complexity": 24,
+    "binary_operators": [
+      "+",
+      "-",
+      "*",
+      "/"
+    ],
+    "unary_operators": [
+      "log",
+      "sqrt"
+    ],
+    "parallelism": "serial",
+    "deterministic": true,
+    "batching": true,
+    "batch_size": 4096,
+    "turbo": true,
+    "julia_threads": 1,
+    "candidate_selection": "minimum_complete_validation_RMSE_then_complexity"
+  },
+  "runtime": {
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "pysr": "1.5.10",
+    "julia_executable": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\julia_env\\pyjuliapkg\\install\\bin\\julia.exe",
+    "JULIA_NUM_THREADS": "1"
+  },
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "train_row_count": 89600,
+  "validation_row_count": 19200,
+  "test_rows_accessed": false,
+  "equations_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-C\\20260817T115632\\runs\\a\\seed_456\\equations.csv",
+  "equations_sha256": "5502182b581e3d2ce3ab8946cd29a0eff8c004ac729c74caf7c719ea9a61c222"
+}

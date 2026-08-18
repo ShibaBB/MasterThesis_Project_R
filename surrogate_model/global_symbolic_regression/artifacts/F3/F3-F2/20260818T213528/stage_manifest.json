@@ -1,0 +1,126 @@
+{
+  "stage": "F3-F2",
+  "created_utc": "2026-08-18T19:35:29.868686+00:00",
+  "freeze_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1S\\20260818T211720",
+  "frozen_candidate_spec_sha256": "1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7",
+  "acceptance_rules": {
+    "full_test": "frozen Re F3 RMSE must be strictly below formal Re F1 on the same test rows",
+    "curve_behavior": "curve-mean and worst-curve RMSE must both be strictly below formal Re F1",
+    "target_region": "1300-2000 Hz RMSE must be strictly below formal Re F1",
+    "guardrails": "none of 700-1000, 1300-1650, or 1650-2000 Hz RMSE may worsen more than 10% versus formal Re F1",
+    "numerical_safety": "F1, residual, and final predictions must all be finite",
+    "all_checks_required": true,
+    "failure_action": "retain formal Re F1"
+  },
+  "no_post_test_tuning": true,
+  "test_features_read": true,
+  "test_targets_read": true,
+  "test_predictions_computed": true,
+  "completed_utc": "2026-08-18T19:35:30.260466+00:00",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "test_curve_count": 150,
+  "test_row_count": 19200,
+  "access_receipt": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F2\\access_receipts\\1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7.json",
+  "decision": {
+    "stage": "F3-F2",
+    "stage_passed": true,
+    "decision": "accept_frozen_Re_F3_as_formal_Re_model",
+    "formal_model_replacement_decision": true,
+    "frozen_candidate_spec_sha256": "1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7",
+    "formal_f1_test_metrics": {
+      "rmse": 0.06946954085841427,
+      "mae": 0.05333854634936886,
+      "max_abs_error": 0.29549959485046595,
+      "r2": 0.8631104827044461,
+      "bias": -0.0011265732541201798,
+      "prediction_min": 0.009631862351687013,
+      "prediction_max": 1.0714080942551314
+    },
+    "frozen_f3_test_metrics": {
+      "rmse": 0.061697052842910646,
+      "mae": 0.042342503427319295,
+      "max_abs_error": 0.33547306779145347,
+      "r2": 0.8920282418697033,
+      "bias": 0.00117129872578106,
+      "prediction_min": -0.10873871006546824,
+      "prediction_max": 1.0714080961773835
+    },
+    "formal_f1_test_curve_summary": {
+      "curve_mean_rmse": 0.06141243193549975,
+      "curve_median_rmse": 0.05561057450065601,
+      "curve_p95_rmse": 0.13562726817670856,
+      "worst_curve_rmse": 0.19695644932039,
+      "worst_curve_id": 434
+    },
+    "frozen_f3_test_curve_summary": {
+      "curve_mean_rmse": 0.05091152880621658,
+      "curve_median_rmse": 0.03951854111068183,
+      "curve_p95_rmse": 0.13414562167778796,
+      "worst_curve_rmse": 0.1874500904819256,
+      "worst_curve_id": 572
+    },
+    "target_region_comparison": {
+      "region_hz": [
+        1300.0,
+        2000.0
+      ],
+      "formal_f1_rmse": 0.08460333368577992,
+      "frozen_f3_rmse": 0.042405394573318864
+    },
+    "guardrails": [
+      {
+        "lower_hz": 700.0,
+        "upper_hz": 1000.0,
+        "formal_f1_rmse": 0.04448192208396162,
+        "frozen_f3_rmse": 0.04316827211852443,
+        "relative_change": -0.02953222126862287,
+        "maximum_allowed_relative_worsening": 0.1,
+        "passed": true
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 1650.0,
+        "formal_f1_rmse": 0.08186308709267708,
+        "frozen_f3_rmse": 0.03161355831118349,
+        "relative_change": -0.6138240147797771,
+        "maximum_allowed_relative_worsening": 0.1,
+        "passed": true
+      },
+      {
+        "lower_hz": 1650.0,
+        "upper_hz": 2000.0,
+        "formal_f1_rmse": 0.08725756765548542,
+        "frozen_f3_rmse": 0.05096094493573607,
+        "relative_change": -0.41597105781194177,
+        "maximum_allowed_relative_worsening": 0.1,
+        "passed": true
+      }
+    ],
+    "checks": {
+      "frozen_inputs_replayed_exactly": true,
+      "all_predictions_finite": true,
+      "candidate_beats_f1_full_test_rmse": true,
+      "candidate_improves_curve_mean_rmse": true,
+      "candidate_improves_worst_curve_rmse": true,
+      "candidate_improves_target_region": true,
+      "all_regional_guardrails_pass": true
+    },
+    "reference_only_f1_test_rmse_rounded_from_plan": 0.06947,
+    "no_post_test_tuning": true,
+    "test_rows_accessed": true
+  },
+  "artifact_files": [
+    "comparison_decision.json",
+    "decision_report.md",
+    "figures/test_curve_rmse_scatter.png",
+    "figures/test_frequency_rmse.png",
+    "pre_access_manifest.json",
+    "stage_manifest.json",
+    "test_curve_metrics.csv",
+    "test_frequency_metrics.csv",
+    "test_guardrails.csv",
+    "test_overall_comparison.csv",
+    "test_predictions.npz",
+    "test_regional_comparison.csv"
+  ]
+}

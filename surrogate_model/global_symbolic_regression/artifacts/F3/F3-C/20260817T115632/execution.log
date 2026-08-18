@@ -1,0 +1,17 @@
+[2026-08-17T09:56:32.395274+00:00] F3-C preflight frozen: seeds=42/123/456, branches=C0/A, budget=20/6/40/24, Plan B, validation-only.
+[2026-08-17T09:56:32.397276+00:00] Starting PySR run: branch=c0, seed=42.
+[2026-08-17T09:57:06.094301+00:00] Completed PySR run: branch=c0, seed=42, validation_RMSE=0.089107819.
+[2026-08-17T09:57:06.096303+00:00] Starting PySR run: branch=a, seed=42.
+[2026-08-17T09:57:39.613062+00:00] Completed PySR run: branch=a, seed=42, validation_RMSE=0.057857081.
+[2026-08-17T09:57:39.615062+00:00] Starting PySR run: branch=c0, seed=123.
+[2026-08-17T09:58:14.055371+00:00] Completed PySR run: branch=c0, seed=123, validation_RMSE=0.099418537.
+[2026-08-17T09:58:14.057373+00:00] Starting PySR run: branch=a, seed=123.
+[2026-08-17T09:58:47.161523+00:00] Completed PySR run: branch=a, seed=123, validation_RMSE=0.057845318.
+[2026-08-17T09:58:47.163525+00:00] Starting PySR run: branch=c0, seed=456.
+[2026-08-17T09:59:21.904865+00:00] Completed PySR run: branch=c0, seed=456, validation_RMSE=0.098598002.
+[2026-08-17T09:59:21.906867+00:00] Starting PySR run: branch=a, seed=456.
+[2026-08-17T09:59:55.561503+00:00] Completed PySR run: branch=a, seed=456, validation_RMSE=0.056030291.
+[2026-08-17T09:59:55.562508+00:00] All six PySR searches completed; computing the frozen three-seed decision.
+[2026-08-17T09:59:56.423171+00:00] F3-C complete: stage_passed=True, decision=advance_branch_A_representation_to_next_explicit_stage, test_rows_accessed=False.
+[2026-08-17T09:59:56.424171+00:00] Artifacts written to C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\F3\F3-C\20260817T115632
+[2026-08-17T10:01:08.727282+00:00] Post-search audit added per-seed F1 guardrails; all passed.

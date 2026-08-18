@@ -1,0 +1,10 @@
+Complexity,Loss,Equation
+1,0.03696065,"0.36895323"
+3,0.024950823,"log10_k0_prime__sobol_mod * -0.100322835"
+4,0.011914512,"log(log10_sigma / log10_f)"
+9,0.011793146,"sqrt(0.28877994 / sqrt((log10_lambda__sobol_mod / -0.1888741) + 0.11626919))"
+11,0.011459487,"(0.08246773 / sqrt(sqrt(log10_lambda__sobol_mod * -0.24823637) + 0.06089062)) / 0.3118683"
+13,0.010885415,"sqrt(sqrt(0.074357174 / ((log10_lambda__sobol_mod / -0.39486685) + ((-0.46905833 - log10_sigma__sobol_mod) / log10_k0_prime__sobol_mod))))"
+15,0.010807459,"sqrt(0.30851993 / sqrt((log10_lambda__sobol_mod / -0.28280818) + (((log10_lambda * 0.19890924) - log10_sigma__sobol_mod) / log10_k0_prime__sobol_mod)))"
+17,0.010761709,"sqrt(sqrt(0.091589294 / ((log10_lambda__sobol_mod / -0.337586) + (((log10_lambda__sobol_mod * 0.91219056) - (log10_sigma__sobol_mod - -0.83695996)) / log10_k0_prime__sobol_mod))))"
+19,0.0107172085,"sqrt(sqrt(0.096161194 / (((log10_lambda__sobol_mod * -0.958757) + (log10_lambda__sobol_mod * -0.65736216)) + ((-0.740737 - log10_sigma__sobol_mod) / log10_k0_prime__sobol_mod))) + -0.030613163)"

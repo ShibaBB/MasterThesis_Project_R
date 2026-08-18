@@ -1,0 +1,26 @@
+{
+  "candidate_index": 5,
+  "source_equation": "(z_sigma__f3_mid * -4.196377) / (-44.352028 - (z_sigma__f3_mid * z_sigma__f3_mid))",
+  "source_expression_for_eval": "z_sigma__f3_mid*(-4.196377)/(-z_sigma__f3_mid*z_sigma__f3_mid - 44.352028)",
+  "canonical_equation": "delta_Re = 4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid^2)",
+  "canonical_expression_for_eval": "4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid**2)",
+  "symbolically_equivalent_to_source": true,
+  "analytic_proof": {
+    "denominator": "44.352028 + z_sigma__f3_mid^2",
+    "denominator_strict_lower_bound_for_all_real_z": 44.352028,
+    "has_real_singularity": false,
+    "continuous_and_finite_domain": "all real z_sigma__f3_mid",
+    "residual_at_zero": 0.0,
+    "limit_at_positive_and_negative_infinity": 0.0
+  },
+  "dense_numeric_audit": {
+    "grid_min": -1000000.0,
+    "grid_max": 1000000.0,
+    "grid_size": 27999,
+    "all_finite": true,
+    "value_at_zero": 0.0,
+    "maximum_absolute_residual": 0.31505600420293056
+  },
+  "source_to_canonical_validation_max_abs_difference": 0.0,
+  "passed": true
+}

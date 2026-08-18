@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "stage": "F3-B",
+  "created_utc": "2026-08-16T13:58:22.974963+00:00",
+  "scope": "Freeze, serialize, reload, and replay the selected Re sigma-local terminal",
+  "dataset_run": "run1",
+  "target": "re",
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_sha256": "42388dae24304760f9e4c8ad686cbc40ffaad4ab06a579061b3b96e831b16a58",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "f1_training_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated",
+  "source_f3a_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654",
+  "source_f3a_files": {
+    "decision_report.json": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\decision_report.json",
+      "sha256": "bac0608b4c63eb2932df502a6404a201df20e451ad90d96d4bf8db7e8fe82fc2"
+    },
+    "training_only_standardization.json": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\training_only_standardization.json",
+      "sha256": "f199d497431f056d9b3aebc5164337cee2b6b63bd372ae57003818c74a0fe761"
+    },
+    "ridge_models.json": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\ridge_models.json",
+      "sha256": "687156db92741b814d97ef318b1505ebb34f76d2f9c1cba2d9a2a745dd3eebf0"
+    },
+    "f1_and_selected_sigma_predictions.npz": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\f1_and_selected_sigma_predictions.npz",
+      "sha256": "d1da3653755f68dd9d0901ac6a3314d0beba776df7e2313dd6c132e8ed6cc9da"
+    },
+    "stage_manifest.json": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\stage_manifest.json",
+      "sha256": "86b0c51ec7f03d91107b72ca4f32f83fbcd4dd1d9682c396c8a6d71f1e54c861"
+    }
+  },
+  "frozen_spec_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\frozen_sigma_local_spec.json",
+  "frozen_spec_sha256": "ea8deda5d8e3b1178c52c1df78350169c2d420928bba424e011fe34ff84dca7e",
+  "data_access": {
+    "partitions_loaded": [
+      "train",
+      "validation"
+    ],
+    "train_curve_count": 700,
+    "validation_curve_count": 150,
+    "train_row_count": 89600,
+    "validation_row_count": 19200,
+    "test_curve_count_declared_but_not_loaded": 150,
+    "test_features_read": false,
+    "test_targets_read": false,
+    "test_predictions_computed": false
+  },
+  "decision": {
+    "stage": "F3-B",
+    "stage_passed": true,
+    "frozen_terminal_name": "z_sigma__f3_mid",
+    "frozen_representation": "z_sigma * smooth_log10_bandpass(1250 Hz, 2100 Hz)",
+    "input_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ],
+    "output_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f",
+      "z_sigma__f3_mid"
+    ],
+    "all_values_finite": true,
+    "training_only_normalization_verified": true,
+    "normalization_check": {
+      "stored_training_stats": {
+        "center": 4.689187575130151,
+        "scale": 0.21494263391550147,
+        "method": "training_unique_curve_population_mean_std_ddof0",
+        "training_curve_count": 700
+      },
+      "recomputed_training_stats": {
+        "center": 4.689187575130151,
+        "scale": 0.21494263391550147,
+        "method": "training_unique_curve_population_mean_std_ddof0",
+        "training_curve_count": 700
+      },
+      "descriptive_validation_stats_not_used_for_transform": {
+        "center": 4.70115577613713,
+        "scale": 0.20391592087495047,
+        "method": "descriptive_validation_unique_curve_population_mean_std_ddof0_not_used_for_transform",
+        "validation_curve_count": 150
+      },
+      "training_center_exact": true,
+      "training_scale_exact": true
+    },
+    "exact_reload_replay": {
+      "passed": true,
+      "tolerance": 0.0,
+      "maximum_absolute_difference": 0.0,
+      "feature_order_exact": true,
+      "train_output_sha256": "2a681cde3f44a0533abdfddc6c1a19b17f4dd87b69e963c14088468b9b00e6c0",
+      "validation_output_sha256": "8ea580d8a8b5647a0d33cd0a8d97d976d275d2dd653995dfde8f82ba7fe37ee5"
+    },
+    "f3a_equivalence": {
+      "terminal_values_exact": true,
+      "maximum_terminal_absolute_difference": 0.0,
+      "corrected_predictions_exact": true,
+      "maximum_train_prediction_absolute_difference": 0.0,
+      "maximum_validation_prediction_absolute_difference": 0.0,
+      "ridge_coefficient_reference_only": 0.09117886714681851,
+      "ridge_coefficient_tolerance": 0.0
+    },
+    "terminal_summaries": [
+      {
+        "split": "train",
+        "row_count": 89600,
+        "curve_count": 700,
+        "frequency_count": 128,
+        "finite_count": 89600,
+        "nonfinite_count": 0,
+        "minimum": -2.3560071951001302,
+        "maximum": 1.3368607704294968,
+        "mean": -6.109398701223004e-16,
+        "standard_deviation": 0.4091401057385199,
+        "sha256_float64_bytes": "83daab918e723806912f16c77bf505952553d7a9ab1be95c0bd863d2a000f4ad"
+      },
+      {
+        "split": "validation",
+        "row_count": 19200,
+        "curve_count": 150,
+        "frequency_count": 128,
+        "finite_count": 19200,
+        "nonfinite_count": 0,
+        "minimum": -2.1988626311968784,
+        "maximum": 1.3322316518975401,
+        "mean": 0.013578592460983235,
+        "standard_deviation": 0.3885817121213123,
+        "sha256_float64_bytes": "8426109b13de77037281e5c15b629b40d64731176e42ddbabe33b2477263c588"
+      }
+    ],
+    "checks": {
+      "f3a_stage_passed": true,
+      "selected_representation_matches": true,
+      "training_center_exact": true,
+      "training_scale_exact": true,
+      "normalization_source_is_train": true,
+      "all_values_finite": true,
+      "feature_order_exact": true,
+      "reload_replay_exact": true,
+      "f3a_terminal_values_exact": true,
+      "f3a_corrected_predictions_exact": true,
+      "test_rows_not_accessed": true
+    },
+    "test_rows_accessed": false,
+    "next_stage_automatically_authorized": false,
+    "next_command_if_user_accepts": "执行 F3-C"
+  },
+  "next_stage_automatically_authorized": false,
+  "artifact_files": [
+    "decision_report.json",
+    "decision_report.md",
+    "execution.log",
+    "figures/frozen_terminal_by_frequency.png",
+    "figures/training_only_z_sigma_normalization.png",
+    "frozen_sigma_local_spec.json",
+    "replay_samples.csv",
+    "stage_manifest.json",
+    "terminal_summary.csv",
+    "terminal_values_train_validation.npz",
+    "transform_validation_report.json"
+  ]
+}

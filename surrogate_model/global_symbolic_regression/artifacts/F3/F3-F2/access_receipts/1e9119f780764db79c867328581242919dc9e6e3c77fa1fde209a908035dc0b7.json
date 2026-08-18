@@ -1,0 +1,13 @@
+{
+  "stage": "F3-F2",
+  "status": "test_evaluation_completed",
+  "claimed_utc": "2026-08-18T19:35:29.869683+00:00",
+  "freeze_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1S\\20260818T211720",
+  "frozen_candidate_spec_sha256": "1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7",
+  "output_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F2\\20260818T213528",
+  "test_rows_loaded": true,
+  "rerun_permitted": false,
+  "completed_utc": "2026-08-18T19:35:30.260466+00:00",
+  "test_row_count": 19200,
+  "decision": "accept_frozen_Re_F3_as_formal_Re_model"
+}

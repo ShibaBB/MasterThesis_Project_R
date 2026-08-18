@@ -1,6 +1,6 @@
 # MasterThesis Project R - Current Handoff
 
-Last updated: 2026-08-16.
+Last updated: 2026-08-18.
 
 ## Training Monitoring Convention
 
@@ -135,7 +135,8 @@ identity-transform compatibility path.
 | Global SR full run | Complete | Complete | Both targets now use the current feature transform and matched search settings |
 | Global SR Sobol feature experiment | Complete | Complete | Full-range matched all/subset runs; Re selects subset, Im retains all |
 | Global SR smooth frequency modulation | Complete | Complete | All base parameters retained; validation selects modulated Re and Im |
-| Global SR target-specific modulation F2 | Planned | Planned | Re and Im envelope optimization defined below; training not started |
+| Global SR target-specific modulation F2 | Stage 1 stopped | Complete | Re has no guardrail-feasible onset branch; Im F2 accepted after formal run |
+| Global SR staged residual F3 | Complete | Unchanged | Re F3 passed formal validation, formula-safety freeze, and one-time test; Im remains F2 |
 | Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
 | MLP Sobol pilot | Complete | Complete | Frequency-resolved S1/ST at N=4096 |
 | Teacher Sobol validation | Complete | Complete | Shared-design N=1024 check confirms MLP sensitivity structure |
@@ -146,8 +147,9 @@ identity-transform compatibility path.
 | Raw unclipped evaluation | Complete | Complete | Dynamic plot limits support negative values |
 
 All three model families now run end to end for both targets. The MLP is the
-clear accuracy baseline. Both symbolic-regression families remain substantially
-less accurate and are the main focus of the next optimization phase.
+clear accuracy baseline. Re F3 and Im F2 are the accepted Global SR target
+models. The immediate next phase is production integration and exact pipeline
+regression testing, not another fit of the frozen Re F3 equation.
 
 ## Latest MLP Results
 
@@ -403,7 +405,88 @@ regressed, and 4000-4950 Hz, where its gain must be retained.
    constants, feature order, split hash, branch metrics, chosen equation, and
    acceptance decision in metadata and the Re/Im comparison directories.
 
-As of this handoff update, F2 training has not started.
+### Global SR F2 execution result
+
+F2 was executed on 2026-08-16 with the frozen screening and formal budgets.
+All 21 screening evaluations were validation-only and record no test-row
+access.
+
+For Re, all nine onset branches completed but none passed the declared
+700-1000, 1300-1650, and 1650-2000 Hz regional guardrails. The best full-range
+branch used center 1800 Hz and transition 0.12, with validation RMSE `0.084468`
+versus F1 `0.069979`. Its three regional RMSE regressions were 58.30, 59.00,
+and 47.57 percent. The Re width screen and formal run were therefore not
+started; Re retains F1.
+
+For Im, stage one selected the split `k0_prime` low-pass center 900 Hz and
+transition 0.10. Stage two selected L0 with validation RMSE `0.063067`; L1 and
+L2 reached `0.081258` and `0.088496` and failed the guardrails. The formal L0
+run used 100 iterations, 12 populations, population size 80, and max
+complexity 24. Validation selected candidate 14, complexity 23:
+
+```text
+Im model   Validation RMSE   Test RMSE   Test MAE   Test max error   Test R2
+F1         0.074101          0.070212    0.054466   0.316217         0.587141
+F2         0.066753          0.063032    0.048076   0.297937         0.667266
+```
+
+Im F2 improves validation RMSE by 9.92 percent and test RMSE by 10.23 percent.
+All formal regional guardrails pass, so Im F2 is accepted as the current Im
+Global SR checkpoint. Raw test predictions span `[-0.432702, 0.364151]`.
+
+The first formal Im execution inherited a legacy trainer behavior that
+reported one training-selected candidate on test before the evaluator reported
+the validation-selected candidate. Test data did not influence either envelope
+or candidate selection, but it was read twice after the envelope freeze. The
+F2 runner now forces formal training to remain validation-only so future runs
+open test only in the final evaluator. The acceptance metadata records the
+actual access count for this run.
+
+### Global SR Re F3 staged residual result
+
+The staged Re F3 program completed on 2026-08-18. F3-B froze the atomic local
+terminal `z_sigma__f3_mid = z_sigma * g_mid`, where `g_mid` is the smooth
+log-frequency 1250-2100 Hz band-pass fitted and normalized from training data
+only. F3-C accepted the fixed-F1 residual representation. F3-D1's additional
+local `z_lambda` terminal and F3-E1's nested `log`/`sqrt` constraints were
+rejected by their validation gates, so the formal representation retained only
+the F3-B sigma-local terminal and the original unconstrained search grammar.
+
+F3-F1's lowest-validation-RMSE equation was held because it was non-finite and
+discontinuous at the valid terminal value zero. F3-F1S then applied the
+explicitly authorized formula-safety-first rule to the existing formal Hall of
+Fame and froze candidate 5, complexity 9, without retraining:
+
+```text
+Re_F3 = Re_F1 + delta_Re
+delta_Re = 4.196377 * z_sigma__f3_mid
+           / (44.352028 + z_sigma__f3_mid^2)
+```
+
+The denominator is strictly positive for every real terminal value, and the
+residual is exactly zero when `z_sigma__f3_mid` is zero. Exact train/validation
+serialization replay passed. The separately authorized F3-F2 evaluation then
+opened the 150 test curves once and accepted the frozen equation under all
+predeclared full-range, curve-level, target-region, numerical-safety, and
+regional-guardrail checks:
+
+```text
+Re model   Validation RMSE   Test RMSE   Test MAE   Test max error   Test R2
+F1         0.069979          0.069470    0.053339   --               0.863110
+F3         0.057850          0.061697    0.042343   0.335473         0.892028
+```
+
+On test, F3 improves full-range RMSE by 11.19 percent, curve-mean RMSE by
+17.10 percent, worst-curve RMSE by 4.83 percent, and 1300-2000 Hz RMSE by
+49.88 percent. All three declared regional guardrails pass. The formal
+replacement decision is `accept_frozen_Re_F3_as_formal_Re_model`; the same
+frozen model must not be retuned against or reevaluated on the one-time test
+partition.
+
+```text
+Safety freeze: global_symbolic_regression/artifacts/F3/F3-F1S/20260818T211720
+Final test:    global_symbolic_regression/artifacts/F3/F3-F2/20260818T213528
+```
 
 ## Latest Segmented SR Results
 
@@ -590,7 +673,9 @@ The curve-aware hybrid above is the current segmented checkpoint to preserve.
 Do not resume segmented training implicitly. If this branch is revisited,
 start from its persisted F0/F1 candidates and declared shape gates, then treat
 within-segment fitting and cross-segment continuity as separate experiments.
-The active optimization target now moves to Sobol-guided Global SR.
+That pause led to the completed Sobol-guided Global SR and Re F3 work recorded
+above. Segmented SR remains deferred while the accepted global models are
+integrated.
 
 ## Current Cross-Family Comparison
 
@@ -599,14 +684,15 @@ Family                    Re test RMSE   Re test R2   Im test RMSE   Im test R2
 MLP                       0.003426       0.998623     0.002914       0.998547
 Segmented SR baseline     0.034924       0.965403     0.032371       0.912239
 Segmented curve-aware F1  0.033009       0.969094     0.030104       0.924101
-Global SR modulated        0.069470      0.863110     0.070212       0.587141
+Global SR current          0.061697      0.892028     0.063032       0.667266
 ```
 
 The MLP RMSE is roughly one order of magnitude lower than segmented SR for both
 targets. Segmentation is substantially better than one global equation, but it
-still trails the MLP and introduces boundary discontinuities. Global SR is the
-weakest family, especially for Im, and requires improvements beyond simply
-increasing the number of search iterations.
+still trails the MLP and introduces boundary discontinuities. The accepted Re
+F3 and Im F2 equations improve Global SR while preserving one whole-range
+analytic model per target; the next work is to integrate those frozen models
+into the main pipeline without changing their validated formulas.
 
 ## Frequency-Resolved Sobol Sensitivity
 
@@ -669,11 +755,12 @@ mapping and should guide, not replace, validation-based SR model selection.
 
 ## Sobol-Guided SR Optimization Plan
 
-The next optimization phase should use one shared principle: Sobol indices set
-feature and interaction priorities, but they do not select the final equation.
-Every feature-set decision must be tested against a matched all-parameter
-control with the same training rows, search budget, random seed, validation
-partition, and raw target. Frequency remains available to every SR model.
+The completed Sobol-guided optimization work used one shared principle: Sobol
+indices set feature and interaction priorities, but they did not select the
+final equation. Every feature-set decision was tested against a matched
+all-parameter control with the same training rows, search budget, random seed,
+validation partition, and raw target. Frequency remained available to every
+SR model. Preserve this contract for any future symbolic-search phase.
 
 ### Segmented SR Strategy
 
@@ -805,10 +892,16 @@ Julia 1.11.9
 SymbolicRegression 1.11.3
 ```
 
-The Python trainers currently use deterministic serial PySR execution. PySR
-warns for segments with more than 10,000 rows and recommends batching. The
-formal runs intentionally used all training rows; batching remains a possible
-future search-speed experiment, not part of the reported results.
+The Python trainers default to deterministic serial PySR execution. A
+controlled Re validation-only benchmark on 2026-08-16 tested plan C
+(8-thread multithreading, batching, and turbo) twice with seed 42. C did not
+replay: its selected equation, validation metrics, and complete Hall-of-Fame
+CSV hash all differed. The automatic plan-B fallback (serial deterministic,
+batching with batch size 4096, and turbo) replayed exactly across two runs.
+Therefore use B for subsequent accelerated PySR experiments; do not use C for
+formal results. See
+`global_symbolic_regression/PYSR_ACCELERATION_BENCHMARK.md`. This benchmark
+did not change the MLP architecture and did not access test rows.
 
 ## Artifact Layout
 
@@ -834,25 +927,34 @@ validate `training_metadata.json` and the evaluation summary.
 
 ## Next Priorities
 
-1. Implement the Re F2 split-`alpha_infinity` modulation specification and run
-   its staged, matched validation-only screen exactly as defined above.
-2. Independently implement the Im F2 split-`k0_prime` screen, followed by the
-   matched `lambda_prime` ablation defined above.
-3. Freeze each target's winning envelope before its formal 100-iteration run;
-   do not increase max complexity or alter the symbolic grammar during F2.
-4. Preserve the current F1 smooth-modulation checkpoints as fixed controls and
-   keep all feature decisions whole-range and validation-only.
-5. Preserve the current MLP results as the accuracy reference while optimizing
-   interpretable symbolic models. Any SR improvement must be reported on the
-   same shared split and raw test targets.
-6. Add a paired complex-reflection diagnostic after both targets from a model
-   family are available on identical test rows.
+The immediate integration plan is:
+
+1. Integrate the F3-B frequency-local terminal and the frozen residual formula
+   into the main inference, evaluation, and export paths.
+2. Switch the formal Re model pointer from F1 to F3 while keeping Im F2
+   unchanged.
+3. Use the saved prediction artifacts for exact regression tests and confirm
+   that the integrated pipeline output matches F3-F2 exactly.
+4. Run one complete system test covering Re, Im, the combined output, boundary
+   frequencies, and model serialization.
+
+The Re F3 formula and constants are frozen. These integration steps do not
+authorize another F3 fit or any tuning against the consumed F3-F2 test set.
+After the immediate plan:
+
+5. Preserve the current MLP results as the accuracy reference while improving
+   interpretable symbolic models. Any future SR model must use the same shared
+   split and raw targets under a newly declared validation/test contract.
+6. Add a paired complex-reflection diagnostic using the accepted Re F3 and Im
+   F2 predictions after confirming identical row ordering.
 7. Keep further segmented work deferred. If explicitly resumed, separately
    address constrained within-segment frequency grammar and validation-only
    boundary continuity/blending.
-8. Consider batching or a curve/frequency-balanced search subset only as a
-   controlled PySR speed experiment; always select on full validation data and
-   report on full test data.
+8. Use accepted PySR plan B for any future controlled symbolic-search run:
+   serial deterministic execution, batching with batch size 4096, turbo, and
+   one Julia thread. C is rejected because fixed-seed multithreading failed
+   exact replay. Always select on full validation data and report on full test
+   data only after the validation decision.
 
 ## Invariants For Future Work
 
