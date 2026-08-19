@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "purpose": "smooth teacher-Sobol parameter-frequency modulation for full-range Global SR",
+  "created_at": "2026-08-16T09:40:42.706018+02:00",
+  "execute": true,
+  "frequency_domains": [
+    {
+      "lower_hz": 100.0,
+      "upper_hz": 4950.0
+    }
+  ],
+  "base_parameters_retained": true,
+  "modulated_features_per_target": 5,
+  "selection_contract": "Compare the single full-range modulated model with the matched all-base control using validation RMSE only; test metrics are final reporting.",
+  "matched_settings": {
+    "dataset_run": "run1",
+    "random_seed": 42,
+    "niterations": 100,
+    "populations": 12,
+    "population_size": 80,
+    "maxsize": 24,
+    "max_samples": null
+  },
+  "runs": [
+    {
+      "target": "re",
+      "branch": "sobol_modulated",
+      "train_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated",
+      "eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_run1_sobol_modulated_best_loss",
+      "baseline_eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260815_run1_sobol_phase1_all_best_loss",
+      "comparison_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\comparison\\20260816_run1_sobol_modulated",
+      "train_command": [
+        "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\Scripts\\python.exe",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\train_global_symbolic_model.py",
+        "--target",
+        "re",
+        "--dataset-run",
+        "run1",
+        "--output-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated",
+        "--feature-branch",
+        "sobol_modulated",
+        "--random-seed",
+        "42",
+        "--niterations",
+        "100",
+        "--populations",
+        "12",
+        "--population-size",
+        "80",
+        "--maxsize",
+        "24",
+        "--model-selection",
+        "best"
+      ],
+      "eval_command": [
+        "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\Scripts\\python.exe",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\evaluate_global_symbolic_candidates.py",
+        "--target",
+        "re",
+        "--dataset-run",
+        "run1",
+        "--training-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated",
+        "--output-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_run1_sobol_modulated_best_loss",
+        "--selection-rule",
+        "best_loss"
+      ],
+      "compare_command": [
+        "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\Scripts\\python.exe",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\compare_global_modulation_results.py",
+        "--all-eval-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260815_run1_sobol_phase1_all_best_loss",
+        "--modulated-eval-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_run1_sobol_modulated_best_loss",
+        "--output-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\comparison\\20260816_run1_sobol_modulated"
+      ]
+    },
+    {
+      "target": "im",
+      "branch": "sobol_modulated",
+      "train_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260816_run1_sobol_modulated",
+      "eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\eval\\20260816_run1_sobol_modulated_best_loss",
+      "baseline_eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\eval\\20260815_run1_sobol_phase1_all_best_loss",
+      "comparison_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\comparison\\20260816_run1_sobol_modulated",
+      "train_command": [
+        "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\Scripts\\python.exe",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\train_global_symbolic_model.py",
+        "--target",
+        "im",
+        "--dataset-run",
+        "run1",
+        "--output-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260816_run1_sobol_modulated",
+        "--feature-branch",
+        "sobol_modulated",
+        "--random-seed",
+        "42",
+        "--niterations",
+        "100",
+        "--populations",
+        "12",
+        "--population-size",
+        "80",
+        "--maxsize",
+        "24",
+        "--model-selection",
+        "best"
+      ],
+      "eval_command": [
+        "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\Scripts\\python.exe",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\evaluate_global_symbolic_candidates.py",
+        "--target",
+        "im",
+        "--dataset-run",
+        "run1",
+        "--training-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260816_run1_sobol_modulated",
+        "--output-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\eval\\20260816_run1_sobol_modulated_best_loss",
+        "--selection-rule",
+        "best_loss"
+      ],
+      "compare_command": [
+        "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\Scripts\\python.exe",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\compare_global_modulation_results.py",
+        "--all-eval-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\eval\\20260815_run1_sobol_phase1_all_best_loss",
+        "--modulated-eval-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\eval\\20260816_run1_sobol_modulated_best_loss",
+        "--output-dir",
+        "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\comparison\\20260816_run1_sobol_modulated"
+      ]
+    }
+  ]
+}

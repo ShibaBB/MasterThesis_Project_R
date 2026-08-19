@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "name": "global_sr_f2_im_split_k0_prime",
+  "source": "F2 frozen residual diagnosis and teacher Sobol envelope locations",
+  "target": "im",
+  "frequency_feature": "log10_f",
+  "frequency_range_hz": [
+    100.0,
+    4950.0
+  ],
+  "base_features_retained": true,
+  "teacher_st_values_used_as_model_inputs": false,
+  "features": [
+    {
+      "name": "log10_k0_prime__f2_low",
+      "base_feature": "log10_k0_prime",
+      "components": [
+        {
+          "kind": "lowpass",
+          "center_hz": 600.0,
+          "transition_log10": 0.1,
+          "weight": 1.0
+        }
+      ],
+      "normalization_max": 0.9995827937262358
+    },
+    {
+      "name": "log10_k0_prime__f2_high",
+      "base_feature": "log10_k0_prime",
+      "components": [
+        {
+          "kind": "highpass",
+          "center_hz": 3900.0,
+          "transition_log10": 0.1,
+          "weight": 1.0
+        }
+      ],
+      "normalization_max": 0.7379626028863572
+    },
+    {
+      "name": "log10_lambda_prime__f2_mod",
+      "base_feature": "log10_lambda_prime",
+      "components": [
+        {
+          "kind": "lowpass",
+          "center_hz": 700.0,
+          "transition_log10": 0.13,
+          "weight": 0.35
+        },
+        {
+          "kind": "highpass",
+          "center_hz": 4000.0,
+          "transition_log10": 0.1,
+          "weight": 1.0
+        }
+      ],
+      "normalization_max": 0.7166592356962695
+    }
+  ],
+  "f2_design": {
+    "k0_low_center_hz": 600.0,
+    "k0_low_transition_log10": 0.1,
+    "k0_high_center_hz": 3900.0,
+    "k0_high_transition_log10": 0.1,
+    "lambda_prime_variant": "L0"
+  }
+}

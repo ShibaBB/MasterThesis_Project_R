@@ -48,6 +48,14 @@ from symbolic_feature_transform import (  # noqa: E402
     apply_feature_transform,
     identity_feature_transform,
 )
+from global_sobol_feature_policy import (  # noqa: E402
+    build_feature_policy,
+    validate_stored_feature_policy,
+)
+from global_frequency_modulation import (  # noqa: E402
+    apply_frequency_modulation,
+    validate_frequency_modulation,
+)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -118,6 +126,11 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=None,
         help="Optional 1-based row number in the global equations CSV.",
+    )
+    parser.add_argument(
+        "--validation-only",
+        action="store_true",
+        help="Select and diagnose on validation rows without subsetting or predicting test rows.",
     )
     return parser.parse_args()
 
@@ -516,6 +529,56 @@ def prediction_diagnostics(y_pred: np.ndarray) -> dict[str, float | int]:
     }
 
 
+DIAGNOSTIC_FREQUENCY_BANDS_HZ = (
+    (100.0, 700.0),
+    (700.0, 1000.0),
+    (1000.0, 1300.0),
+    (1300.0, 1650.0),
+    (1650.0, 2000.0),
+    (2000.0, 3000.0),
+    (3000.0, 4000.0),
+    (4000.0, 4950.0),
+)
+
+
+def regional_metrics(
+    y_true: np.ndarray, y_pred: np.ndarray, frequency_hz: np.ndarray
+) -> list[dict[str, float | int]]:
+    rows: list[dict[str, float | int]] = []
+    for lower_hz, upper_hz in DIAGNOSTIC_FREQUENCY_BANDS_HZ:
+        mask = (frequency_hz >= lower_hz) & (frequency_hz <= upper_hz)
+        metrics = regression_metrics(y_true[mask], y_pred[mask])
+        error = y_pred[mask] - y_true[mask]
+        rows.append(
+            {
+                "lower_hz": lower_hz,
+                "upper_hz": upper_hz,
+                "n_rows": int(np.sum(mask)),
+                "bias": float(np.mean(error)),
+                **metrics,
+            }
+        )
+    return rows
+
+
+def frequency_wise_metrics(
+    y_true: np.ndarray, y_pred: np.ndarray, frequency_hz: np.ndarray
+) -> list[dict[str, float | int]]:
+    rows: list[dict[str, float | int]] = []
+    for frequency in np.unique(frequency_hz):
+        mask = frequency_hz == frequency
+        error = y_pred[mask] - y_true[mask]
+        rows.append(
+            {
+                "frequency_hz": float(frequency),
+                "n_rows": int(np.sum(mask)),
+                "rmse": float(np.sqrt(np.mean(error ** 2))),
+                "bias": float(np.mean(error)),
+            }
+        )
+    return rows
+
+
 def main() -> None:
     args = parse_args()
     args.dataset_file, resolved_dataset_run = resolve_dataset_file(
@@ -548,14 +611,41 @@ def main() -> None:
         data["X"], original_feature_names, feature_transform
     )
     data["feature_names"] = feature_transform["transformed_feature_names"]
+    transformed_feature_names = list(data["feature_names"])
+    feature_policy = training_metadata.get("feature_policy")
+    if feature_policy is None:
+        feature_policy = build_feature_policy(
+            args.target, "all", transformed_feature_names
+        )
+    else:
+        feature_policy = validate_stored_feature_policy(
+            feature_policy, args.target, transformed_feature_names
+        )
+    selected_indices = feature_policy["feature_indices_0based"]
+    data["X"] = data["X"][:, selected_indices]
+    data["feature_names"] = feature_policy["feature_names"]
+    frequency_modulation = training_metadata.get("frequency_modulation")
+    if feature_policy.get("branch") == "sobol_modulated":
+        if frequency_modulation is None:
+            raise ValueError("Modulated training run is missing frequency-modulation metadata.")
+        frequency_modulation = validate_frequency_modulation(
+            frequency_modulation, args.target, data["feature_names"]
+        )
+        data["X"], data["feature_names"] = apply_frequency_modulation(
+            data["X"], data["feature_names"], frequency_modulation
+        )
+    elif frequency_modulation is not None:
+        raise ValueError("Non-modulated feature branch contains modulation metadata.")
     validation_data = subset_symbolic_data(
         data,
         source_curve_mask(data["source_curve_index"], shared_split, "validation"),
     )
-    test_data = subset_symbolic_data(
-        data,
-        source_curve_mask(data["source_curve_index"], shared_split, "test"),
-    )
+    test_data = None
+    if not args.validation_only:
+        test_data = subset_symbolic_data(
+            data,
+            source_curve_mask(data["source_curve_index"], shared_split, "test"),
+        )
     variable_names = make_pysr_variable_names(data["feature_names"])
 
     metrics, _ = evaluate_global_candidates(
@@ -570,14 +660,24 @@ def main() -> None:
         validation_data, metrics, selected_candidate, variable_names
     )
     validation_metrics = regression_metrics(validation_data["y"], validation_y_pred)
-    raw_y_pred_all, y_pred_all, selected_df = evaluate_selected_candidate(
-        test_data, metrics, selected_candidate, variable_names
+    validation_regional_metrics = regional_metrics(
+        validation_data["y"], validation_y_pred, validation_data["frequency_hz"]
     )
+    validation_frequency_wise_metrics = frequency_wise_metrics(
+        validation_data["y"], validation_y_pred, validation_data["frequency_hz"]
+    )
+    selected_df = metrics[metrics["candidate_index"] == selected_candidate].copy()
     selected_df.to_csv(args.output_dir / "selected_candidate.csv", index=False)
-
-    selected_metrics = regression_metrics(test_data["y"], y_pred_all)
-    raw_physical_diagnostics = prediction_diagnostics(raw_y_pred_all)
-    physical_diagnostics = prediction_diagnostics(y_pred_all)
+    selected_metrics = None
+    raw_physical_diagnostics = None
+    physical_diagnostics = None
+    if test_data is not None:
+        raw_y_pred_all, y_pred_all, _ = evaluate_selected_candidate(
+            test_data, metrics, selected_candidate, variable_names
+        )
+        selected_metrics = regression_metrics(test_data["y"], y_pred_all)
+        raw_physical_diagnostics = prediction_diagnostics(raw_y_pred_all)
+        physical_diagnostics = prediction_diagnostics(y_pred_all)
     selected_summary = {
         "dataset_file": str(args.dataset_file),
         "dataset_run": resolved_dataset_run,
@@ -587,7 +687,8 @@ def main() -> None:
         "shared_split_hash": shared_split["split_hash"],
         "training_dir": str(args.training_dir),
         "candidate_selection_split": "validation",
-        "final_evaluation_split": "test",
+        "final_evaluation_split": None if args.validation_only else "test",
+        "test_rows_accessed": not args.validation_only,
         "selection_rule": args.selection_rule,
         "output_postprocessing": {"method": "none"},
         "selected_candidate": selected_candidate,
@@ -596,36 +697,50 @@ def main() -> None:
         "feature_names": data["feature_names"],
         "original_feature_names": original_feature_names,
         "feature_transform": feature_transform,
+        "transformed_feature_names_before_policy": transformed_feature_names,
+        "feature_policy": feature_policy,
+        "frequency_modulation": frequency_modulation,
         "pysr_variable_names": variable_names,
         "overall_metrics": selected_metrics,
         "validation_selection_metrics": validation_metrics,
+        "validation_regional_metrics": validation_regional_metrics,
+        "validation_frequency_wise_metrics": validation_frequency_wise_metrics,
         "raw_prediction_diagnostics": raw_physical_diagnostics,
         "prediction_diagnostics": physical_diagnostics,
     }
     with (args.output_dir / "selected_global_summary.json").open("w", encoding="utf-8") as file:
         json.dump(selected_summary, file, indent=2)
 
-    freq_values = test_data["frequency_hz"]
-    plot_selected_scatter(test_data["y"], y_pred_all, figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
-    plot_error_vs_frequency(freq_values, y_pred_all - test_data["y"], figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
-    plot_curve_comparisons(test_data, y_pred_all, figures_dir, args.num_curves, args.random_seed)
+    if test_data is not None:
+        freq_values = test_data["frequency_hz"]
+        plot_selected_scatter(test_data["y"], y_pred_all, figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
+        plot_error_vs_frequency(freq_values, y_pred_all - test_data["y"], figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
+        plot_curve_comparisons(test_data, y_pred_all, figures_dir, args.num_curves, args.random_seed)
 
     print("Global symbolic candidate evaluation complete.")
     print(f"Candidate metrics: {args.output_dir / 'candidate_metrics.csv'}")
     print(f"Selected candidate: {selected_candidate}")
-    print(
-        "Overall selected-formula metrics: "
-        f"RMSE={selected_metrics['rmse']:.6f}, "
-        f"MAE={selected_metrics['mae']:.6f}, "
-        f"R2={selected_metrics['r2']:.6f}"
-    )
-    print(
-        "Prediction diagnostics: "
-        f"raw_range=[{raw_physical_diagnostics['prediction_min']:.6f}, "
-        f"{raw_physical_diagnostics['prediction_max']:.6f}], "
-        f"final_range=[{physical_diagnostics['prediction_min']:.6f}, "
-        f"{physical_diagnostics['prediction_max']:.6f}]"
-    )
+    if selected_metrics is None:
+        print(
+            "Validation-only selected-formula metrics: "
+            f"RMSE={validation_metrics['rmse']:.6f}, "
+            f"MAE={validation_metrics['mae']:.6f}, "
+            f"R2={validation_metrics['r2']:.6f}; test rows were not accessed."
+        )
+    else:
+        print(
+            "Overall selected-formula metrics: "
+            f"RMSE={selected_metrics['rmse']:.6f}, "
+            f"MAE={selected_metrics['mae']:.6f}, "
+            f"R2={selected_metrics['r2']:.6f}"
+        )
+        print(
+            "Prediction diagnostics: "
+            f"raw_range=[{raw_physical_diagnostics['prediction_min']:.6f}, "
+            f"{raw_physical_diagnostics['prediction_max']:.6f}], "
+            f"final_range=[{physical_diagnostics['prediction_min']:.6f}, "
+            f"{physical_diagnostics['prediction_max']:.6f}]"
+        )
     print(f"Figures saved to: {figures_dir}")
 
 

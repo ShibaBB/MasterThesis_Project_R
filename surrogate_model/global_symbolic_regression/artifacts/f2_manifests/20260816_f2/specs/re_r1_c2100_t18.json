@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "name": "global_sr_f2_re_split_alpha_infinity",
+  "source": "F2 frozen residual diagnosis and teacher Sobol envelope locations",
+  "target": "re",
+  "frequency_feature": "log10_f",
+  "frequency_range_hz": [
+    100.0,
+    4950.0
+  ],
+  "base_features_retained": true,
+  "teacher_st_values_used_as_model_inputs": false,
+  "features": [
+    {
+      "name": "alpha_infinity__f2_onset",
+      "base_feature": "alpha_infinity",
+      "components": [
+        {
+          "kind": "highpass",
+          "center_hz": 2100.0,
+          "transition_log10": 0.18,
+          "weight": 1.0
+        }
+      ],
+      "normalization_max": 0.8878345683459797
+    },
+    {
+      "name": "alpha_infinity__f2_high",
+      "base_feature": "alpha_infinity",
+      "components": [
+        {
+          "kind": "gaussian",
+          "center_hz": 3422.0,
+          "width_log10": 0.22,
+          "weight": 1.0
+        }
+      ],
+      "normalization_max": 0.9999996811212064
+    }
+  ],
+  "f2_design": {
+    "onset_center_hz": 2100.0,
+    "onset_transition_log10": 0.18,
+    "high_center_hz": 3422.0,
+    "high_width_log10": 0.22
+  }
+}

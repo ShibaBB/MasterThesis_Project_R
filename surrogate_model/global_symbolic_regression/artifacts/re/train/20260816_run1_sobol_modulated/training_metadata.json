@@ -1,0 +1,297 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_run": "run1",
+  "target": "re",
+  "target_name": "R_real",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "fiberfolder": "Wool",
+  "num_curve_samples": 1000,
+  "num_symbolic_samples": 128000,
+  "original_feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "log10_sigma__sobol_mod",
+    "alpha_infinity__sobol_mod",
+    "log10_lambda__sobol_mod",
+    "log10_lambda_prime__sobol_mod",
+    "log10_k0_prime__sobol_mod"
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "log10_sigma__sobol_mod",
+    "alpha_infinity__sobol_mod",
+    "log10_lambda__sobol_mod",
+    "log10_lambda_prime__sobol_mod",
+    "log10_k0_prime__sobol_mod"
+  ],
+  "feature_name_mapping": {
+    "log10_sigma": "log10_sigma",
+    "alpha_infinity": "alpha_infinity",
+    "log10_lambda": "log10_lambda",
+    "log10_lambda_prime": "log10_lambda_prime",
+    "log10_k0_prime": "log10_k0_prime",
+    "log10_f": "log10_f",
+    "log10_sigma__sobol_mod": "log10_sigma__sobol_mod",
+    "alpha_infinity__sobol_mod": "alpha_infinity__sobol_mod",
+    "log10_lambda__sobol_mod": "log10_lambda__sobol_mod",
+    "log10_lambda_prime__sobol_mod": "log10_lambda_prime__sobol_mod",
+    "log10_k0_prime__sobol_mod": "log10_k0_prime__sobol_mod"
+  },
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "transformed_feature_names_before_policy": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_policy": {
+    "schema_version": 1,
+    "name": "teacher_sobol_smooth_modulation_base_features",
+    "source": "teacher Sobol run1 N=1024, variance-weighted 100-4950 Hz ST",
+    "branch": "sobol_modulated",
+    "target": "re",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "frequency_always_retained": true,
+    "selection_stage": "after_training_fitted_base_transform",
+    "feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ],
+    "feature_indices_0based": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "excluded_transformed_features": []
+  },
+  "frequency_modulation": {
+    "schema_version": 1,
+    "name": "teacher_sobol_smooth_parameter_envelopes",
+    "source": "teacher Sobol run1 N=1024 frequency and segment ST diagnostics",
+    "target": "re",
+    "frequency_feature": "log10_f",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "base_features_retained": true,
+    "teacher_st_values_used_as_model_inputs": false,
+    "features": [
+      {
+        "name": "log10_sigma__sobol_mod",
+        "base_feature": "log10_sigma",
+        "components": [
+          {
+            "kind": "gaussian",
+            "center_hz": 1437.0,
+            "width_log10": 0.366,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.9999999998577954
+      },
+      {
+        "name": "alpha_infinity__sobol_mod",
+        "base_feature": "alpha_infinity",
+        "components": [
+          {
+            "kind": "gaussian",
+            "center_hz": 3422.0,
+            "width_log10": 0.22,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.9999996811212064
+      },
+      {
+        "name": "log10_lambda__sobol_mod",
+        "base_feature": "log10_lambda",
+        "components": [
+          {
+            "kind": "highpass",
+            "center_hz": 2200.0,
+            "transition_log10": 0.14,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.9252274953084788
+      },
+      {
+        "name": "log10_lambda_prime__sobol_mod",
+        "base_feature": "log10_lambda_prime",
+        "components": [
+          {
+            "kind": "lowpass",
+            "center_hz": 700.0,
+            "transition_log10": 0.12,
+            "weight": 0.3
+          },
+          {
+            "kind": "highpass",
+            "center_hz": 3800.0,
+            "transition_log10": 0.1,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.759437430128616
+      },
+      {
+        "name": "log10_k0_prime__sobol_mod",
+        "base_feature": "log10_k0_prime",
+        "components": [
+          {
+            "kind": "lowpass",
+            "center_hz": 850.0,
+            "transition_log10": 0.12,
+            "weight": 1.0
+          },
+          {
+            "kind": "highpass",
+            "center_hz": 3400.0,
+            "transition_log10": 0.12,
+            "weight": 0.65
+          }
+        ],
+        "normalization_max": 0.9995692172822197
+      }
+    ]
+  },
+  "global_name": "global_100_4950",
+  "global_bounds_hz": [
+    100.0,
+    4950.0
+  ],
+  "training_args": {
+    "target": "re",
+    "dataset_run": "run1",
+    "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+    "split_file": null,
+    "output_root": null,
+    "output_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated",
+    "run_name": "",
+    "random_seed": 42,
+    "feature_branch": "sobol_modulated",
+    "max_samples": null,
+    "niterations": 100,
+    "populations": 12,
+    "population_size": 80,
+    "maxsize": 24,
+    "model_selection": "best",
+    "procs": 0,
+    "julia_exe": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\julia_env\\pyjuliapkg\\install\\bin\\julia.exe",
+    "overwrite": false
+  },
+  "search_contract": {
+    "binary_operators": [
+      "+",
+      "-",
+      "*",
+      "/"
+    ],
+    "unary_operators": [
+      "log",
+      "sqrt"
+    ],
+    "deterministic": true,
+    "parallelism": "serial",
+    "training_rows": "all full-range training rows unless max_samples is set"
+  }
+}

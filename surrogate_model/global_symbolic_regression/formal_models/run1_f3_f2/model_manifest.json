@@ -1,0 +1,551 @@
+{
+  "schema_version": 1,
+  "model_id": "run1_global_sr_re_f3_im_f2",
+  "model_family": "global_symbolic_regression",
+  "dataset": {
+    "run_id": "run1",
+    "complex_source": "Reflect",
+    "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+    "frequency_grid_hz": {
+      "min": 100.0,
+      "max": 4950.0,
+      "points": 128
+    }
+  },
+  "input_contract": {
+    "feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "fixed_features": {
+      "phi": 0.92,
+      "h": 0.03
+    },
+    "frequency_feature": "f",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "out_of_range_policy": "fail_unless_allow_extrapolation_is_explicit"
+  },
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "targets": {
+    "re": {
+      "target_name": "R_real",
+      "definition": "real(Reflect)",
+      "active_model": "Re_F3",
+      "model_definition": "Re_F3 = Re_F1 + delta_Re",
+      "feature_policy": {
+        "schema_version": 1,
+        "name": "teacher_sobol_smooth_modulation_base_features",
+        "source": "teacher Sobol run1 N=1024, variance-weighted 100-4950 Hz ST",
+        "branch": "sobol_modulated",
+        "target": "re",
+        "frequency_range_hz": [
+          100.0,
+          4950.0
+        ],
+        "frequency_always_retained": true,
+        "selection_stage": "after_training_fitted_base_transform",
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "excluded_transformed_features": []
+      },
+      "frequency_modulation": {
+        "schema_version": 1,
+        "name": "teacher_sobol_smooth_parameter_envelopes",
+        "source": "teacher Sobol run1 N=1024 frequency and segment ST diagnostics",
+        "target": "re",
+        "frequency_feature": "log10_f",
+        "frequency_range_hz": [
+          100.0,
+          4950.0
+        ],
+        "base_features_retained": true,
+        "teacher_st_values_used_as_model_inputs": false,
+        "features": [
+          {
+            "name": "log10_sigma__sobol_mod",
+            "base_feature": "log10_sigma",
+            "components": [
+              {
+                "kind": "gaussian",
+                "center_hz": 1437.0,
+                "width_log10": 0.366,
+                "weight": 1.0
+              }
+            ],
+            "normalization_max": 0.9999999998577954
+          },
+          {
+            "name": "alpha_infinity__sobol_mod",
+            "base_feature": "alpha_infinity",
+            "components": [
+              {
+                "kind": "gaussian",
+                "center_hz": 3422.0,
+                "width_log10": 0.22,
+                "weight": 1.0
+              }
+            ],
+            "normalization_max": 0.9999996811212064
+          },
+          {
+            "name": "log10_lambda__sobol_mod",
+            "base_feature": "log10_lambda",
+            "components": [
+              {
+                "kind": "highpass",
+                "center_hz": 2200.0,
+                "transition_log10": 0.14,
+                "weight": 1.0
+              }
+            ],
+            "normalization_max": 0.9252274953084788
+          },
+          {
+            "name": "log10_lambda_prime__sobol_mod",
+            "base_feature": "log10_lambda_prime",
+            "components": [
+              {
+                "kind": "lowpass",
+                "center_hz": 700.0,
+                "transition_log10": 0.12,
+                "weight": 0.3
+              },
+              {
+                "kind": "highpass",
+                "center_hz": 3800.0,
+                "transition_log10": 0.1,
+                "weight": 1.0
+              }
+            ],
+            "normalization_max": 0.759437430128616
+          },
+          {
+            "name": "log10_k0_prime__sobol_mod",
+            "base_feature": "log10_k0_prime",
+            "components": [
+              {
+                "kind": "lowpass",
+                "center_hz": 850.0,
+                "transition_log10": 0.12,
+                "weight": 1.0
+              },
+              {
+                "kind": "highpass",
+                "center_hz": 3400.0,
+                "transition_log10": 0.12,
+                "weight": 0.65
+              }
+            ],
+            "normalization_max": 0.9995692172822197
+          }
+        ]
+      },
+      "f1_equation": {
+        "source_model": "Re_F1",
+        "validation_selected_candidate": 15,
+        "complexity": 24,
+        "equation": "log(((((log10_sigma * 1.652225) + -3.108904) / (log10_f + (alpha_infinity__sobol_mod * 0.89824456))) + ((alpha_infinity__sobol_mod * 0.5542172) - (sqrt(sqrt(alpha_infinity__sobol_mod)) * 0.7014716))) - -0.36555007)",
+        "expression_for_eval": "log(-0.7014716*alpha_infinity__sobol_mod**(1/4) + 0.5542172*alpha_infinity__sobol_mod + 0.36555007 + (1.652225*log10_sigma - 3.108904)/(0.89824456*alpha_infinity__sobol_mod + log10_f))",
+        "variable_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f",
+          "log10_sigma__sobol_mod",
+          "alpha_infinity__sobol_mod",
+          "log10_lambda__sobol_mod",
+          "log10_lambda_prime__sobol_mod",
+          "log10_k0_prime__sobol_mod"
+        ]
+      },
+      "f3_local_terminal_spec": {
+        "schema_version": 1,
+        "name": "re_f3_sigma_local_bandpass_v1",
+        "stage_frozen": "F3-B",
+        "source_evidence_stage": "F3-A",
+        "source_f3a_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654",
+        "target": "re",
+        "dataset_run": "run1",
+        "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+        "frequency_range_hz": [
+          100.0,
+          4950.0
+        ],
+        "input_feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "base_features_retained": true,
+        "frequency_feature": "log10_f",
+        "standardizations": {
+          "z_sigma": {
+            "source_feature": "log10_sigma",
+            "center": 4.689187575130151,
+            "scale": 0.21494263391550147,
+            "fitted_partition": "train",
+            "fitted_unique_curve_count": 700,
+            "method": "training_unique_curve_population_mean_std_ddof0",
+            "ddof": 0
+          }
+        },
+        "envelopes": {
+          "g_mid": {
+            "name": "g_mid",
+            "kind": "smooth_log10_bandpass_product",
+            "frequency_coordinate": "log10_hz",
+            "low_hz": 1250.0,
+            "high_hz": 2100.0,
+            "low_transition_log10": 0.06,
+            "high_transition_log10": 0.06,
+            "normalization_method": "maximum_on_fixed_log10_reference_grid",
+            "normalization_frequency_range_hz": [
+              100.0,
+              4950.0
+            ],
+            "normalization_reference_grid_size": 4096,
+            "normalization_max": 0.7522658139641833
+          }
+        },
+        "terminals": [
+          {
+            "name": "z_sigma__f3_mid",
+            "standardized_feature": "z_sigma",
+            "envelope": "g_mid",
+            "analytic_definition": "((log10_sigma - center) / scale) * g_mid(log10_f)"
+          }
+        ],
+        "terminal_feature_names": [
+          "z_sigma__f3_mid"
+        ],
+        "output_feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f",
+          "z_sigma__f3_mid"
+        ],
+        "terminal_order_contract": "append_after_base_features_in_declared_order",
+        "teacher_or_sobol_values_used_as_row_inputs": false,
+        "output_postprocessing": {
+          "method": "none"
+        },
+        "f3a_selection_evidence": {
+          "selected_candidate": "sigma_bandpass_1250_2100",
+          "ridge_coefficient_reference_only": 0.09117886714681851,
+          "ridge_coefficient_is_part_of_terminal": false,
+          "decision_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\decision_report.json",
+          "decision_file_sha256": "bac0608b4c63eb2932df502a6404a201df20e451ad90d96d4bf8db7e8fe82fc2"
+        }
+      },
+      "f3_residual": {
+        "source_stage": "F3-F1S",
+        "validation_selected_candidate": 5,
+        "complexity": 9,
+        "equation": "delta_Re = 4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid^2)",
+        "expression_for_eval": "4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid**2)",
+        "variable_names": [
+          "z_sigma__f3_mid"
+        ],
+        "formula_safety_passed": true,
+        "f1_fallback_at_terminal_zero": true
+      },
+      "formal_acceptance_decision": "accept_frozen_Re_F3_as_formal_Re_model",
+      "reference_test_metrics": {
+        "rmse": 0.061697052842910646,
+        "mae": 0.042342503427319295,
+        "max_abs_error": 0.33547306779145347,
+        "r2": 0.8920282418697033,
+        "bias": 0.00117129872578106,
+        "prediction_min": -0.10873871006546824,
+        "prediction_max": 1.0714080961773835
+      },
+      "output_postprocessing": {
+        "method": "none"
+      }
+    },
+    "im": {
+      "target_name": "R_imag",
+      "definition": "imag(Reflect)",
+      "active_model": "Im_F2",
+      "feature_policy": {
+        "schema_version": 1,
+        "name": "teacher_sobol_smooth_modulation_base_features",
+        "source": "teacher Sobol run1 N=1024, variance-weighted 100-4950 Hz ST",
+        "branch": "sobol_modulated",
+        "target": "im",
+        "frequency_range_hz": [
+          100.0,
+          4950.0
+        ],
+        "frequency_always_retained": true,
+        "selection_stage": "after_training_fitted_base_transform",
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "excluded_transformed_features": []
+      },
+      "frequency_modulation": {
+        "schema_version": 1,
+        "name": "global_sr_f2_im_split_k0_prime",
+        "source": "F2 frozen residual diagnosis and teacher Sobol envelope locations",
+        "target": "im",
+        "frequency_feature": "log10_f",
+        "frequency_range_hz": [
+          100.0,
+          4950.0
+        ],
+        "base_features_retained": true,
+        "teacher_st_values_used_as_model_inputs": false,
+        "features": [
+          {
+            "name": "log10_k0_prime__f2_low",
+            "base_feature": "log10_k0_prime",
+            "components": [
+              {
+                "kind": "lowpass",
+                "center_hz": 900.0,
+                "transition_log10": 0.1,
+                "weight": 1.0
+              }
+            ],
+            "normalization_max": 0.9999282624928222
+          },
+          {
+            "name": "log10_k0_prime__f2_high",
+            "base_feature": "log10_k0_prime",
+            "components": [
+              {
+                "kind": "highpass",
+                "center_hz": 3900.0,
+                "transition_log10": 0.1,
+                "weight": 1.0
+              }
+            ],
+            "normalization_max": 0.7379626028863572
+          },
+          {
+            "name": "log10_lambda_prime__f2_mod",
+            "base_feature": "log10_lambda_prime",
+            "components": [
+              {
+                "kind": "lowpass",
+                "center_hz": 700.0,
+                "transition_log10": 0.13,
+                "weight": 0.35
+              },
+              {
+                "kind": "highpass",
+                "center_hz": 4000.0,
+                "transition_log10": 0.1,
+                "weight": 1.0
+              }
+            ],
+            "normalization_max": 0.7166592356962695
+          }
+        ],
+        "f2_design": {
+          "k0_low_center_hz": 900.0,
+          "k0_low_transition_log10": 0.1,
+          "k0_high_center_hz": 3900.0,
+          "k0_high_transition_log10": 0.1,
+          "lambda_prime_variant": "L0"
+        }
+      },
+      "equation": {
+        "validation_selected_candidate": 14,
+        "complexity": 23,
+        "equation": "log((((log10_sigma + log10_sigma) + -7.2810593) * 1.456188) + ((log(alpha_infinity) + log10_k0_prime__f2_low) / log10_lambda_prime__f2_mod)) / (log10_lambda - (log10_sigma + (log10_sigma + -7.2810593)))",
+        "expression_for_eval": "log(2.912376*log10_sigma - 10.6025911799484 + (log10_k0_prime__f2_low + log(alpha_infinity))/log10_lambda_prime__f2_mod)/(log10_lambda - 2*log10_sigma + 7.2810593)",
+        "variable_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f",
+          "log10_k0_prime__f2_low",
+          "log10_k0_prime__f2_high",
+          "log10_lambda_prime__f2_mod"
+        ]
+      },
+      "validation_selected_candidate": 14,
+      "formal_acceptance_decision": "accept_Im_F2_as_formal_Im_model",
+      "reference_test_metrics": {
+        "rmse": 0.06303179171217158,
+        "mae": 0.048076400687495885,
+        "max_abs_error": 0.2979369347037859,
+        "r2": 0.6672655222882877,
+        "true_min": -0.6430793623150733,
+        "true_max": 0.20213411538375756,
+        "prediction_min": -0.43270175099021213,
+        "prediction_max": 0.36415096353117676
+      },
+      "output_postprocessing": {
+        "method": "none"
+      }
+    }
+  },
+  "combined_output": {
+    "name": "Reflect",
+    "definition": "R_real + 1j * R_imag",
+    "row_order_contract": "Re and Im are predicted from the same raw input rows"
+  },
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "provenance": {
+    "re_f1_training_metadata": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/re/train/20260816_run1_sobol_modulated/training_metadata.json",
+      "sha256": "bd1dfaaebd231e03764f0e5285c8e209b7c81a129b732aa1ea32d28575ed7b62"
+    },
+    "re_f1_selected_candidate": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/re/eval/20260816_run1_sobol_modulated_best_loss/selected_candidate.csv",
+      "sha256": "11fd0c9c0734614c80a7ec8f6251b6a011c100a50a633f029836134987089923"
+    },
+    "re_f3_frozen_candidate": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/F3/F3-F1S/20260818T211720/frozen_candidate_spec.json",
+      "sha256": "1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7"
+    },
+    "re_f3_formal_acceptance": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/F3/F3-F2/20260818T213528/comparison_decision.json",
+      "sha256": "f5720a134fa9ed0933b46b0d47a3ddfcc535460a2d58011f36109a0944156c45"
+    },
+    "re_f3_reference_predictions": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/F3/F3-F2/20260818T213528/test_predictions.npz",
+      "sha256": "8780668fe1998df4640406e6c8d298247e7303139127fdad93960a3c1e3fd17a"
+    },
+    "im_f2_training_metadata": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/im/train/20260816_f2_im_f2_formal/training_metadata.json",
+      "sha256": "12d4dd4c78866e64988d878774c3ce261b530c36f033fb5cc00781c3aa5d6691"
+    },
+    "im_f2_selected_candidate": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/f2_evaluation_20260816/eval/im_formal/20260816_f2_im_f2_formal_v/selected_candidate.csv",
+      "sha256": "eda66037b832cc946880c2ff0d3ba35fa4971bdb592d3957d8bf37af5d8ac882"
+    },
+    "im_f2_evaluation_summary": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/f2_evaluation_20260816/eval/im_formal/20260816_f2_im_f2_formal_v/selected_global_summary.json",
+      "sha256": "76d504f826ec28bb6a112548ec47ab81423cdf3beb481ffcb2f19a78b9343333"
+    },
+    "im_f2_formal_acceptance": {
+      "path": "surrogate_model/global_symbolic_regression/artifacts/f2_manifests/20260816_f2_im/comparisons/im/formal_acceptance_decision.json",
+      "sha256": "8ac2ec630880993b1417c42ef788259a61abbbee5ab6a17f38079c278daa14af"
+    }
+  },
+  "freeze_contract": {
+    "training_performed_by_export": false,
+    "candidate_selection_performed_by_export": false,
+    "test_data_used_for_export_decision": false,
+    "re_formula_and_constants_frozen": true,
+    "im_formula_and_constants_frozen": true
+  }
+}

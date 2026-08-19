@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-08-16T13:42:24.207757+02:00",
+  "session": "20260816_f2_im",
+  "dataset_run": "run1",
+  "targets": [
+    "im"
+  ],
+  "execute": true,
+  "screen_budget": {
+    "niterations": 20,
+    "populations": 6,
+    "population_size": 40,
+    "maxsize": 24,
+    "random_seed": 42
+  },
+  "formal_budget": {
+    "niterations": 100,
+    "populations": 12,
+    "population_size": 80,
+    "maxsize": 24,
+    "random_seed": 42
+  },
+  "test_access_contract": "No screening train/evaluation subsets or predicts test rows; frozen formal winners open test once."
+}

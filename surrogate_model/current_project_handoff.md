@@ -1,6 +1,6 @@
 # MasterThesis Project R - Current Handoff
 
-Last updated: 2026-08-18.
+Last updated: 2026-08-19.
 
 ## Training Monitoring Convention
 
@@ -137,6 +137,7 @@ identity-transform compatibility path.
 | Global SR smooth frequency modulation | Complete | Complete | All base parameters retained; validation selects modulated Re and Im |
 | Global SR target-specific modulation F2 | Stage 1 stopped | Complete | Re has no guardrail-feasible onset branch; Im F2 accepted after formal run |
 | Global SR staged residual F3 | Complete | Unchanged | Re F3 passed formal validation, formula-safety freeze, and one-time test; Im remains F2 |
+| Global SR production integration | Complete | Complete | Active pointer is Re F3 / Im F2; exact replay and system tests pass |
 | Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
 | MLP Sobol pilot | Complete | Complete | Frequency-resolved S1/ST at N=4096 |
 | Teacher Sobol validation | Complete | Complete | Shared-design N=1024 check confirms MLP sensitivity structure |
@@ -148,8 +149,8 @@ identity-transform compatibility path.
 
 All three model families now run end to end for both targets. The MLP is the
 clear accuracy baseline. Re F3 and Im F2 are the accepted Global SR target
-models. The immediate next phase is production integration and exact pipeline
-regression testing, not another fit of the frozen Re F3 equation.
+models, and their production integration and exact pipeline regression testing
+are complete. Do not refit the frozen Re F3 equation.
 
 ## Latest MLP Results
 
@@ -488,6 +489,54 @@ Safety freeze: global_symbolic_regression/artifacts/F3/F3-F1S/20260818T211720
 Final test:    global_symbolic_regression/artifacts/F3/F3-F2/20260818T213528
 ```
 
+### Global SR formal integration result
+
+Production integration completed on 2026-08-19 without training, candidate
+selection, clipping, smoothing, or formula changes. The active pointer now
+selects the self-contained `run1_global_sr_re_f3_im_f2` manifest:
+
+```text
+global_symbolic_regression/formal_models/active_model.json
+global_symbolic_regression/formal_models/run1_f3_f2/model_manifest.json
+global_symbolic_regression/formal_global_symbolic_model.py
+global_symbolic_regression/export_formal_global_symbolic_model.py
+global_symbolic_regression/evaluate_formal_global_symbolic_model.py
+```
+
+The formal inference path accepts the original eight raw inputs in their
+stored order, replays the common training-fitted transform, applies the frozen
+Re F1/F3-B and Im F2 frequency features independently, and returns `R_real`,
+`R_imag`, and `Reflect = R_real + 1j*R_imag`. It fails loudly if the two fixed
+run1 inputs change or frequency leaves 100-4950 Hz unless extrapolation is
+explicitly requested.
+
+The complete 150-curve test regression reproduces the saved Re F3-F2
+prediction and `z_sigma__f3_mid` arrays bit for bit; maximum absolute
+prediction difference is `0.0`. Re and Im test metrics and prediction ranges
+also match their frozen reports with zero numerical difference. The integrated
+paired complex diagnostic is:
+
+```text
+Complex RMSE:          0.0882016615260024
+Complex MAE:           0.0719342930758710
+Complex max abs error: 0.3409475022958167
+```
+
+Four system tests pass: active-pointer/freeze contract, exact saved prediction
+and metric replay, combined output plus boundary frequencies, and fixed-input
+plus JSON-serialization replay. The persisted integration report is:
+
+```text
+global_symbolic_regression/artifacts/formal_integration/20260819_run1_f3_f2
+global_symbolic_regression/artifacts/formal_integration/20260819_run1_f3_f2/figures
+```
+
+The figure directory contains Re/Im predicted-versus-teacher scatter plots,
+Re/Im error-versus-frequency plots, paired full-curve overlays, a complex-plane
+comparison, and complex-error-versus-frequency diagnostics. They are generated
+from the already saved formal integration predictions, with no additional fit
+or model decision.
+
 ## Latest Segmented SR Results
 
 The configured frequency domains are:
@@ -675,7 +724,7 @@ start from its persisted F0/F1 candidates and declared shape gates, then treat
 within-segment fitting and cross-segment continuity as separate experiments.
 That pause led to the completed Sobol-guided Global SR and Re F3 work recorded
 above. Segmented SR remains deferred while the accepted global models are
-integrated.
+used through the completed formal integration.
 
 ## Current Cross-Family Comparison
 
@@ -691,8 +740,8 @@ The MLP RMSE is roughly one order of magnitude lower than segmented SR for both
 targets. Segmentation is substantially better than one global equation, but it
 still trails the MLP and introduces boundary discontinuities. The accepted Re
 F3 and Im F2 equations improve Global SR while preserving one whole-range
-analytic model per target; the next work is to integrate those frozen models
-into the main pipeline without changing their validated formulas.
+analytic model per target. Those frozen models are now integrated into the
+formal pipeline without changing their validated formulas.
 
 ## Frequency-Resolved Sobol Sensitivity
 
@@ -870,9 +919,9 @@ Every formal evaluation must:
 - preserve raw predictions without clipping or smoothing;
 - record dataset run, target, dataset path, split file, and split hash.
 
-An optional paired diagnostic may combine predictions from the same model
-family, dataset run, split, and source rows into a complex reflection error.
-This paired diagnostic has not yet been implemented as a formal pipeline step.
+The formal Global SR evaluator combines same-row Re F3 and Im F2 predictions
+into a complex reflection diagnostic after verifying their shared raw inputs,
+dataset run, split hash, source-curve ordering, and frequency ordering.
 
 ## Runtime Environment
 
@@ -927,34 +976,30 @@ validate `training_metadata.json` and the evaluation summary.
 
 ## Next Priorities
 
-The immediate integration plan is:
+The immediate integration plan is complete: the F3-B terminal and frozen
+residual are in formal inference/evaluation/export, the active pair is Re F3 /
+Im F2, exact prediction regression passes, and the full paired system test
+covers Re, Im, combined output, boundary frequencies, and serialization.
 
-1. Integrate the F3-B frequency-local terminal and the frozen residual formula
-   into the main inference, evaluation, and export paths.
-2. Switch the formal Re model pointer from F1 to F3 while keeping Im F2
-   unchanged.
-3. Use the saved prediction artifacts for exact regression tests and confirm
-   that the integrated pipeline output matches F3-F2 exactly.
-4. Run one complete system test covering Re, Im, the combined output, boundary
-   frequencies, and model serialization.
+The next priorities are:
 
-The Re F3 formula and constants are frozen. These integration steps do not
-authorize another F3 fit or any tuning against the consumed F3-F2 test set.
-After the immediate plan:
-
-5. Preserve the current MLP results as the accuracy reference while improving
+1. Preserve the current MLP results as the accuracy reference while improving
    interpretable symbolic models. Any future SR model must use the same shared
    split and raw targets under a newly declared validation/test contract.
-6. Add a paired complex-reflection diagnostic using the accepted Re F3 and Im
-   F2 predictions after confirming identical row ordering.
-7. Keep further segmented work deferred. If explicitly resumed, separately
+2. Treat the exported `run1_global_sr_re_f3_im_f2` manifest and active pointer
+   as immutable production inputs. Any replacement requires a new model ID,
+   validation decision, export bundle, and regression baseline.
+3. Keep further segmented work deferred. If explicitly resumed, separately
    address constrained within-segment frequency grammar and validation-only
    boundary continuity/blending.
-8. Use accepted PySR plan B for any future controlled symbolic-search run:
+4. Use accepted PySR plan B for any future controlled symbolic-search run:
    serial deterministic execution, batching with batch size 4096, turbo, and
    one Julia thread. C is rejected because fixed-seed multithreading failed
    exact replay. Always select on full validation data and report on full test
    data only after the validation decision.
+
+The Re F3 formula and constants remain frozen. Integration completion does not
+authorize another F3 fit or any tuning against the consumed F3-F2 test set.
 
 ## Invariants For Future Work
 

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "model_family": "global_symbolic_regression",
+  "active_dataset_run": "run1",
+  "active_targets": {
+    "re": "Re_F3",
+    "im": "Im_F2"
+  },
+  "model_manifest": "run1_f3_f2/model_manifest.json"
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "decision": "fallback_to_B_exact_replay",
+  "selection_rule": "Use C only if two clean same-seed runs have identical Hall-of-Fame CSV, selected equation, and validation metrics; otherwise use B.",
+  "test_metrics_used": false,
+  "runs": [
+    {
+      "variant": "C",
+      "replicate": 1,
+      "train_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_perf_seed42_c1",
+      "eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_perf_seed42_c1_v",
+      "fit_wall_time_seconds": 54.10118290000173,
+      "validation_rmse": 0.09973140277720492,
+      "validation_mae": 0.07529859446277504,
+      "validation_r2": 0.7248187725722997,
+      "selected_candidate": 4,
+      "selected_complexity": 17,
+      "selected_equation": "((-3.1074324 / (log10_k0_prime + ((((log10_lambda__sobol_mod / log10_k0_prime__sobol_mod) * -7.9461374) / 0.013667979) + 0.028366622))) / 0.6117446) + 0.28965852",
+      "equations_sha256": "1d64d0a8897f9f155097d32465098a4d9e15dea28ec715f8cf932805990a80be",
+      "test_rows_accessed": false,
+      "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0"
+    },
+    {
+      "variant": "C",
+      "replicate": 2,
+      "train_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_perf_seed42_c2",
+      "eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_perf_seed42_c2_v",
+      "fit_wall_time_seconds": 20.608063200001197,
+      "validation_rmse": 0.09042102029262367,
+      "validation_mae": 0.06767141183261977,
+      "validation_r2": 0.7737993989651962,
+      "selected_candidate": 10,
+      "selected_complexity": 23,
+      "selected_equation": "sqrt(sqrt(0.76458836 / (((log10_lambda__sobol_mod / -0.27551606) / log(sqrt(((1.2808262 - log10_sigma) * -0.2979477) - -0.1490444))) - ((log10_lambda_prime / log10_lambda) / -0.8574676))))",
+      "equations_sha256": "bbea447c4ff196bea0ad82ed4199166b6ab8ce2240eb7e16c06fc53a815bb654",
+      "test_rows_accessed": false,
+      "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0"
+    },
+    {
+      "variant": "B",
+      "replicate": 1,
+      "train_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_perf_seed42_b1",
+      "eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_perf_seed42_b1_v",
+      "fit_wall_time_seconds": 23.243642700002965,
+      "validation_rmse": 0.09790341220993852,
+      "validation_mae": 0.07328235305389942,
+      "validation_r2": 0.7348139923971784,
+      "selected_candidate": 9,
+      "selected_complexity": 24,
+      "selected_equation": "sqrt(sqrt((0.0796826 / sqrt((log10_k0_prime / log10_k0_prime__sobol_mod) - (log10_lambda__sobol_mod * 1.529667))) / (((log10_k0_prime / (log10_k0_prime__sobol_mod + log10_lambda__sobol_mod)) - (log10_lambda__sobol_mod * 0.84325534)) - 0.886424)))",
+      "equations_sha256": "7ed8cf946bacd377c27d59a33e3d69f90a19b2af9e61bc9f421d36c6a09154f2",
+      "test_rows_accessed": false,
+      "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0"
+    },
+    {
+      "variant": "B",
+      "replicate": 2,
+      "train_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_perf_seed42_b2",
+      "eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_perf_seed42_b2_v",
+      "fit_wall_time_seconds": 22.432803499999864,
+      "validation_rmse": 0.09790341220993852,
+      "validation_mae": 0.07328235305389942,
+      "validation_r2": 0.7348139923971784,
+      "selected_candidate": 9,
+      "selected_complexity": 24,
+      "selected_equation": "sqrt(sqrt((0.0796826 / sqrt((log10_k0_prime / log10_k0_prime__sobol_mod) - (log10_lambda__sobol_mod * 1.529667))) / (((log10_k0_prime / (log10_k0_prime__sobol_mod + log10_lambda__sobol_mod)) - (log10_lambda__sobol_mod * 0.84325534)) - 0.886424)))",
+      "equations_sha256": "7ed8cf946bacd377c27d59a33e3d69f90a19b2af9e61bc9f421d36c6a09154f2",
+      "test_rows_accessed": false,
+      "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0"
+    }
+  ],
+  "plan_c_replay": {
+    "selected_equation_exact_match": false,
+    "validation_metrics_exact_match": false,
+    "hall_of_fame_csv_exact_match": false,
+    "exact_replay": false,
+    "validation_rmse_absolute_difference": 0.009310382484581256
+  },
+  "plan_b_replay": {
+    "selected_equation_exact_match": true,
+    "validation_metrics_exact_match": true,
+    "hall_of_fame_csv_exact_match": true,
+    "exact_replay": true,
+    "validation_rmse_absolute_difference": 0.0
+  }
+}

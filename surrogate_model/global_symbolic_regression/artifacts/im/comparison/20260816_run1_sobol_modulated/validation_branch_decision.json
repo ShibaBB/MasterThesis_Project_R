@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "experiment": "smooth teacher-Sobol parameter frequency modulation",
+  "target": "im",
+  "dataset_run": "run1",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "frequency_range_hz": [
+    100.0,
+    4950.0
+  ],
+  "decision_data": "full-range validation rows only",
+  "test_metrics_used_for_decision": false,
+  "test_metrics_reported_after_validation_decision": true,
+  "selected_branch": "sobol_modulated",
+  "selected_eval_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\eval\\20260816_run1_sobol_modulated_best_loss",
+  "selected_validation_metrics": {
+    "rmse": 0.07410101599988758,
+    "mae": 0.057150410888620516,
+    "max_abs_error": 0.28243701469830507,
+    "r2": 0.5895156676260832,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.4184741206111677,
+    "prediction_max": 0.09403238167658962
+  },
+  "selected_test_metrics": {
+    "rmse": 0.07021202780451606,
+    "mae": 0.05446561556060007,
+    "max_abs_error": 0.3162172689717299,
+    "r2": 0.5871412131756422,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.20213411538375756,
+    "prediction_min": -0.40629363212598907,
+    "prediction_max": 0.2532019005212838
+  },
+  "matched_training_args": {
+    "dataset_run": "run1",
+    "random_seed": 42,
+    "max_samples": null,
+    "niterations": 100,
+    "populations": 12,
+    "population_size": 80,
+    "maxsize": 24,
+    "model_selection": "best"
+  },
+  "comparison_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\comparison\\20260816_run1_sobol_modulated\\validation_branch_comparison.csv"
+}

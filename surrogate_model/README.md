@@ -10,8 +10,8 @@ material/acoustic parameters -> R_imag(f)
 
 The retained model families are MLP, segmented PySR, and global PySR. Their
 data generators, loaders, trainers, evaluators, metadata checks, and artifact
-paths now implement the paired-component contract. No full `run1` dataset or
-formal training/evaluation run has been generated yet.
+paths implement the paired-component contract. The full `run1` dataset and
+formal Re/Im training and evaluation artifacts exist for all three families.
 
 Read [current_project_handoff.md](current_project_handoff.md) before changing
 code. It is the authoritative implementation plan.
@@ -31,15 +31,14 @@ targets by mistake.
 
 ## Shared Data Contract
 
-One teacher dataset will contain common inputs plus paired targets:
+The active teacher dataset contains common inputs plus paired targets:
 
 ```text
 X, Y_re, Y_im, freq_grid, dataset_info, sample_metadata
 ```
 
-One source-curve split will be shared by both targets and all model families.
-The first new dataset run should be R `run1`, using the existing 100–4950 Hz,
-128-point configuration unless explicitly changed.
+One source-curve split is shared by both targets and all model families. The
+active dataset is `run1`, using the 100-4950 Hz, 128-point configuration.
 
 ## Model Branches
 
@@ -66,13 +65,14 @@ Full hyperparameters belong in metadata files, not directory names.
 
 ## Current Status
 
-The code migration is complete. A 50-curve deterministic interface test
-verified exact `Reflect` component extraction, paired scalar expansion, the
-shared curve split, and independent one-epoch MLP Re/Im runs. Install the
-PySR Python/Julia environment before launching symbolic searches, then create
-the full paired dataset through `run_active_dataset_generation.ps1`.
+The accepted formal Global SR pair is Re F3 plus Im F2. Its production
+inference, evaluation, export, active-model pointer, exact prediction replay,
+paired complex output, frequency-boundary checks, and serialization tests are
+implemented under [global_symbolic_regression](global_symbolic_regression/README.md).
+The frozen Global SR formulas must not be refitted or tuned against their
+consumed test data. The formal MLP remains the accuracy reference, and further
+segmented SR work is deferred.
 
-The previously used Python package versions are recorded in
-`requirements-pysr.txt`. Create
-`segmented_symbolic_regression/.venv_py311` with Python 3.11 and install that
-file before running dataset splitting or either PySR branch.
+The active Python package versions are recorded in `requirements-pysr.txt`.
+The existing Python 3.11 environment is
+`segmented_symbolic_regression/.venv_py311`.

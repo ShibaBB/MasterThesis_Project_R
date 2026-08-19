@@ -13,6 +13,7 @@ import math
 import os
 import pickle
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -35,6 +36,14 @@ from shared_split_utils import (  # noqa: E402
 from symbolic_feature_transform import (  # noqa: E402
     apply_feature_transform,
     fit_feature_transform,
+)
+from global_sobol_feature_policy import (  # noqa: E402
+    SUPPORTED_BRANCHES,
+    build_feature_policy,
+)
+from global_frequency_modulation import (  # noqa: E402
+    apply_frequency_modulation,
+    build_frequency_modulation,
 )
 
 
@@ -113,6 +122,23 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--random-seed", type=int, default=42)
     parser.add_argument(
+        "--feature-branch",
+        choices=SUPPORTED_BRANCHES,
+        default="all",
+        help="Feature view exposed to the single full-range PySR search.",
+    )
+    parser.add_argument(
+        "--frequency-modulation-spec",
+        type=Path,
+        default=None,
+        help="Optional persisted custom modulation JSON (requires --feature-branch sobol_modulated).",
+    )
+    parser.add_argument(
+        "--validation-only",
+        action="store_true",
+        help="Do not subset, predict, or report test rows; required for F2 screening runs.",
+    )
+    parser.add_argument(
         "--max-samples",
         type=int,
         default=None,
@@ -124,11 +150,32 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--maxsize", type=int, default=24)
     parser.add_argument("--model-selection", choices=["best", "accuracy", "score"], default="best")
     parser.add_argument(
+        "--parallelism",
+        choices=("serial", "multithreading", "multiprocessing"),
+        default="serial",
+        help="PySR search parallelism. Exact deterministic replay requires serial.",
+    )
+    parser.add_argument(
+        "--julia-threads",
+        type=int,
+        default=1,
+        help="JULIA_NUM_THREADS set before PySR initializes (used by multithreading).",
+    )
+    parser.add_argument(
         "--procs",
         type=int,
         default=0,
-        help="Deprecated compatibility option. Global training is serial, so this value is ignored.",
+        help="Worker count for multiprocessing; 0 lets PySR choose.",
     )
+    parser.add_argument(
+        "--deterministic",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Request exact deterministic search; supported only with serial parallelism.",
+    )
+    parser.add_argument("--batching", action="store_true")
+    parser.add_argument("--batch-size", type=int, default=50)
+    parser.add_argument("--turbo", action="store_true")
     parser.add_argument("--julia-exe", type=Path, default=DEFAULT_JULIA_EXE)
     parser.add_argument(
         "--overwrite",
@@ -321,14 +368,19 @@ def build_model(args: argparse.Namespace, pysr_output_dir: Path, run_id: str) ->
         "maxsize": args.maxsize,
         "model_selection": args.model_selection,
         "random_state": args.random_seed,
-        "deterministic": True,
-        "parallelism": "serial",
+        "deterministic": args.deterministic,
+        "parallelism": args.parallelism,
+        "batching": args.batching,
+        "batch_size": args.batch_size,
+        "turbo": args.turbo,
         "progress": False,
         "verbosity": 1,
         "temp_equation_file": False,
         "output_directory": pysr_output_dir.as_posix(),
         "run_id": run_id,
     }
+    if args.parallelism == "multiprocessing" and args.procs > 0:
+        model_kwargs["procs"] = args.procs
     return PySRRegressor(**model_kwargs)
 
 
@@ -362,23 +414,28 @@ def train_global_model(
     validation_indices = np.flatnonzero(
         source_curve_mask(data["source_curve_index"], data["shared_split"], "validation")
     )
-    test_indices = np.flatnonzero(
-        source_curve_mask(data["source_curve_index"], data["shared_split"], "test")
-    )
+    test_indices = None
+    if not args.validation_only:
+        test_indices = np.flatnonzero(
+            source_curve_mask(data["source_curve_index"], data["shared_split"], "test")
+        )
 
     rng = np.random.default_rng(args.random_seed)
     if args.max_samples is not None and train_indices.size > args.max_samples:
         train_indices = rng.choice(train_indices, size=args.max_samples, replace=False)
 
-    if min(train_indices.size, validation_indices.size, test_indices.size) == 0:
+    partition_sizes = [train_indices.size, validation_indices.size]
+    if test_indices is not None:
+        partition_sizes.append(test_indices.size)
+    if min(partition_sizes) == 0:
         raise ValueError("Global symbolic dataset has an empty shared split partition.")
 
     X_train = data["X"][train_indices, :]
     y_train = data["y"][train_indices]
     X_validation = data["X"][validation_indices, :]
     y_validation = data["y"][validation_indices]
-    X_test = data["X"][test_indices, :]
-    y_test = data["y"][test_indices]
+    X_test = data["X"][test_indices, :] if test_indices is not None else None
+    y_test = data["y"][test_indices] if test_indices is not None else None
 
     global_slug = sanitize_name(global_name)
     equations_dir = output_dir / "equations"
@@ -392,14 +449,17 @@ def train_global_model(
         f"\nTraining global model: {global_name} "
         f"({bounds[0]:.2f}-{bounds[1]:.2f} Hz), "
         f"train/validation/test rows="
-        f"{len(train_indices)}/{len(validation_indices)}/{len(test_indices)}"
+        f"{len(train_indices)}/{len(validation_indices)}/"
+        f"{'inaccessible' if test_indices is None else len(test_indices)}"
     )
     model = build_model(args, pysr_runs_dir, global_slug)
+    fit_started = time.perf_counter()
     model.fit(X_train, y_train, variable_names=data["pysr_variable_names"])
+    fit_wall_time_seconds = time.perf_counter() - fit_started
 
     train_pred = model.predict(X_train)
     validation_pred = model.predict(X_validation)
-    test_pred = model.predict(X_test)
+    test_pred = model.predict(X_test) if X_test is not None else None
     selected = model.get_best()
 
     equations = model.equations_.copy()
@@ -422,15 +482,17 @@ def train_global_model(
         "complexity": int(selected["complexity"]),
         "loss": float(selected["loss"]),
         "score": float(selected["score"]) if "score" in selected and pd.notna(selected["score"]) else None,
+        "fit_wall_time_seconds": float(fit_wall_time_seconds),
         "n_rows_used": int(
-            len(train_indices) + len(validation_indices) + len(test_indices)
+            len(train_indices) + len(validation_indices)
+            + (0 if test_indices is None else len(test_indices))
         ),
         "n_train": int(len(y_train)),
         "n_validation": int(len(y_validation)),
-        "n_test": int(len(y_test)),
+        "n_test": None if y_test is None else int(len(y_test)),
         "train_metrics": regression_metrics(y_train, train_pred),
         "validation_metrics": regression_metrics(y_validation, validation_pred),
-        "test_metrics": regression_metrics(y_test, test_pred),
+        "test_metrics": None if y_test is None else regression_metrics(y_test, test_pred),
         "equations_csv": str(equations_csv),
         "model_file": str(model_path),
     }
@@ -443,6 +505,16 @@ def train_global_model(
 
 def main() -> None:
     args = parse_args()
+    if args.julia_threads < 1:
+        raise ValueError("--julia-threads must be positive.")
+    if args.batch_size < 1:
+        raise ValueError("--batch-size must be positive.")
+    if args.parallelism != "serial" and args.deterministic:
+        raise ValueError(
+            "PySR deterministic=True requires --parallelism serial; "
+            "use --no-deterministic for threaded or multiprocessing benchmarks."
+        )
+    os.environ["JULIA_NUM_THREADS"] = str(args.julia_threads)
     args.dataset_file, resolved_dataset_run = resolve_dataset_file(
         args.dataset_run, args.dataset_file
     )
@@ -469,6 +541,31 @@ def main() -> None:
         data["X"], original_feature_names, feature_transform
     )
     data["feature_names"] = feature_transform["transformed_feature_names"]
+    transformed_feature_names = list(data["feature_names"])
+    feature_policy = build_feature_policy(
+        args.target, args.feature_branch, transformed_feature_names
+    )
+    selected_indices = feature_policy["feature_indices_0based"]
+    data["X"] = data["X"][:, selected_indices]
+    data["feature_names"] = feature_policy["feature_names"]
+    frequency_modulation = None
+    if args.frequency_modulation_spec is not None and args.feature_branch != "sobol_modulated":
+        raise ValueError("--frequency-modulation-spec requires --feature-branch sobol_modulated.")
+    if args.feature_branch == "sobol_modulated":
+        if args.frequency_modulation_spec is None:
+            frequency_modulation = build_frequency_modulation(
+                args.target, data["feature_names"]
+            )
+        else:
+            with args.frequency_modulation_spec.open("r", encoding="utf-8") as file:
+                frequency_modulation = json.load(file)
+            from global_frequency_modulation import validate_frequency_modulation
+            frequency_modulation = validate_frequency_modulation(
+                frequency_modulation, args.target, data["feature_names"]
+            )
+        data["X"], data["feature_names"] = apply_frequency_modulation(
+            data["X"], data["feature_names"], frequency_modulation
+        )
     validate_output_path_length(args.output_dir, data["segment_names"][0])
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise FileExistsError(f"Refusing to overwrite non-empty training directory: {args.output_dir}")
@@ -490,11 +587,26 @@ def main() -> None:
         "pysr_variable_names": data["pysr_variable_names"],
         "feature_name_mapping": dict(zip(data["feature_names"], data["pysr_variable_names"])),
         "feature_transform": feature_transform,
+        "transformed_feature_names_before_policy": transformed_feature_names,
+        "feature_policy": feature_policy,
+        "frequency_modulation": frequency_modulation,
         "global_name": data["segment_names"][0],
         "global_bounds_hz": data["segment_bounds"][0].tolist(),
         "training_args": {
             key: str(value) if isinstance(value, Path) else value
             for key, value in vars(args).items()
+        },
+        "search_contract": {
+            "binary_operators": ["+", "-", "*", "/"],
+            "unary_operators": ["log", "sqrt"],
+            "deterministic": args.deterministic,
+            "parallelism": args.parallelism,
+            "julia_threads": args.julia_threads,
+            "procs": args.procs,
+            "batching": args.batching,
+            "batch_size": args.batch_size,
+            "turbo": args.turbo,
+            "training_rows": "all full-range training rows unless max_samples is set",
         },
     }
     with (args.output_dir / "training_metadata.json").open("w", encoding="utf-8") as file:
@@ -511,13 +623,14 @@ def main() -> None:
                 "equation": item["equation"],
                 "complexity": item["complexity"],
                 "loss": item["loss"],
+                "fit_wall_time_seconds": item["fit_wall_time_seconds"],
                 "train_rmse": item["train_metrics"]["rmse"],
                 "validation_rmse": item["validation_metrics"]["rmse"],
-                "test_rmse": item["test_metrics"]["rmse"],
+                "test_rmse": None if item["test_metrics"] is None else item["test_metrics"]["rmse"],
                 "train_mae": item["train_metrics"]["mae"],
                 "validation_mae": item["validation_metrics"]["mae"],
-                "test_mae": item["test_metrics"]["mae"],
-                "test_r2": item["test_metrics"]["r2"],
+                "test_mae": None if item["test_metrics"] is None else item["test_metrics"]["mae"],
+                "test_r2": None if item["test_metrics"] is None else item["test_metrics"]["r2"],
                 "n_rows_used": item["n_rows_used"],
             }
             for item in [summary]
@@ -528,7 +641,10 @@ def main() -> None:
         json.dump(summary, file, indent=2)
 
     print("\nGlobal PySR training complete.")
-    print(summary_df[["global_name", "complexity", "test_rmse", "test_mae", "test_r2"]].to_string(index=False))
+    report_columns = ["global_name", "complexity", "validation_rmse"]
+    if not args.validation_only:
+        report_columns.extend(["test_rmse", "test_mae", "test_r2"])
+    print(summary_df[report_columns].to_string(index=False))
     print(f"Artifacts saved to: {args.output_dir}")
 
 

@@ -1,0 +1,7 @@
+{
+  "stage": "re_stage1_onset",
+  "target": "re",
+  "reason": "No screening branch passed every declared F1 regional RMSE guardrail.",
+  "guardrail_relative_limit": 0.1,
+  "test_rows_accessed": false
+}
