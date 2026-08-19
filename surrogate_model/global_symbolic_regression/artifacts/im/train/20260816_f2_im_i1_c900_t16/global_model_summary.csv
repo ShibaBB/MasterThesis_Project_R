@@ -1,0 +1,2 @@
+global_name,lower_hz,upper_hz,equation,complexity,loss,train_rmse,validation_rmse,test_rmse,train_mae,validation_mae,test_mae,test_r2,n_rows_used
+global_100_4950,100.0,4950.0,-0.1625435 - (log10_k0_prime__f2_low * -0.025666231),5,0.010255087,0.10126740804979321,0.09816284402921513,,0.07239301630823135,0.07194546399078319,,,108800

@@ -1,0 +1,84 @@
+1. 固定 F1，专门学习残差
+这是我最推荐的方案。
+令：
+R_re_F3 = R_re_F1 + ΔR_re
+PySR 不再从零重新搜索整条 Re 公式，而只拟合：
+ΔR_re = teacher - R_re_F1
+这样有几个优点：
+F1 自动成为保底模型，ΔR=0 时就等于现有 F1。
+搜索不会浪费大量预算重新发现 F1 已经掌握的整体频率形状。
+可以专门针对 1300–2000 Hz 的缺失关系。
+如果残差公式没有改善，验证选择直接回退 F1，不会像本次筛选一样整体退化。
+最终仍然可以把 F1 + residual equation 合并成一个显式解析表达式。
+2. 将调制重点从 alpha_infinity 转向 sigma
+建议先加入以下原子终端：
+z_sigma * g_mid(log10_f)
+z_sigma * g_low_mid(log10_f)
+z_sigma * g_high_mid(log10_f)
+这里 z_sigma 应当使用训练集中心化或标准化后的 log10_sigma，而不是直接使用带较大常数偏置的原值。
+频率 envelope 建议使用局部 bump，而不是 high-pass：
+g_low_mid:  Gaussian around 1450 Hz
+g_high_mid: Gaussian around 1750 Hz
+g_mid:      smooth band-pass covering approximately 1250–2100 Hz
+原来的 high-pass 会同时改变 onset 之后的所有高频区域，很容易破坏 3000–4950 Hz；局部 Gaussian 或“两条 sigmoid 之差”的 band-pass 更符合当前残差分布。
+3. 第二优先级加入局部材料交互
+Sobol 结果和残差分析表明，1300–2000 Hz 主要应关注：
+sigma
+lambda
+alpha_infinity
+可以逐步比较：
+A: z_sigma * g_mid
+B: A + z_lambda * g_mid
+C: B + z_alpha * g_mid
+D: C + z_sigma * z_lambda * g_mid
+不要一次加入大量终端。每增加一组交互，都应和上一组使用完全相同的搜索预算与 seed。
+lambda_prime 和 k0_prime 在这个频率区域优先级较低，暂时不建议继续扩大它们的搜索空间。
+4. 先做廉价线性诊断，再启动 PySR
+在重新跑几十个 PySR 分支前，可以先做一个几秒钟的 train-only residual test：
+ΔR ≈ a1 * z_sigma * Gaussian(1450 Hz)
+a2 * z_sigma * Gaussian(1750 Hz)
+也可以加入少量 lambda 和 alpha_infinity 项，用 ridge regression 求系数，然后只看验证集。
+这个诊断可以快速回答：
+sigma × 局部频率 envelope 是否确实能降低残差；
+需要一个还是两个频率 lobe；
+是否值得投入正式 PySR 搜索。
+如果这个简单模型都不能改善验证 RMSE，就没必要直接进行昂贵的符号搜索。
+5. 修正筛选方法
+本次筛选存在一个重要的不对称：
+F1 reference: 100 / 12 / 80
+F2 screen:     20 / 6 / 40
+小预算 F2 直接和正式预算 F1 比较，很容易把“搜索尚未收敛”误判成“特征无效”。
+下一轮应该增加同预算控制：
+C0: 原始 F1 feature representation，20 / 6 / 40
+C1: sigma local modulation，20 / 6 / 40
+C2: sigma + lambda local modulation，20 / 6 / 40
+先在相同预算下判断哪种表示更容易搜索。筛选赢家再使用 100 / 12 / 80 正式训练，最后才与正式 F1 比较。
+最好每个筛选分支使用 3 个 seed，以验证结果不是某一次随机搜索的偶然性。可以用多个 seed 的验证 RMSE 中位数选择 feature branch，再以固定 seed 做正式训练。
+6. 受控调整公式搜索
+如果残差方案有效但仍受限，可以逐项尝试：
+将 max complexity 从 24 提升到 28，作为单独 A/B 实验；
+把预定义 frequency bump 当作原子 terminal，减少 PySR 自己组合复杂 nested log/sqrt 的负担；
+对 log、sqrt 设置嵌套限制，避免产生很深但泛化不好的公式；
+搜索阶段使用 curve/frequency-balanced subset，提高搜索速度；
+最终选择仍使用完整 validation curves；
+将 1300–2000 Hz 在训练 loss 中提高到约 1.5–2 倍权重，但最终选择仍按完整、未加权 validation RMSE 和区域 guardrail。
+其中“增加复杂度”不应排在第一位。当前最明显的问题是缺少正确的 sigma × frequency 局部关系，而不只是公式不够长。
+7. 如果单一 PySR 公式仍然停滞
+更强但结构变化更大的方法是平滑基函数分解：
+R_re(f, x) = mean_curve(f)
+c1(x) B1(f)
+c2(x) B2(f)
+...
+其中：
+B1(f)…Bk(f) 由训练集曲线的 PCA/SVD 得到；
+每个系数 ck(x) 用一个较小的符号回归公式预测；
+最终结果仍是显式的解析组合；
+频率基函数是连续的，不存在 segmented SR 的边界跳变。
+这种方法通常比要求 PySR 一次性发现完整的八维频率响应容易得多，也可能显著接近 MLP，但解释形式会从“一个紧凑公式”变成“少量材料系数公式 + 固定频率基函数”。
+综合来看，我建议的优先顺序是：
+先做 sigma × 1450/1750 Hz bump 的廉价残差线性诊断。
+如果验证有效，运行固定 F1 + residual PySR。
+使用同预算 F1 control 和多个 seed 筛选。
+再考虑把 complexity 从 24 提高到 28。
+如果仍然停滞，转向 PCA/SVD frequency basis + symbolic coefficient 模型。
+最值得立即尝试的不是继续微调 alpha_infinity，而是保留现有 F1，并针对 sigma 在约 1300–2000 Hz 的材料依赖残差建立局部修正。

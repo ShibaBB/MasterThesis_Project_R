@@ -1,0 +1,40 @@
+{
+  "global_name": "global_100_4950",
+  "target": "re",
+  "target_name": "R_real",
+  "lower_hz": 100.0,
+  "upper_hz": 4950.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "equation": "log(log10_sigma / log10_f)",
+  "complexity": 4,
+  "loss": 0.011914512,
+  "score": 0.6936917880749559,
+  "n_rows_used": 108800,
+  "n_train": 89600,
+  "n_validation": 19200,
+  "n_test": null,
+  "train_metrics": {
+    "rmse": 0.10915361755884606,
+    "mae": 0.07624780493337635,
+    "max_abs_error": 0.4500630009077382,
+    "r2": 0.6776432534323511,
+    "true_min": -0.2232058095984081,
+    "true_max": 0.9854348042856556,
+    "prediction_min": 0.12408763337681393,
+    "prediction_max": 0.9115940515395184
+  },
+  "validation_metrics": {
+    "rmse": 0.1045077830688383,
+    "mae": 0.07239736753754028,
+    "max_abs_error": 0.3947146522774279,
+    "r2": 0.6978293920553027,
+    "true_min": -0.1274621043189832,
+    "true_max": 0.9838400807547939,
+    "prediction_min": 0.1321315839052422,
+    "prediction_max": 0.9113940708797833
+  },
+  "test_metrics": null,
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_f2_r1_c1500_t24\\equations\\global_100_4950_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_f2_r1_c1500_t24\\models\\global_100_4950_pysr_model.pkl"
+}

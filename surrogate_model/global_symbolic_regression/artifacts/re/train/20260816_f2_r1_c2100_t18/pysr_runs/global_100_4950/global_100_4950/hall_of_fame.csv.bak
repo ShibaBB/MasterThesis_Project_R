@@ -1,0 +1,13 @@
+Complexity,Loss,Equation
+1,0.03696064,"0.3690579"
+3,0.023842005,"1.2414956 / log10_f"
+5,0.013327671,"(3.6612911 / log10_f) + -0.76012176"
+8,0.012461594,"(log(alpha_infinity__f2_high) * -0.02795823) - (-1.0532703 / log10_f)"
+9,0.011494998,"((log10_sigma - log(sqrt(alpha_infinity__f2_high))) * -0.5768465) / log10_k0_prime"
+10,0.011132695,"((log10_sigma + -1.9003898) - log(alpha_infinity__f2_onset)) * (-0.9146604 / log10_k0_prime)"
+11,0.011013279,"(((log10_sigma + -0.79889476) - log(sqrt(alpha_infinity__f2_high))) * -0.6615483) / log10_k0_prime"
+14,0.01032952,"log(sqrt((alpha_infinity__f2_high * 1.064207) + (((log10_f / log10_lambda_prime) - log(alpha_infinity__f2_onset)) + 1.5475527)))"
+16,0.010314258,"log(sqrt((alpha_infinity__f2_high * 1.064207) + ((1.5475527 + (log10_f / log10_lambda_prime)) - log(alpha_infinity__f2_onset)))) / 1.0059079"
+20,0.010309357,"((((log10_sigma + -1.5888969) - log(sqrt(alpha_infinity__f2_high))) / log10_k0_prime) * -0.6816902) + ((log(alpha_infinity) * -0.9309217) / (alpha_infinity__f2_high + log10_k0_prime))"
+21,0.010266214,"log(log(((((alpha_infinity__f2_onset / log10_lambda) - (log(alpha_infinity__f2_onset) / log(log10_sigma))) + alpha_infinity__f2_onset) * (log10_sigma - (alpha_infinity__f2_onset + 0.31689757))) + alpha_infinity__f2_onset))"
+22,0.008673008,"log(log(((0.37640905 - (alpha_infinity__f2_high * alpha_infinity__f2_high)) / log10_lambda) + ((log10_sigma + (log(alpha_infinity__f2_onset) - (log(alpha_infinity__f2_high) / log(log10_sigma)))) - alpha_infinity__f2_onset)))"

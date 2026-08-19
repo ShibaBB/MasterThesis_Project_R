@@ -1,0 +1,2 @@
+global_name,lower_hz,upper_hz,equation,complexity,loss,fit_wall_time_seconds,train_rmse,validation_rmse,test_rmse,train_mae,validation_mae,test_mae,test_r2,n_rows_used
+global_100_4950,100.0,4950.0,-1.979368 / (((log10_k0_prime / log10_k0_prime__sobol_mod) - 0.74292195) * log10_k0_prime__sobol_mod),9,0.013007579,22.432803499999864,0.11405077329521221,0.11146994963129697,,0.0902047535195098,0.08943801765900072,,,108800

@@ -1,0 +1,182 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_run": "run1",
+  "target": "im",
+  "target_name": "R_imag",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "training_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260815_run1_sobol_phase1_all",
+  "candidate_selection_split": "validation",
+  "final_evaluation_split": "test",
+  "selection_rule": "best_loss",
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "selected_candidate": 13,
+  "global_name": "global_100_4950",
+  "global_bounds_hz": [
+    100.0,
+    4950.0
+  ],
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "original_feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "transformed_feature_names_before_policy": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_policy": {
+    "schema_version": 1,
+    "name": "teacher_sobol_full_range_global_features",
+    "source": "teacher Sobol run1 N=1024, variance-weighted 100-4950 Hz ST",
+    "branch": "all",
+    "target": "im",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "frequency_always_retained": true,
+    "selection_stage": "after_training_fitted_base_transform",
+    "feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ],
+    "feature_indices_0based": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "excluded_transformed_features": []
+  },
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "overall_metrics": {
+    "rmse": 0.07974128878261778,
+    "mae": 0.05797669012654178,
+    "max_abs_error": 0.3509984654525712,
+    "r2": 0.4674688694336281,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.20213411538375756,
+    "prediction_min": -0.4548909987178066,
+    "prediction_max": 0.008976722447032832
+  },
+  "validation_selection_metrics": {
+    "rmse": 0.08595153194273294,
+    "mae": 0.06198936651276135,
+    "max_abs_error": 0.3363396327881068,
+    "r2": 0.44772484857489037,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.41136649624119526,
+    "prediction_max": 0.001664076754125092
+  },
+  "raw_prediction_diagnostics": {
+    "prediction_min": -0.4548909987178066,
+    "prediction_max": 0.008976722447032832,
+    "finite_count": 19200
+  },
+  "prediction_diagnostics": {
+    "prediction_min": -0.4548909987178066,
+    "prediction_max": 0.008976722447032832,
+    "finite_count": 19200
+  }
+}

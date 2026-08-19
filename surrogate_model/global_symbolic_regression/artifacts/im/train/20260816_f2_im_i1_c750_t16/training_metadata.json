@@ -1,0 +1,268 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_run": "run1",
+  "target": "im",
+  "target_name": "R_imag",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "fiberfolder": "Wool",
+  "num_curve_samples": 1000,
+  "num_symbolic_samples": 128000,
+  "original_feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "log10_k0_prime__f2_low",
+    "log10_k0_prime__f2_high",
+    "log10_lambda_prime__f2_mod"
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "log10_k0_prime__f2_low",
+    "log10_k0_prime__f2_high",
+    "log10_lambda_prime__f2_mod"
+  ],
+  "feature_name_mapping": {
+    "log10_sigma": "log10_sigma",
+    "alpha_infinity": "alpha_infinity",
+    "log10_lambda": "log10_lambda",
+    "log10_lambda_prime": "log10_lambda_prime",
+    "log10_k0_prime": "log10_k0_prime",
+    "log10_f": "log10_f",
+    "log10_k0_prime__f2_low": "log10_k0_prime__f2_low",
+    "log10_k0_prime__f2_high": "log10_k0_prime__f2_high",
+    "log10_lambda_prime__f2_mod": "log10_lambda_prime__f2_mod"
+  },
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "transformed_feature_names_before_policy": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_policy": {
+    "schema_version": 1,
+    "name": "teacher_sobol_smooth_modulation_base_features",
+    "source": "teacher Sobol run1 N=1024, variance-weighted 100-4950 Hz ST",
+    "branch": "sobol_modulated",
+    "target": "im",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "frequency_always_retained": true,
+    "selection_stage": "after_training_fitted_base_transform",
+    "feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ],
+    "feature_indices_0based": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "excluded_transformed_features": []
+  },
+  "frequency_modulation": {
+    "schema_version": 1,
+    "name": "global_sr_f2_im_split_k0_prime",
+    "source": "F2 frozen residual diagnosis and teacher Sobol envelope locations",
+    "target": "im",
+    "frequency_feature": "log10_f",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "base_features_retained": true,
+    "teacher_st_values_used_as_model_inputs": false,
+    "features": [
+      {
+        "name": "log10_k0_prime__f2_low",
+        "base_feature": "log10_k0_prime",
+        "components": [
+          {
+            "kind": "lowpass",
+            "center_hz": 750.0,
+            "transition_log10": 0.16,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.9958028053769723
+      },
+      {
+        "name": "log10_k0_prime__f2_high",
+        "base_feature": "log10_k0_prime",
+        "components": [
+          {
+            "kind": "highpass",
+            "center_hz": 3900.0,
+            "transition_log10": 0.1,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.7379626028863572
+      },
+      {
+        "name": "log10_lambda_prime__f2_mod",
+        "base_feature": "log10_lambda_prime",
+        "components": [
+          {
+            "kind": "lowpass",
+            "center_hz": 700.0,
+            "transition_log10": 0.13,
+            "weight": 0.35
+          },
+          {
+            "kind": "highpass",
+            "center_hz": 4000.0,
+            "transition_log10": 0.1,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.7166592356962695
+      }
+    ],
+    "f2_design": {
+      "k0_low_center_hz": 750.0,
+      "k0_low_transition_log10": 0.16,
+      "k0_high_center_hz": 3900.0,
+      "k0_high_transition_log10": 0.1,
+      "lambda_prime_variant": "L0"
+    }
+  },
+  "global_name": "global_100_4950",
+  "global_bounds_hz": [
+    100.0,
+    4950.0
+  ],
+  "training_args": {
+    "target": "im",
+    "dataset_run": "run1",
+    "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+    "split_file": null,
+    "output_root": null,
+    "output_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260816_f2_im_i1_c750_t16",
+    "run_name": "",
+    "random_seed": 42,
+    "feature_branch": "sobol_modulated",
+    "frequency_modulation_spec": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\f2_manifests\\20260816_f2_im\\specs\\im_i1_c750_t16.json",
+    "validation_only": true,
+    "max_samples": null,
+    "niterations": 20,
+    "populations": 6,
+    "population_size": 40,
+    "maxsize": 24,
+    "model_selection": "best",
+    "procs": 0,
+    "julia_exe": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\julia_env\\pyjuliapkg\\install\\bin\\julia.exe",
+    "overwrite": false
+  },
+  "search_contract": {
+    "binary_operators": [
+      "+",
+      "-",
+      "*",
+      "/"
+    ],
+    "unary_operators": [
+      "log",
+      "sqrt"
+    ],
+    "deterministic": true,
+    "parallelism": "serial",
+    "training_rows": "all full-range training rows unless max_samples is set"
+  }
+}

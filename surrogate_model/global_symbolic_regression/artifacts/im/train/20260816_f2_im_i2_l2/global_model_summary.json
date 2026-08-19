@@ -1,0 +1,40 @@
+{
+  "global_name": "global_100_4950",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 100.0,
+  "upper_hz": 4950.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "equation": "(log10_k0_prime__f2_low + log10_k0_prime) * 0.021011127",
+  "complexity": 5,
+  "loss": 0.0104063535,
+  "score": 0.08494481571965332,
+  "n_rows_used": 108800,
+  "n_train": 89600,
+  "n_validation": 19200,
+  "n_test": null,
+  "train_metrics": {
+    "rmse": 0.10201154066767606,
+    "mae": 0.07264223869007862,
+    "max_abs_error": 0.4324753653895276,
+    "r2": 0.2725464160472685,
+    "true_min": -0.6557487363608505,
+    "true_max": 0.258125011124402,
+    "prediction_min": -0.41960840745500944,
+    "prediction_max": -0.16820941091513647
+  },
+  "validation_metrics": {
+    "rmse": 0.09904149589442379,
+    "mae": 0.07241974447464249,
+    "max_abs_error": 0.41742973710852216,
+    "r2": 0.26669838336436014,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.41327813384898093,
+    "prediction_max": -0.1683180121287623
+  },
+  "test_metrics": null,
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260816_f2_im_i2_l2\\equations\\global_100_4950_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260816_f2_im_i2_l2\\models\\global_100_4950_pysr_model.pkl"
+}

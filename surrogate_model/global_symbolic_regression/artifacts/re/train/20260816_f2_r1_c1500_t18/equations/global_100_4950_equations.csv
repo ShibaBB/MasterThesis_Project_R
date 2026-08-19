@@ -1,0 +1,7 @@
+complexity,loss,equation,score,sympy_format,lambda_format
+1,0.03696064,0.3690577,0.0,0.369057700000000,PySRFunction(X=>0.369057700000000)
+3,0.03532392,log10_sigma * 0.079092376,0.022646603893033357,log10_sigma*0.079092376,PySRFunction(X=>log10_sigma*0.079092376)
+4,0.011914512,log(log10_sigma / log10_f),1.08680320192003,log(log10_sigma/log10_f),PySRFunction(X=>log(log10_sigma/log10_f))
+7,0.011361285,(0.09573153 / (alpha_infinity__f2_onset + 0.12622218)) + 0.22689646,0.01584854328058279,0.22689646 + 0.09573153/(alpha_infinity__f2_onset + 0.12622218),PySRFunction(X=>0.22689646 + 0.09573153/(alpha_infinity__f2_onset + 0.12622218))
+9,0.010406399,((log10_sigma - log10_f) / (log10_f * 1.0208032)) / 1.158362,0.043895308848252164,(-log10_f + log10_sigma)/(1.158362*((log10_f*1.0208032))),PySRFunction(X=>(-log10_f + log10_sigma)/(1.158362*((log10_f*1.0208032))))
+22,0.010225332,0.078409314 / ((0.53849983 / (((log(alpha_infinity) / ((alpha_infinity + (alpha_infinity__f2_onset / 0.8545319)) / alpha_infinity__f2_onset)) + alpha_infinity) + (alpha_infinity / alpha_infinity__f2_onset))) + 0.08267846),0.0013502103505486157,0.078409314/(0.08267846 + 0.53849983/(alpha_infinity + alpha_infinity/alpha_infinity__f2_onset + alpha_infinity__f2_onset*log(alpha_infinity)/(alpha_infinity + 1.17023132781819*alpha_infinity__f2_onset))),PySRFunction(X=>0.078409314/(0.08267846 + 0.53849983/(alpha_infinity + alpha_infinity/alpha_infinity__f2_onset + alpha_infinity__f2_onset*log(alpha_infinity)/(alpha_infinity + 1.17023132781819*alpha_infinity__f2_onset))))

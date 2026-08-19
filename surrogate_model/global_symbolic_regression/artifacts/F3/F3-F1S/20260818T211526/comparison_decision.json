@@ -1,0 +1,381 @@
+{
+  "stage": "F3-F1S",
+  "stage_passed": true,
+  "decision": "freeze_domain_safe_formal_Re_F3_candidate_for_separately_authorized_F3_F2",
+  "selected_candidate_index": 5,
+  "selected_complexity": 9,
+  "frozen_candidate": {
+    "schema_version": 1,
+    "stage_frozen": "F3-F1S",
+    "source_formal_stage": "F3-F1",
+    "source_formal_seed": 42,
+    "source_candidate_index": 5,
+    "source_candidate_complexity": 9,
+    "source_equation": "(z_sigma__f3_mid * -4.196377) / (-44.352028 - (z_sigma__f3_mid * z_sigma__f3_mid))",
+    "source_expression_for_eval": "z_sigma__f3_mid*(-4.196377)/(-z_sigma__f3_mid*z_sigma__f3_mid - 44.352028)",
+    "canonical_equation": "delta_Re = 4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid^2)",
+    "canonical_expression_for_eval": "4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid**2)",
+    "terminal_name": "z_sigma__f3_mid",
+    "terminal_coefficient": 4.196377,
+    "positive_denominator_constant": 44.352028,
+    "model_definition": "Re_F3 = frozen_formal_Re_F1 + delta_Re",
+    "f1_fallback_at_terminal_zero": true,
+    "input_feature_names": [
+      "z_sigma__f3_mid"
+    ],
+    "f3_output_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f",
+      "z_sigma__f3_mid"
+    ],
+    "f3b_terminal_spec": {
+      "schema_version": 1,
+      "name": "re_f3_sigma_local_bandpass_v1",
+      "stage_frozen": "F3-B",
+      "source_evidence_stage": "F3-A",
+      "source_f3a_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654",
+      "target": "re",
+      "dataset_run": "run1",
+      "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+      "frequency_range_hz": [
+        100.0,
+        4950.0
+      ],
+      "input_feature_names": [
+        "log10_sigma",
+        "alpha_infinity",
+        "log10_lambda",
+        "log10_lambda_prime",
+        "log10_k0_prime",
+        "log10_f"
+      ],
+      "base_features_retained": true,
+      "frequency_feature": "log10_f",
+      "standardizations": {
+        "z_sigma": {
+          "source_feature": "log10_sigma",
+          "center": 4.689187575130151,
+          "scale": 0.21494263391550147,
+          "fitted_partition": "train",
+          "fitted_unique_curve_count": 700,
+          "method": "training_unique_curve_population_mean_std_ddof0",
+          "ddof": 0
+        }
+      },
+      "envelopes": {
+        "g_mid": {
+          "name": "g_mid",
+          "kind": "smooth_log10_bandpass_product",
+          "frequency_coordinate": "log10_hz",
+          "low_hz": 1250.0,
+          "high_hz": 2100.0,
+          "low_transition_log10": 0.06,
+          "high_transition_log10": 0.06,
+          "normalization_method": "maximum_on_fixed_log10_reference_grid",
+          "normalization_frequency_range_hz": [
+            100.0,
+            4950.0
+          ],
+          "normalization_reference_grid_size": 4096,
+          "normalization_max": 0.7522658139641833
+        }
+      },
+      "terminals": [
+        {
+          "name": "z_sigma__f3_mid",
+          "standardized_feature": "z_sigma",
+          "envelope": "g_mid",
+          "analytic_definition": "((log10_sigma - center) / scale) * g_mid(log10_f)"
+        }
+      ],
+      "terminal_feature_names": [
+        "z_sigma__f3_mid"
+      ],
+      "output_feature_names": [
+        "log10_sigma",
+        "alpha_infinity",
+        "log10_lambda",
+        "log10_lambda_prime",
+        "log10_k0_prime",
+        "log10_f",
+        "z_sigma__f3_mid"
+      ],
+      "terminal_order_contract": "append_after_base_features_in_declared_order",
+      "teacher_or_sobol_values_used_as_row_inputs": false,
+      "output_postprocessing": {
+        "method": "none"
+      },
+      "f3a_selection_evidence": {
+        "selected_candidate": "sigma_bandpass_1250_2100",
+        "ridge_coefficient_reference_only": 0.09117886714681851,
+        "ridge_coefficient_is_part_of_terminal": false,
+        "decision_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\decision_report.json",
+        "decision_file_sha256": "bac0608b4c63eb2932df502a6404a201df20e451ad90d96d4bf8db7e8fe82fc2"
+      }
+    },
+    "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+    "selection_policy": {
+      "eligibility_first": [
+        "expression evaluates successfully on observed train/validation rows",
+        "expression is finite and continuous over the entire real terminal domain",
+        "residual is continuous at z_sigma__f3_mid = 0",
+        "residual equals exactly zero at z_sigma__f3_mid = 0"
+      ],
+      "ranking_among_eligible": "minimum complete-validation RMSE, then minimum complexity, then candidate index",
+      "purpose": "deployment-safety resolution before any test access"
+    },
+    "validation_metrics": {
+      "rmse": 0.05784999480377146,
+      "mae": 0.041313796341665626,
+      "max_abs_error": 0.2568526431969135,
+      "r2": 0.9074105303087001,
+      "bias": 0.004342225967410324,
+      "prediction_min": -0.08256375143229609,
+      "prediction_max": 1.0714975611617756
+    },
+    "validation_curve_summary": {
+      "curve_mean_rmse": 0.04955928311551556,
+      "curve_median_rmse": 0.04019150793796812,
+      "curve_p95_rmse": 0.11640314257861223,
+      "worst_curve_rmse": 0.14803572707685836,
+      "worst_curve_id": 953
+    },
+    "validation_regional_metrics": [
+      {
+        "lower_hz": 100.0,
+        "upper_hz": 700.0,
+        "row_count": 2400,
+        "rmse": 0.07293245723110042,
+        "mae": 0.057716678205964475,
+        "bias": -0.014649986662210693
+      },
+      {
+        "lower_hz": 700.0,
+        "upper_hz": 1000.0,
+        "row_count": 1200,
+        "rmse": 0.04399466105216296,
+        "mae": 0.03471744408245993,
+        "bias": 0.027820902884871823
+      },
+      {
+        "lower_hz": 1000.0,
+        "upper_hz": 1300.0,
+        "row_count": 1200,
+        "rmse": 0.038097385340272766,
+        "mae": 0.025779142779582365,
+        "bias": 0.022594628339133876
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 1650.0,
+        "row_count": 1350,
+        "rmse": 0.024789094684014763,
+        "mae": 0.015758303331526856,
+        "bias": 0.007900630762247602
+      },
+      {
+        "lower_hz": 1650.0,
+        "upper_hz": 2000.0,
+        "row_count": 1350,
+        "rmse": 0.03621126854434519,
+        "mae": 0.019806987841955115,
+        "bias": 0.0007078791300610962
+      },
+      {
+        "lower_hz": 2000.0,
+        "upper_hz": 3000.0,
+        "row_count": 3900,
+        "rmse": 0.052493241018270215,
+        "mae": 0.037615603453605435,
+        "bias": 0.004994833314715698
+      },
+      {
+        "lower_hz": 3000.0,
+        "upper_hz": 4000.0,
+        "row_count": 4050,
+        "rmse": 0.06653001562546638,
+        "mae": 0.05050180872119809,
+        "bias": 6.695025509925773e-05
+      },
+      {
+        "lower_hz": 4000.0,
+        "upper_hz": 4950.0,
+        "row_count": 3750,
+        "rmse": 0.06562968106799744,
+        "mae": 0.048763369588560104,
+        "bias": 0.007109221941231222
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 2000.0,
+        "row_count": 2700,
+        "rmse": 0.031030268971149223,
+        "mae": 0.017782645586740985,
+        "bias": 0.00430425494615435
+      }
+    ],
+    "train_metrics": {
+      "rmse": 0.06541349710518894,
+      "mae": 0.04453743231071634,
+      "max_abs_error": 0.4436603965593379,
+      "r2": 0.884230213526665,
+      "bias": -0.00010430902375814644,
+      "prediction_min": -0.11105337444080715,
+      "prediction_max": 1.0717607474577222
+    },
+    "train_curve_summary": {
+      "curve_mean_rmse": 0.053372556300186134,
+      "curve_median_rmse": 0.04045252575438689,
+      "curve_p95_rmse": 0.137468314489008,
+      "worst_curve_rmse": 0.2200092204085023,
+      "worst_curve_id": 459
+    },
+    "formula_domain_safety_passed": true,
+    "test_rows_accessed": false
+  },
+  "formal_f1_validation_reference": {
+    "validation_metrics": {
+      "rmse": 0.06997865488067417,
+      "mae": 0.0539982673677811,
+      "max_abs_error": 0.2549097475756308,
+      "r2": 0.864516586956995,
+      "bias": 0.002986810480004279,
+      "prediction_min": 0.0726826636225841,
+      "prediction_max": 1.0714975592363623
+    },
+    "validation_curve_summary": {
+      "curve_mean_rmse": 0.06226378248239593,
+      "curve_median_rmse": 0.05367115272322798,
+      "curve_p95_rmse": 0.12723338150020871,
+      "worst_curve_rmse": 0.16927367878579033,
+      "worst_curve_id": 953
+    },
+    "validation_regional_metrics": [
+      {
+        "lower_hz": 100.0,
+        "upper_hz": 700.0,
+        "row_count": 2400,
+        "rmse": 0.0728056266670498,
+        "mae": 0.05755686783925331,
+        "bias": -0.014663104499207285
+      },
+      {
+        "lower_hz": 700.0,
+        "upper_hz": 1000.0,
+        "row_count": 1200,
+        "rmse": 0.04544491052184621,
+        "mae": 0.03418260514755525,
+        "bias": 0.027356761283747824
+      },
+      {
+        "lower_hz": 1000.0,
+        "upper_hz": 1300.0,
+        "row_count": 1200,
+        "rmse": 0.06651851844199297,
+        "mae": 0.05081275153805298,
+        "bias": 0.02004850869810642
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 1650.0,
+        "row_count": 1350,
+        "rmse": 0.08807740122553251,
+        "mae": 0.07432354595860732,
+        "bias": 0.0026373388185151505
+      },
+      {
+        "lower_hz": 1650.0,
+        "upper_hz": 2000.0,
+        "row_count": 1350,
+        "rmse": 0.09383708894027783,
+        "mae": 0.07937062877759993,
+        "bias": -0.004470664775111991
+      },
+      {
+        "lower_hz": 2000.0,
+        "upper_hz": 3000.0,
+        "row_count": 3900,
+        "rmse": 0.06827285179699469,
+        "mae": 0.05315994656697831,
+        "bias": 0.0031160677742184473
+      },
+      {
+        "lower_hz": 3000.0,
+        "upper_hz": 4000.0,
+        "row_count": 4050,
+        "rmse": 0.06474804083095217,
+        "mae": 0.049346312584718346,
+        "bias": -0.00013985196458844257
+      },
+      {
+        "lower_hz": 4000.0,
+        "upper_hz": 4950.0,
+        "row_count": 3750,
+        "rmse": 0.06531065827411411,
+        "mae": 0.048525954440334605,
+        "bias": 0.0070774971238644095
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 2000.0,
+        "row_count": 2700,
+        "rmse": 0.09100282376780693,
+        "mae": 0.07684708736810363,
+        "bias": -0.0009166629782984219
+      }
+    ]
+  },
+  "formal_f1_guardrails": [
+    {
+      "lower_hz": 700.0,
+      "upper_hz": 1000.0,
+      "formal_f1_control_rmse": 0.04544491052184621,
+      "frozen_safe_candidate_rmse": 0.04399466105216296,
+      "relative_change": -0.031912252725992074,
+      "maximum_allowed_relative_worsening": 0.1,
+      "passed": true
+    },
+    {
+      "lower_hz": 1300.0,
+      "upper_hz": 1650.0,
+      "formal_f1_control_rmse": 0.08807740122553251,
+      "frozen_safe_candidate_rmse": 0.024789094684014763,
+      "relative_change": -0.7185532913199905,
+      "maximum_allowed_relative_worsening": 0.1,
+      "passed": true
+    },
+    {
+      "lower_hz": 1650.0,
+      "upper_hz": 2000.0,
+      "formal_f1_control_rmse": 0.09383708894027783,
+      "frozen_safe_candidate_rmse": 0.03621126854434519,
+      "relative_change": -0.6141049455680399,
+      "maximum_allowed_relative_worsening": 0.1,
+      "passed": true
+    }
+  ],
+  "checks": {
+    "beats_formal_f1_full_validation_rmse": true,
+    "improves_curve_mean_rmse": true,
+    "improves_worst_curve_rmse": true,
+    "improves_target_region": true,
+    "all_formal_f1_regional_guardrails_pass": true,
+    "train_residual_exact_reload_replay": true,
+    "validation_residual_exact_reload_replay": true,
+    "train_prediction_all_finite": true,
+    "validation_prediction_all_finite": true,
+    "candidate_5_selected_by_frozen_safety_first_policy": true,
+    "formula_domain_safety_passed": true
+  },
+  "validation_rmse_relative_improvement": 0.17331942286664692,
+  "formal_model_replacement_decision": false,
+  "f3f2_readiness": true,
+  "test_evaluation_authorized": false,
+  "explicit_f3f2_command_still_required": true,
+  "test_rows_accessed": false,
+  "next_command_if_user_accepts": "执行 F3-F2"
+}

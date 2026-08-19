@@ -1,0 +1,7 @@
+Complexity,Loss,Equation
+1,0.03696064,"0.3690577"
+3,0.03532392,"log10_sigma * 0.079092376"
+4,0.011914512,"log(log10_sigma / log10_f)"
+7,0.011361285,"(0.09573153 / (alpha_infinity__f2_onset + 0.12622218)) + 0.22689646"
+9,0.010406399,"((log10_sigma - log10_f) / (log10_f * 1.0208032)) / 1.158362"
+22,0.010225332,"0.078409314 / ((0.53849983 / (((log(alpha_infinity) / ((alpha_infinity + (alpha_infinity__f2_onset / 0.8545319)) / alpha_infinity__f2_onset)) + alpha_infinity) + (alpha_infinity / alpha_infinity__f2_onset))) + 0.08267846)"
