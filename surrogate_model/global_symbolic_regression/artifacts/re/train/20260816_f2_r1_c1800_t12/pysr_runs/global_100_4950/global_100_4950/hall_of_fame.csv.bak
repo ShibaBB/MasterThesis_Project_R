@@ -1,0 +1,12 @@
+Complexity,Loss,Equation
+1,0.03696064,"0.3690577"
+3,0.023842005,"1.2414923 / log10_f"
+4,0.011914512,"log(log10_sigma / log10_f)"
+6,0.011829346,"log(log10_sigma / log10_f) + 0.009228516"
+7,0.010188042,"((log10_sigma / log10_f) + -0.977095) / 1.2710701"
+9,0.010188041,"(((log10_sigma / log10_f) + -0.9771725) / 1.2643628) / 1.005134"
+16,0.008999473,"sqrt(log(sqrt((sqrt(sqrt(((1.6548238 / alpha_infinity__f2_onset) / log10_f) - -1.6459619)) * log10_sigma) * 0.20872732)))"
+18,0.008358572,"sqrt(log(0.9220561 * sqrt((log10_sigma * 0.20872732) * sqrt(((alpha_infinity / sqrt(alpha_infinity__f2_onset)) / log10_f) - -1.6459619))))"
+20,0.00814351,"sqrt(log(sqrt(sqrt((sqrt((alpha_infinity__f2_high + (0.7324895 / alpha_infinity__f2_onset)) * (alpha_infinity + log10_f)) * 0.054612197) * log10_sigma) * 1.3016598)))"
+21,0.00811676,"sqrt(log(sqrt(sqrt(((sqrt((0.7333712 / alpha_infinity__f2_onset) + (alpha_infinity__f2_high - -0.24174097)) + sqrt(alpha_infinity / log10_f)) * 0.14937022) * log10_sigma))))"
+22,0.007612265,"sqrt(log(sqrt(sqrt((log10_sigma * sqrt((((0.69192505 / alpha_infinity__f2_onset) + alpha_infinity__f2_high) * (alpha_infinity + log10_f)) - -1.0306159)) * 0.06804133) * 1.1724911)))"

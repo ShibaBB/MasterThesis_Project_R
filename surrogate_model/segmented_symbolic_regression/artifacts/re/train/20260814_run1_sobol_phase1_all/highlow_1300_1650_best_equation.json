@@ -1,0 +1,64 @@
+{
+  "segment_id": 4,
+  "segment_name": "highlow_1300_1650",
+  "target": "re",
+  "target_name": "R_real",
+  "lower_hz": 1300.0,
+  "upper_hz": 1650.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "all",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "equation": "(log10_sigma * 0.7428963) + -3.1875556",
+  "complexity": 5,
+  "loss": 0.0008896025,
+  "score": 0.30861361502301743,
+  "n_rows_used": 7650,
+  "n_train": 6300,
+  "n_validation": 1350,
+  "train_metrics": {
+    "rmse": 0.029826220691742705,
+    "mae": 0.019328429828278825,
+    "max_abs_error": 0.34294161592961286,
+    "r2": 0.9662863115261257,
+    "true_min": -0.16790819986349745,
+    "true_max": 0.5295439338991517,
+    "prediction_min": -0.08022968669636388,
+    "prediction_max": 0.5095210722358536
+  },
+  "validation_metrics": {
+    "rmse": 0.028522693465087994,
+    "mae": 0.020237832564526208,
+    "max_abs_error": 0.15034389714334057,
+    "r2": 0.96845490828118,
+    "true_min": -0.12179783660446854,
+    "true_max": 0.5275390762338282,
+    "prediction_min": -0.05513371069909523,
+    "prediction_max": 0.5087818023261543
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260814_run1_sobol_phase1_all\\equations\\highlow_1300_1650_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260814_run1_sobol_phase1_all\\models\\highlow_1300_1650_pysr_model.pkl"
+}

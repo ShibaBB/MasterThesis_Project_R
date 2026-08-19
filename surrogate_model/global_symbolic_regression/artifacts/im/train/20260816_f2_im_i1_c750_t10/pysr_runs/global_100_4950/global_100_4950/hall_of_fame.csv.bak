@@ -1,0 +1,8 @@
+Complexity,Loss,Equation
+1,0.014305179,"-0.20809935"
+3,0.01233334,"-0.68363285 / log10_f"
+6,0.010876465,"log(log10_sigma - log10_k0_prime__f2_low) / log10_k0_prime"
+8,0.010146317,"log((log10_sigma - log10_k0_prime__f2_low) - log10_k0_prime__f2_low) / log10_k0_prime"
+10,0.009826786,"-0.09882753 / (sqrt(-3.2417848 / (log10_k0_prime__f2_low + -0.64812493)) / log10_f)"
+11,0.007788548,"(log10_k0_prime__f2_low * (((log10_f * 8.526699) + -26.448498) * log10_k0_prime__f2_high)) - 0.30108714"
+17,0.00730395,"((((log10_f * 6.363015) + -19.275421) * ((alpha_infinity * log10_k0_prime__f2_high) * log10_k0_prime__f2_low)) / (log10_sigma / log10_f)) - 0.31254756"

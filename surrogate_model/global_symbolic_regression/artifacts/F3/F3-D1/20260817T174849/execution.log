@@ -1,0 +1,10 @@
+[2026-08-17T15:48:52.173485+00:00] F3-D1 preflight frozen: seeds=42/123/456, saved A versus new B, budget=20/6/40/24, Plan B, validation-only.
+[2026-08-17T15:48:52.176485+00:00] Starting PySR run: branch=B, seed=42.
+[2026-08-17T15:49:28.197424+00:00] Completed PySR run: branch=B, seed=42, validation_RMSE=0.056896195.
+[2026-08-17T15:49:28.199425+00:00] Starting PySR run: branch=B, seed=123.
+[2026-08-17T15:50:03.185564+00:00] Completed PySR run: branch=B, seed=123, validation_RMSE=0.056885618.
+[2026-08-17T15:50:03.187565+00:00] Starting PySR run: branch=B, seed=456.
+[2026-08-17T15:50:39.909787+00:00] Completed PySR run: branch=B, seed=456, validation_RMSE=0.056030291.
+[2026-08-17T15:50:39.910792+00:00] All three B searches completed; comparing against saved branch A.
+[2026-08-17T15:50:40.203976+00:00] F3-D1 complete: stage_passed=False, decision=retain_saved_branch_A_representation, test_rows_accessed=False.
+[2026-08-17T15:50:40.204978+00:00] Artifacts written to C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\F3\F3-D1\20260817T174849

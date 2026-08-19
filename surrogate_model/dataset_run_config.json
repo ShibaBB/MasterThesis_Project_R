@@ -1,5 +1,5 @@
 {
   "schema_version": 1,
-  "default_dataset_run": "run3",
+  "default_dataset_run": "run1",
   "run_config_filename": "dataset_config.json"
 }

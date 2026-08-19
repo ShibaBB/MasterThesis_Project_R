@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "stage_prepared_for": "F3-F2",
+  "prepared_by": "F3-F1S",
+  "prepared_utc": "2026-08-18T19:17:23.897157+00:00",
+  "f3f1s_stage_passed": true,
+  "explicit_user_command_required": true,
+  "one_time_access_enforcement": "exclusive receipt keyed by frozen candidate spec SHA256 is written before test row load",
+  "frozen_candidate_spec_path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1S\\20260818T211720\\frozen_candidate_spec.json",
+  "frozen_candidate_spec_sha256": "1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7",
+  "f3f2_runner_path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\run_f3f2_one_time_test.py",
+  "f3f2_runner_sha256": "9f0945cc38198cd2a696be026602d6b2e07689a373faeb4838d53f0cd4afa2af",
+  "frozen_input_files": {
+    "dataset": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+      "sha256": "42388dae24304760f9e4c8ad686cbc40ffaad4ab06a579061b3b96e831b16a58"
+    },
+    "split": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+      "sha256": "77c70adb5a57f55476a808e43ae1e85a54ee3fd82f1636bc51e737c4f324c562"
+    },
+    "f1_metadata": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated\\training_metadata.json",
+      "sha256": "bd1dfaaebd231e03764f0e5285c8e209b7c81a129b732aa1ea32d28575ed7b62"
+    },
+    "f1_selection": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_run1_sobol_modulated_best_loss\\selected_candidate.csv",
+      "sha256": "11fd0c9c0734614c80a7ec8f6251b6a011c100a50a633f029836134987089923"
+    },
+    "f3b_spec": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\frozen_sigma_local_spec.json",
+      "sha256": "ea8deda5d8e3b1178c52c1df78350169c2d420928bba424e011fe34ff84dca7e"
+    }
+  },
+  "expected_partition": {
+    "name": "test",
+    "curve_count": 150,
+    "rows_per_curve": 128,
+    "row_count": 19200,
+    "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0"
+  },
+  "acceptance_rules": {
+    "full_test": "frozen Re F3 RMSE must be strictly below formal Re F1 on the same test rows",
+    "curve_behavior": "curve-mean and worst-curve RMSE must both be strictly below formal Re F1",
+    "target_region": "1300-2000 Hz RMSE must be strictly below formal Re F1",
+    "guardrails": "none of 700-1000, 1300-1650, or 1650-2000 Hz RMSE may worsen more than 10% versus formal Re F1",
+    "numerical_safety": "F1, residual, and final predictions must all be finite",
+    "all_checks_required": true,
+    "failure_action": "retain formal Re F1"
+  },
+  "reporting_contract": [
+    "raw full-range RMSE/MAE/max-absolute-error/R2/bias/prediction range",
+    "curve mean/median/p95/worst RMSE and per-curve metrics",
+    "frequency-wise RMSE/MAE/bias",
+    "all reporting regions, target region, and guardrails",
+    "frozen predictions and diagnostic figures"
+  ],
+  "no_post_test_formula_or_threshold_changes": true,
+  "test_rows_accessed_during_protocol_preparation": false
+}

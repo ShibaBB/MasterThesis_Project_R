@@ -1,0 +1,98 @@
+Worker start: stage=F3-D1, branch=b, seed=42, budget=20/6/40/24
+Compiling Julia backend...
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:142 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:187 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:152 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:212 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:161 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:77 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:114 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:66 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:87 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+[ Info: Started!
+
+Expressions evaluated per second: 1.970e+03
+Progress: 88 / 120 total iterations (73.333%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           5.674e-03  0.000e+00  y = 0.00028162
+3           4.282e-03  1.407e-01  y = 0.091289 * z_sigma__f3_mid
+7           4.211e-03  4.185e-03  y = (z_sigma__f3_mid * 0.091289) - (z_lambda__f3_mid * 0.0...
+                                      21478)
+11          4.157e-03  3.215e-03  y = (z_sigma__f3_mid - (-0.15703 * ((z_lambda__f3_mid * z_...
+                                      sigma__f3_mid) - z_lambda__f3_mid))) * 0.093659
+13          4.156e-03  9.746e-05  y = (z_sigma__f3_mid - ((((z_lambda__f3_mid * 1.1358) * z_...
+                                      sigma__f3_mid) - z_lambda__f3_mid) * -0.14897)) * 0.093659
+14          4.138e-03  4.314e-03  y = (z_sigma__f3_mid - (sqrt(3.0855) * (-0.15703 * ((z_lam...
+                                      bda__f3_mid * z_sigma__f3_mid) - z_lambda__f3_mid)))) * 0....
+                                      093659
+19          4.137e-03  6.921e-05  y = (z_sigma__f3_mid - ((z_lambda__f3_mid * (z_sigma__f3_m...
+                                      id - ((z_lambda__f3_mid - (z_sigma__f3_mid - (1.1359 + 0.5...
+                                      8409))) - z_lambda__f3_mid))) * -0.14897)) * 0.093659
+21          4.137e-03  2.313e-05  y = (z_sigma__f3_mid - ((((z_sigma__f3_mid * z_lambda__f3_...
+                                      mid) - (z_lambda__f3_mid * ((z_sigma__f3_mid - z_sigma__f3...
+                                      _mid) - (z_sigma__f3_mid - 0.44831)))) - z_lambda__f3_mid)...
+                                       * -0.14897)) * 0.093659
+23          4.136e-03  5.979e-05  y = (z_sigma__f3_mid - (((z_lambda__f3_mid * (z_sigma__f3_...
+                                      mid - ((z_lambda__f3_mid * (z_sigma__f3_mid - z_sigma__f3_...
+                                      mid)) - ((z_sigma__f3_mid - 1.1359) + 0.58409)))) - z_lamb...
+                                      da__f3_mid) * -0.14897)) * 0.093659
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+[ Info: Final population:
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           5.674e-03  0.000e+00  y = 0.00028162
+3           4.282e-03  1.407e-01  y = 0.091289 * z_sigma__f3_mid
+5           4.282e-03  3.219e-06  y = (z_sigma__f3_mid - -0.00069167) * 0.091352
+7           4.211e-03  8.367e-03  y = (z_sigma__f3_mid * 0.091289) - (z_lambda__f3_mid * 0.0...
+                                      21478)
+11          4.157e-03  3.215e-03  y = (z_sigma__f3_mid - (-0.15703 * ((z_lambda__f3_mid * z_...
+                                      sigma__f3_mid) - z_lambda__f3_mid))) * 0.093659
+13          4.156e-03  9.746e-05  y = (z_sigma__f3_mid - ((((z_lambda__f3_mid * 1.1358) * z_...
+                                      sigma__f3_mid) - z_lambda__f3_mid) * -0.14897)) * 0.093659
+14          4.138e-03  4.314e-03  y = (z_sigma__f3_mid - (sqrt(3.0855) * (-0.15703 * ((z_lam...
+                                      bda__f3_mid * z_sigma__f3_mid) - z_lambda__f3_mid)))) * 0....
+                                      093659
+15          4.137e-03  2.664e-04  y = (z_sigma__f3_mid - (1.3493 * ((((z_lambda__f3_mid * 1....
+                                      3493) * z_sigma__f3_mid) - z_lambda__f3_mid) * -0.14897)))...
+                                       * 0.093659
+17          4.136e-03  1.924e-04  y = (z_sigma__f3_mid + (z_sigma__f3_mid + ((((z_sigma__f3_...
+                                      mid + -0.8779) * -0.78545) * (z_lambda__f3_mid * 0.84394))...
+                                       * -0.82937))) * 0.046246
+18          4.102e-03  8.188e-03  y = ((z_sigma__f3_mid - (z_sigma__f3_mid * (((z_lambda__f3...
+                                      _mid + -0.065895) / sqrt(z_lambda__f3_mid * z_lambda__f3_m...
+                                      id)) * -0.18948))) - -4.6993e-05) * 0.092698
+───────────────────────────────────────────────────────────────────────────────────────────────────
+[ Info: Results saved to:
+  - C:/MasterThesis_Project_R/surrogate_model/global_symbolic_regression/artifacts/F3/F3-D1/20260817T174849/runs/b/seed_42/pysr_runs\f3d1_b_s42\hall_of_fame.csv
+Worker complete: branch=b, seed=42, validation_RMSE=0.056896195, selected=9, source=pysr_hall_of_fame, complexity=15, fit_seconds=28.7

@@ -1,0 +1,227 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\segmented_SR\\Wool_R_segmented.mat",
+  "dataset_run": "run1",
+  "target": "re",
+  "target_name": "R_real",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "training_dir": "surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260809_run1_log10_i100_p12",
+  "candidate_selection_split": "validation",
+  "final_evaluation_split": "test",
+  "selection_rule": "best_loss",
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "selected_candidates": {
+    "low_100_700": 10,
+    "midlow_700_1000": 17,
+    "midhigh_1000_1300": 12,
+    "highlow_1300_1650": 15,
+    "high_1650_2000": 15,
+    "upperlow_2000_3000": 16,
+    "uppermid_3000_4000": 15,
+    "upperhigh_4000_4950": 14
+  },
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "original_feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "overall_metrics": {
+    "rmse": 0.03492446641796532,
+    "mae": 0.02389866892319917,
+    "max_abs_error": 0.2672839216076709,
+    "r2": 0.9654028046129349,
+    "true_min": -0.16768789543909363,
+    "true_max": 0.9848472521819153,
+    "prediction_min": -0.1285882476681925,
+    "prediction_max": 0.9796417907028051
+  },
+  "validation_selection_metrics": {
+    "rmse": 0.03559606052219282,
+    "mae": 0.02472118806353428,
+    "max_abs_error": 0.23605185525573408,
+    "r2": 0.9649442856718188,
+    "true_min": -0.1274621043189832,
+    "true_max": 0.9838400807547939,
+    "prediction_min": -0.11972742508792,
+    "prediction_max": 0.9795379033793382
+  },
+  "raw_prediction_diagnostics": {
+    "prediction_min": -0.1285882476681925,
+    "prediction_max": 0.9796417907028051,
+    "finite_count": 19200
+  },
+  "prediction_diagnostics": {
+    "prediction_min": -0.1285882476681925,
+    "prediction_max": 0.9796417907028051,
+    "finite_count": 19200
+  },
+  "boundary_transition_diagnostics": [
+    {
+      "left_segment": "low_100_700",
+      "right_segment": "midlow_700_1000",
+      "boundary_hz": 700.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.052519157515880446,
+      "max_abs_prediction_change": 0.21948440382599438,
+      "mean_abs_teacher_change": 0.021400045247244405,
+      "mean_abs_excess_change": 0.04612031292555514,
+      "max_abs_excess_change": 0.1750157523034901
+    },
+    {
+      "left_segment": "midlow_700_1000",
+      "right_segment": "midhigh_1000_1300",
+      "boundary_hz": 1000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.0405289644688811,
+      "max_abs_prediction_change": 0.10142225139306249,
+      "mean_abs_teacher_change": 0.01353174758659554,
+      "mean_abs_excess_change": 0.034305218872104644,
+      "max_abs_excess_change": 0.06826008554197538
+    },
+    {
+      "left_segment": "midhigh_1000_1300",
+      "right_segment": "highlow_1300_1650",
+      "boundary_hz": 1300.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.021967555486987925,
+      "max_abs_prediction_change": 0.11211727357616437,
+      "mean_abs_teacher_change": 0.007410585083911741,
+      "mean_abs_excess_change": 0.018683531354171036,
+      "max_abs_excess_change": 0.08861741822719862
+    },
+    {
+      "left_segment": "highlow_1300_1650",
+      "right_segment": "high_1650_2000",
+      "boundary_hz": 1650.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.02345874777494774,
+      "max_abs_prediction_change": 0.14903142966918037,
+      "mean_abs_teacher_change": 0.003847134450935526,
+      "mean_abs_excess_change": 0.020902646067897213,
+      "max_abs_excess_change": 0.13225016538283046
+    },
+    {
+      "left_segment": "high_1650_2000",
+      "right_segment": "upperlow_2000_3000",
+      "boundary_hz": 2000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.058579779951236796,
+      "max_abs_prediction_change": 0.3942019650513826,
+      "mean_abs_teacher_change": 0.00315345484631334,
+      "mean_abs_excess_change": 0.05565564499611536,
+      "max_abs_excess_change": 0.375519496971491
+    },
+    {
+      "left_segment": "upperlow_2000_3000",
+      "right_segment": "uppermid_3000_4000",
+      "boundary_hz": 3000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.07789483148824326,
+      "max_abs_prediction_change": 0.26159275583420416,
+      "mean_abs_teacher_change": 0.002684932087640582,
+      "mean_abs_excess_change": 0.0753341984111548,
+      "max_abs_excess_change": 0.24930775282418938
+    },
+    {
+      "left_segment": "uppermid_3000_4000",
+      "right_segment": "upperhigh_4000_4950",
+      "boundary_hz": 4000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.0430393315356422,
+      "max_abs_prediction_change": 0.17265869507867931,
+      "mean_abs_teacher_change": 0.0028897162184739486,
+      "mean_abs_excess_change": 0.04130344480718971,
+      "max_abs_excess_change": 0.16090587963604652
+    }
+  ]
+}

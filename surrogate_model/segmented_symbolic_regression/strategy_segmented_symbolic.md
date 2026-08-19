@@ -1,4 +1,10 @@
-# Symbolic Regression Strategy
+# Symbolic Regression Strategy (Legacy)
+
+> **Not authoritative for MasterThesis_Project_R.** This document describes
+> the superseded target pipeline. The current project trains separate
+> `R_real = real(Reflect)` and `R_imag = imag(Reflect)` segmented models, uses
+> raw unclipped evaluation, and follows `segmented_symbolic_regression/README.md`
+> plus `surrogate_model/current_project_handoff.md`.
 
 ## 1. Purpose
 

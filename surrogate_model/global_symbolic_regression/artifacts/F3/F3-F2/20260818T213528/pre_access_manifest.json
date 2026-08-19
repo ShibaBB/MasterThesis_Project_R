@@ -1,0 +1,19 @@
+{
+  "stage": "F3-F2",
+  "created_utc": "2026-08-18T19:35:29.868686+00:00",
+  "freeze_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1S\\20260818T211720",
+  "frozen_candidate_spec_sha256": "1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7",
+  "acceptance_rules": {
+    "full_test": "frozen Re F3 RMSE must be strictly below formal Re F1 on the same test rows",
+    "curve_behavior": "curve-mean and worst-curve RMSE must both be strictly below formal Re F1",
+    "target_region": "1300-2000 Hz RMSE must be strictly below formal Re F1",
+    "guardrails": "none of 700-1000, 1300-1650, or 1650-2000 Hz RMSE may worsen more than 10% versus formal Re F1",
+    "numerical_safety": "F1, residual, and final predictions must all be finite",
+    "all_checks_required": true,
+    "failure_action": "retain formal Re F1"
+  },
+  "no_post_test_tuning": true,
+  "test_features_read": false,
+  "test_targets_read": false,
+  "test_predictions_computed": false
+}

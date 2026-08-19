@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "target": "im",
+  "dataset_run": "run1",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "decision_data": "validation only",
+  "test_metrics_used_for_decision": false,
+  "test_metrics_reported_after_validation_decision": true,
+  "matched_training_args": {
+    "dataset_run": "run1",
+    "random_seed": 42,
+    "max_samples_per_segment": null,
+    "niterations": 100,
+    "populations": 12,
+    "population_size": 80,
+    "maxsize": 24,
+    "model_selection": "best"
+  },
+  "per_segment_validation_rmse_winner": {
+    "low_100_700": "all",
+    "midlow_700_1000": "all",
+    "midhigh_1000_1300": "all",
+    "highlow_1300_1650": "sobol_subset",
+    "high_1650_2000": "all",
+    "upperlow_2000_3000": "all",
+    "uppermid_3000_4000": "all",
+    "upperhigh_4000_4950": "sobol_subset"
+  },
+  "hybrid_metrics": {
+    "validation": {
+      "n_rows": 19200,
+      "rmse": 0.030428837005423648,
+      "mae": 0.02047691863362136,
+      "max_abs_error": 0.2051383214420949,
+      "r2": 0.9307820125455328,
+      "true_min": -0.6045116854711113,
+      "true_max": 0.2375006444540555,
+      "prediction_min": -0.6152079399882533,
+      "prediction_max": 0.2048541016778201
+    },
+    "test": {
+      "n_rows": 19200,
+      "rmse": 0.030685500872090703,
+      "mae": 0.020056942408808027,
+      "max_abs_error": 0.2868630232163012,
+      "r2": 0.9211421498687876,
+      "true_min": -0.6430793623150733,
+      "true_max": 0.2021341153837575,
+      "prediction_min": -0.6163292689456501,
+      "prediction_max": 0.2174440850105605
+    }
+  },
+  "hybrid_segment_metrics_csv": "surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\comparison\\20260814_run1_sobol_phase1\\hybrid_selected_segment_metrics.csv",
+  "comparison_csv": "surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\comparison\\20260814_run1_sobol_phase1\\validation_branch_comparison.csv"
+}

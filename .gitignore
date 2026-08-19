@@ -21,6 +21,13 @@ surrogate_model/**/*.bak
 surrogate_model/**/artifacts/**/_scratch/
 surrogate_model/**/artifacts/**/tmp/
 
+# Deterministic interface-test outputs; formal run datasets/artifacts remain trackable
+surrogate_model/datasets/*/smoke/
+
+# Disposable model smoke runs and superseded pre-fix evaluations
+surrogate_model/**/artifacts/**/20260809_run1_log10_smoke*/
+surrogate_model/global_symbolic_regression/artifacts/*/eval/20260809_run1_best_loss/
+
 # MATLAB autosave and transient files
 *.asv
 *.m~

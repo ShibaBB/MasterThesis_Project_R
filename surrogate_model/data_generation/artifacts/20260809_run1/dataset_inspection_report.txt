@@ -1,0 +1,12 @@
+Paired Reflection Teacher Dataset Inspection
+Dataset run: run1
+Material: Wool
+Curves: 1000
+Frequency points: 128
+Complex source: Reflect
+R_real: real(Reflect)
+R_imag: imag(Reflect)
+Maximum checked complex error: 0.000000000000e+00
+
+RE: min=-2.23205810e-01 max=9.85434804e-01 mean=3.69875493e-01 std=1.91273964e-01
+IM: min=-6.55748736e-01 max=2.58125011e-01 mean=-2.09325093e-01 std=1.17537989e-01

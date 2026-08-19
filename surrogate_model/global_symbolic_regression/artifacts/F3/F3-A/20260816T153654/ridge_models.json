@@ -1,0 +1,112 @@
+[
+  {
+    "name": "zero_correction",
+    "family": "control",
+    "eligible_for_stage_decision": false,
+    "term_names": [],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": []
+  },
+  {
+    "name": "sigma_g1450",
+    "family": "sigma_local",
+    "eligible_for_stage_decision": true,
+    "term_names": [
+      "z_sigma_x_g1450"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": [
+      0.10821299891348597
+    ]
+  },
+  {
+    "name": "sigma_g1750",
+    "family": "sigma_local",
+    "eligible_for_stage_decision": true,
+    "term_names": [
+      "z_sigma_x_g1750"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": [
+      0.10473281356232211
+    ]
+  },
+  {
+    "name": "sigma_g1450_g1750",
+    "family": "sigma_local",
+    "eligible_for_stage_decision": true,
+    "term_names": [
+      "z_sigma_x_g1450",
+      "z_sigma_x_g1750"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": [
+      0.04813688972450286,
+      0.07096928116623266
+    ]
+  },
+  {
+    "name": "sigma_bandpass_1250_2100",
+    "family": "sigma_local",
+    "eligible_for_stage_decision": true,
+    "term_names": [
+      "z_sigma_x_g_bandpass_1250_2100"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": [
+      0.09117886714681851
+    ]
+  },
+  {
+    "name": "diagnostic_sigma_bandpass_1250_2100_plus_lambda",
+    "family": "optional_material_diagnostic",
+    "eligible_for_stage_decision": false,
+    "term_names": [
+      "z_sigma_x_g_bandpass_1250_2100",
+      "z_lambda_x_g_bandpass_1250_2100"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": [
+      0.09211139506399826,
+      -0.020660228873891445
+    ]
+  },
+  {
+    "name": "diagnostic_sigma_bandpass_1250_2100_plus_alpha",
+    "family": "optional_material_diagnostic",
+    "eligible_for_stage_decision": false,
+    "term_names": [
+      "z_sigma_x_g_bandpass_1250_2100",
+      "z_alpha_x_g_bandpass_1250_2100"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": [
+      0.09130168667226297,
+      0.0098409275097774
+    ]
+  },
+  {
+    "name": "diagnostic_sigma_bandpass_1250_2100_plus_lambda_alpha",
+    "family": "optional_material_diagnostic",
+    "eligible_for_stage_decision": false,
+    "term_names": [
+      "z_sigma_x_g_bandpass_1250_2100",
+      "z_lambda_x_g_bandpass_1250_2100",
+      "z_alpha_x_g_bandpass_1250_2100"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_intercept": false,
+    "coefficients": [
+      0.0921896025969328,
+      -0.020063883794673568,
+      0.008423102932094249
+    ]
+  }
+]

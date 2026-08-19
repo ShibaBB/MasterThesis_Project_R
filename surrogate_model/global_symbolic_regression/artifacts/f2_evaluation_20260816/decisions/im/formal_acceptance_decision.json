@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "target": "im",
+  "selection_data": "validation only",
+  "test_metrics_used_for_decision": false,
+  "selected_checkpoint": "F2",
+  "f1_validation_metrics": {
+    "rmse": 0.07410101599988758,
+    "mae": 0.057150410888620516,
+    "max_abs_error": 0.28243701469830507,
+    "r2": 0.5895156676260832,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.4184741206111677,
+    "prediction_max": 0.09403238167658962
+  },
+  "f2_validation_metrics": {
+    "rmse": 0.06675302749823202,
+    "mae": 0.050469632784510186,
+    "max_abs_error": 0.2553010382578274,
+    "r2": 0.66688806380266,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.43133014211319076,
+    "prediction_max": 0.1393579136860389
+  },
+  "regional_guardrails_passed": true,
+  "regional_guardrails": [
+    {
+      "lower_hz": 700.0,
+      "upper_hz": 1000.0,
+      "f1_validation_rmse": 0.11253029251935233,
+      "f2_validation_rmse": 0.08023988006473379,
+      "relative_delta": -0.28694862273698807,
+      "f1_validation_bias": 0.0020633493811683416,
+      "f2_validation_bias": 0.003961067748763108
+    },
+    {
+      "lower_hz": 1000.0,
+      "upper_hz": 1300.0,
+      "f1_validation_rmse": 0.09962791100658129,
+      "f2_validation_rmse": 0.06790425637032503,
+      "relative_delta": -0.3184213571853437,
+      "f1_validation_bias": -0.03011947197180315,
+      "f2_validation_bias": -0.023566053439929135
+    },
+    {
+      "lower_hz": 1300.0,
+      "upper_hz": 1650.0,
+      "f1_validation_rmse": 0.07354728627849245,
+      "f2_validation_rmse": 0.04885249546886469,
+      "relative_delta": -0.335767532144137,
+      "f1_validation_bias": -0.026258311246523343,
+      "f2_validation_bias": -0.010701441124943714
+    },
+    {
+      "lower_hz": 3000.0,
+      "upper_hz": 4000.0,
+      "f1_validation_rmse": 0.06690292156706748,
+      "f2_validation_rmse": 0.06408996236118486,
+      "relative_delta": -0.04204538665867885,
+      "f1_validation_bias": -0.0148979520182356,
+      "f2_validation_bias": -0.012516612799392651
+    },
+    {
+      "lower_hz": 4000.0,
+      "upper_hz": 4950.0,
+      "f1_validation_rmse": 0.04684928261959265,
+      "f2_validation_rmse": 0.049973786408863165,
+      "relative_delta": 0.06669267093459896,
+      "f1_validation_bias": 0.00729456041452105,
+      "f2_validation_bias": 0.020634300333042078
+    }
+  ],
+  "f1_test_metrics_final_reporting": {
+    "rmse": 0.07021202780451606,
+    "mae": 0.05446561556060007,
+    "max_abs_error": 0.3162172689717299,
+    "r2": 0.5871412131756422,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.20213411538375756,
+    "prediction_min": -0.40629363212598907,
+    "prediction_max": 0.2532019005212838
+  },
+  "f2_test_metrics_final_reporting": {
+    "rmse": 0.06303179171217158,
+    "mae": 0.048076400687495885,
+    "max_abs_error": 0.2979369347037859,
+    "r2": 0.6672655222882877,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.20213411538375756,
+    "prediction_min": -0.43270175099021213,
+    "prediction_max": 0.36415096353117676
+  },
+  "formal_training_accessed_test_rows": true,
+  "formal_evaluator_accessed_test_rows": true,
+  "f2_test_access_count_after_freeze": 2
+}

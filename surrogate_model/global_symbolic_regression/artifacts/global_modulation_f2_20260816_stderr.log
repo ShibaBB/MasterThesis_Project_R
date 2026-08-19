@@ -1,0 +1,72 @@
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+C:\MasterThesis_Project_R\surrogate_model\segmented_symbolic_regression\.venv_py311\Lib\site-packages\pysr\sr.py:2265: UserWarning: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (https://ai.damtp.cam.ac.uk/pysr/options/#batching). You should also reconsider if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form with symbolic regression. More datapoints will lower the search speed.
+  warnings.warn(
+Compiling Julia backend...
+[ Info: Note: you are running with more than 10,000 datapoints. You should consider turning on batching (`options.batching`), and also if you need that many datapoints. Unless you have a large amount of noise (in which case you should smooth your dataset first), generally < 10,000 datapoints is enough to find a functional form.
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+Traceback (most recent call last):
+  File "C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\run_global_modulation_f2_experiments.py", line 422, in <module>
+    main()
+  File "C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\run_global_modulation_f2_experiments.py", line 388, in main
+    _, winner_spec = compare_screen("re_stage1_onset", target, stage1, reference, bands, args.guardrail_relative_limit, comparison_dir / target)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\run_global_modulation_f2_experiments.py", line 283, in compare_screen
+    raise RuntimeError(f"{target} {stage}: no branch passes all regional guardrails")
+RuntimeError: re re_stage1_onset: no branch passes all regional guardrails

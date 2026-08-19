@@ -1,0 +1,3 @@
+branch,validation_rmse,validation_mae,validation_r2,test_rmse,test_mae,test_max_abs_error,test_r2,eval_dir,selected_by_validation_rmse
+all,0.08595153194273294,0.06198936651276135,0.44772484857489037,0.07974128878261778,0.05797669012654178,0.3509984654525712,0.4674688694336281,C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\im\eval\20260815_run1_sobol_phase1_all_best_loss,True
+sobol_subset,0.08928890112633849,0.06377394633532812,0.404004176500099,0.08357235064735882,0.0599707495616864,0.32984794663452627,0.41507021652946785,C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\im\eval\20260815_run1_sobol_phase1_sobol_subset_best_loss,False

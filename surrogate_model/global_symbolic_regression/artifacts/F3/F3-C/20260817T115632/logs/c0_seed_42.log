@@ -1,0 +1,91 @@
+Worker start: branch=c0, seed=42, budget=20/6/40/24
+Compiling Julia backend...
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:66 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:161 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:187 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:152 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:212 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:142 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:87 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:77 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+┌ Warning: #= C:\Users\liuzi\.julia\packages\DynamicExpressions\gNHdy\ext\DynamicExpressionsLoopVectorizationExt.jl:114 =#:
+│ `LoopVectorization.check_args` on your inputs failed; running fallback `@inbounds @fastmath` loop instead.
+│ Use `warn_check_args=false`, e.g. `@turbo warn_check_args=false ...`, to disable this warning.
+└ @ DynamicExpressionsLoopVectorizationExt C:\Users\liuzi\.julia\packages\LoopVectorization\Y0o9B\src\condense_loopset.jl:1166
+[ Info: Started!
+
+Expressions evaluated per second: 2.040e+03
+Progress: 92 / 120 total iterations (76.667%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.696e-02  0.000e+00  y = 0.36877
+3           3.532e-02  2.264e-02  y = log10_sigma * 0.07921
+4           3.019e-02  1.570e-01  y = 0.67942 / sqrt(log10_f)
+5           2.571e-02  1.608e-01  y = sqrt(sqrt(0.049603 / log10_sigma__sobol_mod))
+6           1.367e-02  6.317e-01  y = (4.2495 / sqrt(log10_f)) - 1.9888
+9           1.301e-02  1.651e-02  y = -1.9794 / (((log10_k0_prime / log10_k0_prime__sobol_mo...
+                                      d) - 0.74292) * log10_k0_prime__sobol_mod)
+11          1.050e-02  1.071e-01  y = sqrt(sqrt(0.049151 / ((log10_k0_prime / log10_k0_prime...
+                                      __sobol_mod) - (log10_lambda__sobol_mod + 0.9382))))
+22          1.047e-02  2.889e-04  y = sqrt(sqrt((0.079683 / sqrt((log10_k0_prime / log10_k0_...
+                                      prime__sobol_mod) - log10_lambda__sobol_mod)) / (((log10_k...
+                                      0_prime / (log10_k0_prime__sobol_mod + log10_lambda__sobol...
+                                      _mod)) - (log10_lambda__sobol_mod * 0.84326)) - 0.88642)))
+24          1.038e-02  4.247e-03  y = sqrt(sqrt((0.079355 / sqrt((log10_k0_prime / log10_k0_...
+                                      prime__sobol_mod) - (log10_lambda__sobol_mod * 1.5295))) /...
+                                       (((log10_k0_prime / (log10_k0_prime__sobol_mod + log10_la...
+                                      mbda__sobol_mod)) - (log10_lambda__sobol_mod * 0.84078)) -...
+                                       0.88487)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+[ Info: Final population:
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.696e-02  0.000e+00  y = 0.36908
+3           3.532e-02  2.264e-02  y = log10_sigma * 0.07921
+4           3.019e-02  1.570e-01  y = 0.67942 / sqrt(log10_f)
+5           2.411e-02  2.252e-01  y = 1.9888 / (log10_f / 0.59802)
+6           1.367e-02  5.674e-01  y = (4.2495 / sqrt(log10_f)) - 1.9888
+9           1.301e-02  1.651e-02  y = -1.9794 / (((log10_k0_prime / log10_k0_prime__sobol_mo...
+                                      d) - 0.74292) * log10_k0_prime__sobol_mod)
+11          1.050e-02  1.071e-01  y = sqrt(sqrt(0.049151 / ((log10_k0_prime / log10_k0_prime...
+                                      __sobol_mod) - (log10_lambda__sobol_mod + 0.9382))))
+14          9.572e-03  3.080e-02  y = log(sqrt(sqrt((log10_sigma * -6.6537) / (log10_lambda_...
+                                      _sobol_mod + ((-0.86546 - log10_k0_prime__sobol_mod) + log...
+                                      10_k0_prime)))))
+16          8.636e-03  5.143e-02  y = log(sqrt(sqrt((log10_sigma * -1.4404) / (((-0.85019 - ...
+                                      log10_k0_prime__sobol_mod) + (log10_lambda__sobol_mod + lo...
+                                      g10_k0_prime)) / log10_sigma))))
+18          8.635e-03  1.005e-04  y = log(sqrt(sqrt((log10_sigma * -1.5163) / ((((log10_lamb...
+                                      da__sobol_mod + -0.83137) - log10_k0_prime__sobol_mod) + l...
+                                      og10_k0_prime) / log10_sigma)))) + -0.012454
+───────────────────────────────────────────────────────────────────────────────────────────────────
+[ Info: Results saved to:
+  - C:/MasterThesis_Project_R/surrogate_model/global_symbolic_regression/artifacts/F3/F3-C/20260817T115632/runs/c0/seed_42/pysr_runs\f3c_c0_s42\hall_of_fame.csv
+Worker complete: branch=c0, seed=42, validation_RMSE=0.089107819, selected=9, complexity=16, fit_seconds=26.9

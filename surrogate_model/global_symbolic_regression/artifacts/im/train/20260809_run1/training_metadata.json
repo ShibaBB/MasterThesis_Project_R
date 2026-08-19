@@ -1,0 +1,65 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_run": "run1",
+  "target": "im",
+  "target_name": "R_imag",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "fiberfolder": "Wool",
+  "num_curve_samples": 1000,
+  "num_symbolic_samples": 128000,
+  "feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "pysr_variable_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda_var",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_name_mapping": {
+    "phi": "phi",
+    "h": "h",
+    "sigma": "sigma",
+    "alpha_infinity": "alpha_infinity",
+    "lambda": "lambda_var",
+    "lambda_prime": "lambda_prime",
+    "k0_prime": "k0_prime",
+    "f": "f"
+  },
+  "global_name": "global_100_4950",
+  "global_bounds_hz": [
+    100.0,
+    4950.0
+  ],
+  "training_args": {
+    "target": "im",
+    "dataset_run": "run1",
+    "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+    "split_file": null,
+    "output_root": null,
+    "output_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260809_run1",
+    "run_name": "",
+    "random_seed": 42,
+    "max_samples": null,
+    "niterations": 40,
+    "populations": 8,
+    "population_size": 80,
+    "maxsize": 24,
+    "model_selection": "best",
+    "procs": 0,
+    "julia_exe": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\.venv_py311\\julia_env\\pyjuliapkg\\install\\bin\\julia.exe",
+    "overwrite": false
+  }
+}

@@ -1,0 +1,7 @@
+Complexity,Loss,Equation
+1,0.005673664,"0.00016703448"
+3,0.0042818845,"z_sigma__f3_mid * 0.09112186"
+9,0.004279992,"z_sigma__f3_mid / (((z_sigma__f3_mid * 0.15937714) + -5.1575) * -2.1015723)"
+13,0.0042797476,"(z_sigma__f3_mid - (((z_sigma__f3_mid * -0.010656237) * (z_sigma__f3_mid * z_sigma__f3_mid)) * -3.2544684)) * 0.10010762"
+15,0.00427798,"(z_sigma__f3_mid - (z_sigma__f3_mid * ((z_sigma__f3_mid * 0.014892744) * (z_sigma__f3_mid - (z_sigma__f3_mid * z_sigma__f3_mid))))) * 0.09649936"
+17,0.004028604,"(z_sigma__f3_mid - (z_sigma__f3_mid * (((z_sigma__f3_mid - 6.570291) * 0.0052170097) / (-0.0046468284 - (z_sigma__f3_mid * z_sigma__f3_mid))))) * 0.103564985"

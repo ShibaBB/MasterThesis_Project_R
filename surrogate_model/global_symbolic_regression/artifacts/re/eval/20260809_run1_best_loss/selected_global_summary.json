@@ -1,0 +1,71 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_run": "run1",
+  "target": "re",
+  "target_name": "R_real",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "training_dir": "surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260809_run1",
+  "candidate_selection_split": "validation",
+  "final_evaluation_split": "test",
+  "selection_rule": "best_loss",
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "selected_candidate": 13,
+  "global_name": "global_100_4950",
+  "global_bounds_hz": [
+    100.0,
+    4950.0
+  ],
+  "feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "pysr_variable_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda_var",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "overall_metrics": {
+    "rmse": 0.08938606416950416,
+    "mae": 0.05988179742539599,
+    "max_abs_error": 0.4071785552099583,
+    "r2": 0.7733681390817839,
+    "true_min": -0.16768789543909363,
+    "true_max": 0.9848472521819153,
+    "prediction_min": 0.16266001294838706,
+    "prediction_max": 1.0010409485569318
+  },
+  "validation_selection_metrics": {
+    "rmse": 0.09318441346630847,
+    "mae": 0.062182349443711565,
+    "max_abs_error": 0.3872774748807034,
+    "r2": 0.7597621126422072,
+    "true_min": -0.1274621043189832,
+    "true_max": 0.9838400807547939,
+    "prediction_min": 0.16533378565616455,
+    "prediction_max": 1.0010400078318638
+  },
+  "raw_prediction_diagnostics": {
+    "prediction_min": 0.16266001294838706,
+    "prediction_max": 1.0010409485569318,
+    "finite_count": 19200
+  },
+  "prediction_diagnostics": {
+    "prediction_min": 0.16266001294838706,
+    "prediction_max": 1.0010409485569318,
+    "finite_count": 19200
+  }
+}

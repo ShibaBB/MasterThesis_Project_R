@@ -1,0 +1,41 @@
+{
+  "global_name": "global_100_4950",
+  "target": "re",
+  "target_name": "R_real",
+  "lower_hz": 100.0,
+  "upper_hz": 4950.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "equation": "-1.979368 / (((log10_k0_prime / log10_k0_prime__sobol_mod) - 0.74292195) * log10_k0_prime__sobol_mod)",
+  "complexity": 9,
+  "loss": 0.013007579,
+  "score": 0.4187160966646291,
+  "fit_wall_time_seconds": 23.243642700002965,
+  "n_rows_used": 108800,
+  "n_train": 89600,
+  "n_validation": 19200,
+  "n_test": null,
+  "train_metrics": {
+    "rmse": 0.11405077329521221,
+    "mae": 0.0902047535195098,
+    "max_abs_error": 0.49068113429854676,
+    "r2": 0.6480694524580219,
+    "true_min": -0.2232058095984081,
+    "true_max": 0.9854348042856556,
+    "prediction_min": 0.21783385232233052,
+    "prediction_max": 0.9623319080624909
+  },
+  "validation_metrics": {
+    "rmse": 0.11146994963129697,
+    "mae": 0.08943801765900072,
+    "max_abs_error": 0.3844939001820491,
+    "r2": 0.6562279548052898,
+    "true_min": -0.1274621043189832,
+    "true_max": 0.9838400807547939,
+    "prediction_min": 0.22117046215700287,
+    "prediction_max": 0.9617109976096838
+  },
+  "test_metrics": null,
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_perf_seed42_b1\\equations\\global_100_4950_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_perf_seed42_b1\\models\\global_100_4950_pysr_model.pkl"
+}

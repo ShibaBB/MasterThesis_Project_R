@@ -1,4 +1,6 @@
-function [Reflect, Zs_norm, alpha, Re, Im, Zc, k] = jcal_reflection(h, phi, sigma, alpha_infin, lambda, lambda_prime, k0_prime, freq, airProperties)
+function [Reflect, Zs_norm, alpha, Zs_real_norm, Zs_imag_norm, Zc, k] = jcal_reflection(h, phi, sigma, alpha_infin, lambda, lambda_prime, k0_prime, freq, airProperties)
+% The fourth/fifth outputs are normalized surface-impedance components.
+% Reflection-coefficient targets must use real(Reflect) and imag(Reflect).
     % Extract air properties from the structure
     rho_air = airProperties.density_humid_air;  % Density of humid air (kg/m^3)
     air_Zc = airProperties.impedance;           % Characteristic impedance of air (kg/(m^2.s))
@@ -40,8 +42,8 @@ function [Reflect, Zs_norm, alpha, Re, Im, Zc, k] = jcal_reflection(h, phi, sigm
     Reflect = (Zs_norm - 1) ./ (Zs_norm + 1);
 
     % Surface impedance components (real and imaginary parts)
-    Re = real(Zs) / air_Zc;  % Normalized real part
-    Im = imag(Zs) / air_Zc;  % Normalized imaginary part
+    Zs_real_norm = real(Zs) / air_Zc;
+    Zs_imag_norm = imag(Zs) / air_Zc;
 
     % Predicted sound absorption (alpha = 1 - |R|^2)
     alpha = 1 - abs(Reflect).^2;

@@ -1,0 +1,67 @@
+{
+  "segment_id": 1,
+  "segment_name": "low_100_700",
+  "target": "re",
+  "target_name": "R_real",
+  "lower_hz": 100.0,
+  "upper_hz": 700.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "frequency_enhanced_f1",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_k0_prime",
+    "log10_f",
+    "local_t",
+    "local_t2",
+    "local_t3"
+  ],
+  "equation": "0.8498888 - ((((local_t / log10_sigma) * -1.1466951) + -0.05271317) / (log10_sigma / log10_k0_prime))",
+  "complexity": 13,
+  "loss": 0.00031127405,
+  "score": 0.057519746318455835,
+  "n_rows_used": 13600,
+  "n_train": 11200,
+  "n_validation": 2400,
+  "train_metrics": {
+    "rmse": 0.017642960528428186,
+    "mae": 0.013320114050156465,
+    "max_abs_error": 0.13253047513281713,
+    "r2": 0.9820254224315292,
+    "true_min": 0.31451112166569084,
+    "true_max": 0.9854348042856556,
+    "prediction_min": 0.44704159679850797,
+    "prediction_max": 1.041448915108479
+  },
+  "validation_metrics": {
+    "rmse": 0.0163595677790948,
+    "mae": 0.012585791993837858,
+    "max_abs_error": 0.10174594091156963,
+    "r2": 0.9844345005386974,
+    "true_min": 0.3902374023758223,
+    "true_max": 0.9838400807547939,
+    "prediction_min": 0.4644100475674982,
+    "prediction_max": 1.0257344149281413
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260815_run1_frequency_f1\\equations\\low_100_700_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260815_run1_frequency_f1\\models\\low_100_700_pysr_model.pkl"
+}

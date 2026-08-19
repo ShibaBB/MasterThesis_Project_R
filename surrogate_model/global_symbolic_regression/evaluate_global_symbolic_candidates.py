@@ -44,16 +44,26 @@ from shared_split_utils import (  # noqa: E402
     subset_symbolic_data,
     validate_training_split,
 )
-
-DEFAULT_TRAINING_ROOT = SCRIPT_DIR / "artifacts" / "wool_global_symbolic_pysr_runs"
-DEFAULT_OUTPUT_ROOT = SCRIPT_DIR / "artifacts" / "wool_global_symbolic_candidate_evaluation_runs"
-OUTPUT_LOWER_BOUND = 0.0
-OUTPUT_UPPER_BOUND = 1.0
-
+from symbolic_feature_transform import (  # noqa: E402
+    apply_feature_transform,
+    identity_feature_transform,
+)
+from global_sobol_feature_policy import (  # noqa: E402
+    build_feature_policy,
+    validate_stored_feature_policy,
+)
+from global_frequency_modulation import (  # noqa: E402
+    apply_frequency_modulation,
+    validate_frequency_modulation,
+)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Evaluate PySR candidate equations and generate diagnostic plots."
+    )
+    parser.add_argument(
+        "--target", required=True, choices=("re", "im"),
+        help="Reflection-coefficient component to evaluate.",
     )
     parser.add_argument(
         "--dataset-run",
@@ -75,7 +85,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--training-root",
         type=Path,
-        default=DEFAULT_TRAINING_ROOT,
+        default=None,
         help="Parent directory used to find the latest training run when --training-dir is omitted.",
     )
     parser.add_argument(
@@ -87,7 +97,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-root",
         type=Path,
-        default=DEFAULT_OUTPUT_ROOT,
+        default=None,
         help="Parent directory for automatically named evaluation runs.",
     )
     parser.add_argument(
@@ -117,6 +127,11 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional 1-based row number in the global equations CSV.",
     )
+    parser.add_argument(
+        "--validation-only",
+        action="store_true",
+        help="Select and diagnose on validation rows without subsetting or predicting test rows.",
+    )
     return parser.parse_args()
 
 
@@ -133,6 +148,7 @@ def unique_path(base_path: Path) -> Path:
 
 
 def resolve_training_dir(args: argparse.Namespace, dataset_run: str) -> Path:
+    training_root = args.training_root or SCRIPT_DIR / "artifacts" / args.target / "train"
     if args.training_dir is not None:
         candidate_run = training_dataset_run(args.training_dir)
         if dataset_run != "custom" and candidate_run != dataset_run:
@@ -142,15 +158,15 @@ def resolve_training_dir(args: argparse.Namespace, dataset_run: str) -> Path:
             )
         return args.training_dir
 
-    if not args.training_root.exists():
+    if not training_root.exists():
         raise FileNotFoundError(
             "No --training-dir was provided and the default training root does not exist: "
-            f"{args.training_root}"
+            f"{training_root}"
         )
 
     candidates = [
         path
-        for path in args.training_root.iterdir()
+        for path in training_root.iterdir()
         if path.is_dir()
         and (path / "equations").exists()
         and (dataset_run == "custom" or training_dataset_run(path) == dataset_run)
@@ -158,7 +174,7 @@ def resolve_training_dir(args: argparse.Namespace, dataset_run: str) -> Path:
     if not candidates:
         raise FileNotFoundError(
             f"No training runs for dataset run {dataset_run!r} with an equations "
-            f"directory were found under: {args.training_root}"
+            f"directory were found under: {training_root}"
         )
 
     return max(candidates, key=lambda path: path.stat().st_mtime)
@@ -168,11 +184,10 @@ def resolve_output_dir(args: argparse.Namespace) -> Path:
     if args.output_dir is not None:
         return args.output_dir
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    training_name = sanitize_name(args.training_dir.name)
-    selection_tag = sanitize_name(args.selection_rule)
-    run_tag = sanitize_name(args.dataset_run)
-    return unique_path(args.output_root / f"{timestamp}_{run_tag}_{training_name}_{selection_tag}")
+    output_root = args.output_root or SCRIPT_DIR / "artifacts" / args.target / "eval"
+    timestamp = datetime.now().strftime("%Y%m%d")
+    selector = f"c{args.max_complexity}" if args.selection_rule == "max_complexity" else sanitize_name(args.selection_rule)
+    return unique_path(output_root / f"{timestamp}_{sanitize_name(args.dataset_run)}_{selector}")
 
 
 def decode_matlab_string(file: h5py.File, value: Any) -> str:
@@ -200,15 +215,33 @@ def decode_matlab_string_array(file: h5py.File, dataset: h5py.Dataset) -> list[s
     return values
 
 
-def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
+def read_symbolic_dataset(dataset_file: Path, target: str, dataset_run: str) -> dict[str, Any]:
     if not dataset_file.exists():
         raise FileNotFoundError(f"Symbolic dataset file not found: {dataset_file}")
 
     with h5py.File(dataset_file, "r") as file:
         info_group = file["symbolic_dataset_info"]
+        missing_targets = [key for key in ("y_re_symbolic", "y_im_symbolic") if key not in file]
+        if missing_targets:
+            raise ValueError(f"Symbolic dataset is missing paired target arrays {missing_targets}.")
+        target_key = {"re": "y_re_symbolic", "im": "y_im_symbolic"}[target]
+        if target_key not in file:
+            raise ValueError(f"Symbolic dataset is missing target array {target_key}.")
+        target_names = decode_matlab_string_array(file, info_group["target_names"])
+        complex_source = decode_matlab_string(file, info_group["complex_source"])
+        recorded_run = decode_matlab_string(file, info_group["dataset_run"])
+        if target_names != ["R_real", "R_imag"] or complex_source != "Reflect":
+            raise ValueError("Symbolic dataset metadata does not match paired Reflect targets.")
+        if dataset_run != "custom" and recorded_run != dataset_run:
+            raise ValueError(f"Dataset metadata run {recorded_run!r} does not match {dataset_run!r}.")
+        row_count = np.array(file["X_symbolic"]).shape[1]
+        if any(np.array(file[key]).size != row_count for key in ("y_re_symbolic", "y_im_symbolic")):
+            raise ValueError("Paired symbolic target arrays are not aligned with X_symbolic.")
         data = {
             "X": np.array(file["X_symbolic"]).T,
-            "y": np.array(file["y_symbolic"]).reshape(-1),
+            "y": np.array(file[target_key]).reshape(-1),
+            "target": target,
+            "target_name": {"re": "R_real", "im": "R_imag"}[target],
             "segment_index": np.array(file["segment_index"]).reshape(-1).astype(int),
             "source_curve_index": np.array(file["source_curve_index"]).reshape(-1).astype(int),
             "freq_grid": np.array(file["freq_grid"]).reshape(-1),
@@ -269,20 +302,11 @@ def regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, floa
         "mae": float(mean_absolute_error(y_true, y_pred)),
         "max_abs_error": float(np.max(np.abs(y_true - y_pred))),
         "r2": float(r2_score(y_true, y_pred)),
+        "true_min": float(np.min(y_true)),
+        "true_max": float(np.max(y_true)),
+        "prediction_min": float(np.min(y_pred)),
+        "prediction_max": float(np.max(y_pred)),
     }
-
-
-def clip_predictions(y_pred: np.ndarray) -> np.ndarray:
-    return np.clip(y_pred, OUTPUT_LOWER_BOUND, OUTPUT_UPPER_BOUND)
-
-
-def count_values_clipped(y_pred: np.ndarray) -> int:
-    return int(
-        np.sum(
-            np.isfinite(y_pred)
-            & ((y_pred < OUTPUT_LOWER_BOUND) | (y_pred > OUTPUT_UPPER_BOUND))
-        )
-    )
 
 
 def build_predictor(expression: str, variable_names: list[str]) -> Any:
@@ -327,19 +351,17 @@ def evaluate_global_candidates(
         expression = str(equation_row["expression_for_eval"])
         try:
             raw_y_pred = predict_expression(expression, data["X"], variable_names)
-            y_pred = clip_predictions(raw_y_pred)
+            y_pred = raw_y_pred
             metrics = regression_metrics(data["y"], y_pred)
             status = "ok"
             predictions[candidate_index] = y_pred
             raw_prediction_min = float(np.min(raw_y_pred))
             raw_prediction_max = float(np.max(raw_y_pred))
-            num_clipped = count_values_clipped(raw_y_pred)
         except Exception as exc:  # Keep evaluating other candidates.
             metrics = {"rmse": math.inf, "mae": math.inf, "max_abs_error": math.inf, "r2": -math.inf}
             status = f"failed: {exc}"
             raw_prediction_min = math.nan
             raw_prediction_max = math.nan
-            num_clipped = 0
 
         rows.append(
             {
@@ -353,7 +375,6 @@ def evaluate_global_candidates(
                 "eval_status": status,
                 "raw_prediction_min": raw_prediction_min,
                 "raw_prediction_max": raw_prediction_max,
-                "num_clipped": num_clipped,
                 **metrics,
             }
         )
@@ -398,7 +419,7 @@ def plot_complexity_vs_error(metrics: pd.DataFrame, figures_dir: Path) -> None:
     plt.close(fig)
 
 
-def plot_selected_scatter(y_true: np.ndarray, y_pred: np.ndarray, figures_dir: Path, max_points: int, seed: int) -> None:
+def plot_selected_scatter(y_true: np.ndarray, y_pred: np.ndarray, figures_dir: Path, max_points: int, seed: int, target_name: str) -> None:
     rng = np.random.default_rng(seed)
     indices = np.arange(y_true.size)
     if indices.size > max_points:
@@ -409,16 +430,16 @@ def plot_selected_scatter(y_true: np.ndarray, y_pred: np.ndarray, figures_dir: P
     lower = min(float(np.min(y_true[indices])), float(np.min(y_pred[indices])))
     upper = max(float(np.max(y_true[indices])), float(np.max(y_pred[indices])))
     ax.plot([lower, upper], [lower, upper], color="black", linewidth=1)
-    ax.set_xlabel("Teacher alpha")
-    ax.set_ylabel("Symbolic alpha")
-    ax.set_title("Selected global formula: predicted vs true")
+    ax.set_xlabel(f"Teacher {target_name}")
+    ax.set_ylabel(f"Symbolic {target_name}")
+    ax.set_title(f"Selected global formula: {target_name} predicted vs true")
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     fig.savefig(figures_dir / "selected_predicted_vs_true.png", dpi=180)
     plt.close(fig)
 
 
-def plot_error_vs_frequency(freq: np.ndarray, error: np.ndarray, figures_dir: Path, max_points: int, seed: int) -> None:
+def plot_error_vs_frequency(freq: np.ndarray, error: np.ndarray, figures_dir: Path, max_points: int, seed: int, target_name: str) -> None:
     rng = np.random.default_rng(seed)
     indices = np.arange(freq.size)
     if indices.size > max_points:
@@ -429,7 +450,7 @@ def plot_error_vs_frequency(freq: np.ndarray, error: np.ndarray, figures_dir: Pa
     ax.axhline(0.0, color="black", linewidth=1)
     ax.set_xlabel("Frequency (Hz)")
     ax.set_ylabel("Prediction error")
-    ax.set_title("Selected global formula: error vs frequency")
+    ax.set_title(f"Selected global formula: {target_name} error vs frequency")
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     fig.savefig(figures_dir / "selected_error_vs_frequency.png", dpi=180)
@@ -454,16 +475,16 @@ def plot_curve_comparisons(
 
     for ax, curve_id in zip(axes.flatten(), curve_ids):
         mask = data["source_curve_index"] == curve_id
-        order = np.argsort(data["X"][mask, -1])
-        freq = data["X"][mask, -1][order]
+        order = np.argsort(data["frequency_hz"][mask])
+        freq = data["frequency_hz"][mask][order]
         y_true = data["y"][mask][order]
         y_pred = y_pred_all[mask][order]
         ax.plot(freq, y_true, label="Teacher", linewidth=1.8)
         ax.plot(freq, y_pred, label="Symbolic", linewidth=1.5, linestyle="--")
         ax.set_title(f"Curve {int(curve_id)}")
         ax.set_xlabel("Frequency (Hz)")
-        ax.set_ylabel("alpha")
-        ax.set_ylim(-0.05, 1.05)
+        ax.set_ylabel(data["target_name"])
+        set_dynamic_curve_ylim(ax, y_true, y_pred)
         ax.grid(True, alpha=0.3)
 
     for ax in axes.flatten()[len(curve_ids):]:
@@ -476,6 +497,18 @@ def plot_curve_comparisons(
     plt.close(fig)
 
 
+def set_dynamic_curve_ylim(ax: Any, y_true: np.ndarray, y_pred: np.ndarray) -> None:
+    values = np.concatenate((np.asarray(y_true).reshape(-1), np.asarray(y_pred).reshape(-1)))
+    values = values[np.isfinite(values)]
+    if values.size == 0:
+        return
+    lower = float(np.min(values))
+    upper = float(np.max(values))
+    span = upper - lower
+    padding = max(0.05 * span, 1e-6)
+    ax.set_ylim(lower - padding, upper + padding)
+
+
 def evaluate_selected_candidate(
     data: dict[str, Any],
     metrics: pd.DataFrame,
@@ -484,20 +517,66 @@ def evaluate_selected_candidate(
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     row = metrics[metrics["candidate_index"] == selected_candidate].iloc[0]
     raw_y_pred = predict_expression(row["expression_for_eval"], data["X"], variable_names)
-    y_pred = clip_predictions(raw_y_pred)
+    y_pred = raw_y_pred
     return raw_y_pred, y_pred, pd.DataFrame([row.to_dict()])
 
 
 def prediction_diagnostics(y_pred: np.ndarray) -> dict[str, float | int]:
-    below_zero = y_pred < 0.0
-    above_one = y_pred > 1.0
     return {
         "prediction_min": float(np.min(y_pred)),
         "prediction_max": float(np.max(y_pred)),
-        "count_below_zero": int(np.sum(below_zero)),
-        "count_above_one": int(np.sum(above_one)),
-        "fraction_outside_0_1": float(np.mean(below_zero | above_one)),
+        "finite_count": int(np.sum(np.isfinite(y_pred))),
     }
+
+
+DIAGNOSTIC_FREQUENCY_BANDS_HZ = (
+    (100.0, 700.0),
+    (700.0, 1000.0),
+    (1000.0, 1300.0),
+    (1300.0, 1650.0),
+    (1650.0, 2000.0),
+    (2000.0, 3000.0),
+    (3000.0, 4000.0),
+    (4000.0, 4950.0),
+)
+
+
+def regional_metrics(
+    y_true: np.ndarray, y_pred: np.ndarray, frequency_hz: np.ndarray
+) -> list[dict[str, float | int]]:
+    rows: list[dict[str, float | int]] = []
+    for lower_hz, upper_hz in DIAGNOSTIC_FREQUENCY_BANDS_HZ:
+        mask = (frequency_hz >= lower_hz) & (frequency_hz <= upper_hz)
+        metrics = regression_metrics(y_true[mask], y_pred[mask])
+        error = y_pred[mask] - y_true[mask]
+        rows.append(
+            {
+                "lower_hz": lower_hz,
+                "upper_hz": upper_hz,
+                "n_rows": int(np.sum(mask)),
+                "bias": float(np.mean(error)),
+                **metrics,
+            }
+        )
+    return rows
+
+
+def frequency_wise_metrics(
+    y_true: np.ndarray, y_pred: np.ndarray, frequency_hz: np.ndarray
+) -> list[dict[str, float | int]]:
+    rows: list[dict[str, float | int]] = []
+    for frequency in np.unique(frequency_hz):
+        mask = frequency_hz == frequency
+        error = y_pred[mask] - y_true[mask]
+        rows.append(
+            {
+                "frequency_hz": float(frequency),
+                "n_rows": int(np.sum(mask)),
+                "rmse": float(np.sqrt(np.mean(error ** 2))),
+                "bias": float(np.mean(error)),
+            }
+        )
+    return rows
 
 
 def main() -> None:
@@ -508,24 +587,65 @@ def main() -> None:
     args.dataset_run = resolved_dataset_run
     args.training_dir = resolve_training_dir(args, resolved_dataset_run)
     args.output_dir = resolve_output_dir(args)
+    if args.output_dir.exists() and any(args.output_dir.iterdir()):
+        raise FileExistsError(f"Refusing to overwrite non-empty evaluation directory: {args.output_dir}")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     figures_dir = args.output_dir / "figures"
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    data = read_symbolic_dataset(args.dataset_file)
+    data = read_symbolic_dataset(args.dataset_file, args.target, resolved_dataset_run)
+    frequency_index = data["feature_names"].index("f")
+    data["frequency_hz"] = data["X"][:, frequency_index].copy()
     num_curve_samples = int(np.unique(data["source_curve_index"]).size)
     shared_split = resolve_and_load_shared_split(
         resolved_dataset_run, args.split_file, num_curve_samples
     )
-    validate_training_split(args.training_dir, shared_split)
+    validate_training_split(args.training_dir, shared_split, expected_target=args.target, expected_dataset_run=resolved_dataset_run)
+    with (args.training_dir / "training_metadata.json").open("r", encoding="utf-8") as file:
+        training_metadata = json.load(file)
+    feature_transform = training_metadata.get("feature_transform")
+    if feature_transform is None:
+        feature_transform = identity_feature_transform(data["feature_names"])
+    original_feature_names = list(data["feature_names"])
+    data["X"] = apply_feature_transform(
+        data["X"], original_feature_names, feature_transform
+    )
+    data["feature_names"] = feature_transform["transformed_feature_names"]
+    transformed_feature_names = list(data["feature_names"])
+    feature_policy = training_metadata.get("feature_policy")
+    if feature_policy is None:
+        feature_policy = build_feature_policy(
+            args.target, "all", transformed_feature_names
+        )
+    else:
+        feature_policy = validate_stored_feature_policy(
+            feature_policy, args.target, transformed_feature_names
+        )
+    selected_indices = feature_policy["feature_indices_0based"]
+    data["X"] = data["X"][:, selected_indices]
+    data["feature_names"] = feature_policy["feature_names"]
+    frequency_modulation = training_metadata.get("frequency_modulation")
+    if feature_policy.get("branch") == "sobol_modulated":
+        if frequency_modulation is None:
+            raise ValueError("Modulated training run is missing frequency-modulation metadata.")
+        frequency_modulation = validate_frequency_modulation(
+            frequency_modulation, args.target, data["feature_names"]
+        )
+        data["X"], data["feature_names"] = apply_frequency_modulation(
+            data["X"], data["feature_names"], frequency_modulation
+        )
+    elif frequency_modulation is not None:
+        raise ValueError("Non-modulated feature branch contains modulation metadata.")
     validation_data = subset_symbolic_data(
         data,
         source_curve_mask(data["source_curve_index"], shared_split, "validation"),
     )
-    test_data = subset_symbolic_data(
-        data,
-        source_curve_mask(data["source_curve_index"], shared_split, "test"),
-    )
+    test_data = None
+    if not args.validation_only:
+        test_data = subset_symbolic_data(
+            data,
+            source_curve_mask(data["source_curve_index"], shared_split, "test"),
+        )
     variable_names = make_pysr_variable_names(data["feature_names"])
 
     metrics, _ = evaluate_global_candidates(
@@ -540,64 +660,87 @@ def main() -> None:
         validation_data, metrics, selected_candidate, variable_names
     )
     validation_metrics = regression_metrics(validation_data["y"], validation_y_pred)
-    raw_y_pred_all, y_pred_all, selected_df = evaluate_selected_candidate(
-        test_data, metrics, selected_candidate, variable_names
+    validation_regional_metrics = regional_metrics(
+        validation_data["y"], validation_y_pred, validation_data["frequency_hz"]
     )
+    validation_frequency_wise_metrics = frequency_wise_metrics(
+        validation_data["y"], validation_y_pred, validation_data["frequency_hz"]
+    )
+    selected_df = metrics[metrics["candidate_index"] == selected_candidate].copy()
     selected_df.to_csv(args.output_dir / "selected_candidate.csv", index=False)
-
-    selected_metrics = regression_metrics(test_data["y"], y_pred_all)
-    raw_physical_diagnostics = prediction_diagnostics(raw_y_pred_all)
-    physical_diagnostics = prediction_diagnostics(y_pred_all)
+    selected_metrics = None
+    raw_physical_diagnostics = None
+    physical_diagnostics = None
+    if test_data is not None:
+        raw_y_pred_all, y_pred_all, _ = evaluate_selected_candidate(
+            test_data, metrics, selected_candidate, variable_names
+        )
+        selected_metrics = regression_metrics(test_data["y"], y_pred_all)
+        raw_physical_diagnostics = prediction_diagnostics(raw_y_pred_all)
+        physical_diagnostics = prediction_diagnostics(y_pred_all)
     selected_summary = {
         "dataset_file": str(args.dataset_file),
         "dataset_run": resolved_dataset_run,
+        "target": args.target,
+        "target_name": data["target_name"],
         "shared_split_file": shared_split["split_file"],
         "shared_split_hash": shared_split["split_hash"],
         "training_dir": str(args.training_dir),
         "candidate_selection_split": "validation",
-        "final_evaluation_split": "test",
+        "final_evaluation_split": None if args.validation_only else "test",
+        "test_rows_accessed": not args.validation_only,
         "selection_rule": args.selection_rule,
-        "output_postprocessing": {
-            "method": "clip",
-            "lower_bound": OUTPUT_LOWER_BOUND,
-            "upper_bound": OUTPUT_UPPER_BOUND,
-            "num_values_clipped": count_values_clipped(raw_y_pred_all),
-        },
+        "output_postprocessing": {"method": "none"},
         "selected_candidate": selected_candidate,
         "global_name": data["segment_names"][0],
         "global_bounds_hz": data["segment_bounds"][0].tolist(),
         "feature_names": data["feature_names"],
+        "original_feature_names": original_feature_names,
+        "feature_transform": feature_transform,
+        "transformed_feature_names_before_policy": transformed_feature_names,
+        "feature_policy": feature_policy,
+        "frequency_modulation": frequency_modulation,
         "pysr_variable_names": variable_names,
         "overall_metrics": selected_metrics,
         "validation_selection_metrics": validation_metrics,
+        "validation_regional_metrics": validation_regional_metrics,
+        "validation_frequency_wise_metrics": validation_frequency_wise_metrics,
         "raw_prediction_diagnostics": raw_physical_diagnostics,
         "prediction_diagnostics": physical_diagnostics,
     }
     with (args.output_dir / "selected_global_summary.json").open("w", encoding="utf-8") as file:
         json.dump(selected_summary, file, indent=2)
 
-    freq_values = test_data["X"][:, -1]
-    plot_selected_scatter(test_data["y"], y_pred_all, figures_dir, args.max_plot_points, args.random_seed)
-    plot_error_vs_frequency(freq_values, y_pred_all - test_data["y"], figures_dir, args.max_plot_points, args.random_seed)
-    plot_curve_comparisons(test_data, y_pred_all, figures_dir, args.num_curves, args.random_seed)
+    if test_data is not None:
+        freq_values = test_data["frequency_hz"]
+        plot_selected_scatter(test_data["y"], y_pred_all, figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
+        plot_error_vs_frequency(freq_values, y_pred_all - test_data["y"], figures_dir, args.max_plot_points, args.random_seed, data["target_name"])
+        plot_curve_comparisons(test_data, y_pred_all, figures_dir, args.num_curves, args.random_seed)
 
     print("Global symbolic candidate evaluation complete.")
     print(f"Candidate metrics: {args.output_dir / 'candidate_metrics.csv'}")
     print(f"Selected candidate: {selected_candidate}")
-    print(
-        "Overall selected-formula metrics: "
-        f"RMSE={selected_metrics['rmse']:.6f}, "
-        f"MAE={selected_metrics['mae']:.6f}, "
-        f"R2={selected_metrics['r2']:.6f}"
-    )
-    print(
-        "Prediction diagnostics: "
-        f"raw_range=[{raw_physical_diagnostics['prediction_min']:.6f}, "
-        f"{raw_physical_diagnostics['prediction_max']:.6f}], "
-        f"clipped_values={count_values_clipped(raw_y_pred_all)}, "
-        f"final_range=[{physical_diagnostics['prediction_min']:.6f}, "
-        f"{physical_diagnostics['prediction_max']:.6f}]"
-    )
+    if selected_metrics is None:
+        print(
+            "Validation-only selected-formula metrics: "
+            f"RMSE={validation_metrics['rmse']:.6f}, "
+            f"MAE={validation_metrics['mae']:.6f}, "
+            f"R2={validation_metrics['r2']:.6f}; test rows were not accessed."
+        )
+    else:
+        print(
+            "Overall selected-formula metrics: "
+            f"RMSE={selected_metrics['rmse']:.6f}, "
+            f"MAE={selected_metrics['mae']:.6f}, "
+            f"R2={selected_metrics['r2']:.6f}"
+        )
+        print(
+            "Prediction diagnostics: "
+            f"raw_range=[{raw_physical_diagnostics['prediction_min']:.6f}, "
+            f"{raw_physical_diagnostics['prediction_max']:.6f}], "
+            f"final_range=[{physical_diagnostics['prediction_min']:.6f}, "
+            f"{physical_diagnostics['prediction_max']:.6f}]"
+        )
     print(f"Figures saved to: {figures_dir}")
 
 

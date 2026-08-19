@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "name": "re_f3_sigma_local_bandpass_v1",
+  "stage_frozen": "F3-B",
+  "source_evidence_stage": "F3-A",
+  "source_f3a_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654",
+  "target": "re",
+  "dataset_run": "run1",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "frequency_range_hz": [
+    100.0,
+    4950.0
+  ],
+  "input_feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "base_features_retained": true,
+  "frequency_feature": "log10_f",
+  "standardizations": {
+    "z_sigma": {
+      "source_feature": "log10_sigma",
+      "center": 4.689187575130151,
+      "scale": 0.21494263391550147,
+      "fitted_partition": "train",
+      "fitted_unique_curve_count": 700,
+      "method": "training_unique_curve_population_mean_std_ddof0",
+      "ddof": 0
+    }
+  },
+  "envelopes": {
+    "g_mid": {
+      "name": "g_mid",
+      "kind": "smooth_log10_bandpass_product",
+      "frequency_coordinate": "log10_hz",
+      "low_hz": 1250.0,
+      "high_hz": 2100.0,
+      "low_transition_log10": 0.06,
+      "high_transition_log10": 0.06,
+      "normalization_method": "maximum_on_fixed_log10_reference_grid",
+      "normalization_frequency_range_hz": [
+        100.0,
+        4950.0
+      ],
+      "normalization_reference_grid_size": 4096,
+      "normalization_max": 0.7522658139641833
+    }
+  },
+  "terminals": [
+    {
+      "name": "z_sigma__f3_mid",
+      "standardized_feature": "z_sigma",
+      "envelope": "g_mid",
+      "analytic_definition": "((log10_sigma - center) / scale) * g_mid(log10_f)"
+    }
+  ],
+  "terminal_feature_names": [
+    "z_sigma__f3_mid"
+  ],
+  "output_feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "z_sigma__f3_mid"
+  ],
+  "terminal_order_contract": "append_after_base_features_in_declared_order",
+  "teacher_or_sobol_values_used_as_row_inputs": false,
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "f3a_selection_evidence": {
+    "selected_candidate": "sigma_bandpass_1250_2100",
+    "ridge_coefficient_reference_only": 0.09117886714681851,
+    "ridge_coefficient_is_part_of_terminal": false,
+    "decision_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\decision_report.json",
+    "decision_file_sha256": "bac0608b4c63eb2932df502a6404a201df20e451ad90d96d4bf8db7e8fe82fc2"
+  }
+}

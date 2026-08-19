@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-08-16T14:57:55.747616+02:00",
+  "purpose": "Seed replay and performance check for PySR acceleration plans C and B",
+  "dataset_run": "run1",
+  "target": "re",
+  "random_seed": 42,
+  "budget": {
+    "niterations": 10,
+    "populations": 6,
+    "population_size": 40,
+    "maxsize": 24
+  },
+  "batch_size": 4096,
+  "plan_c": "8-thread multithreading + batching + turbo; nondeterministic by PySR contract",
+  "plan_b": "serial deterministic + batching + turbo",
+  "test_access": "validation-only benchmark; test rows inaccessible",
+  "execute": true
+}

@@ -1,0 +1,2 @@
+global_name,lower_hz,upper_hz,equation,complexity,loss,train_rmse,validation_rmse,test_rmse,train_mae,validation_mae,test_mae,test_r2,n_rows_used
+global_100_4950,100.0,4950.0,log(log(((0.37640905 - (alpha_infinity__f2_high * alpha_infinity__f2_high)) / log10_lambda) + ((log10_sigma + (log(alpha_infinity__f2_onset) - (log(alpha_infinity__f2_high) / log(log10_sigma)))) - alpha_infinity__f2_onset))),22,0.008673008,0.09312898324179819,0.08889897612040636,,0.06951775174052381,0.06785428011636987,,,108800

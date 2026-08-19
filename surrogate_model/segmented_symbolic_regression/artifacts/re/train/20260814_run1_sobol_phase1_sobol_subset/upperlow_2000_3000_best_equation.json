@@ -1,0 +1,58 @@
+{
+  "segment_id": 6,
+  "segment_name": "upperlow_2000_3000",
+  "target": "re",
+  "target_name": "R_real",
+  "lower_hz": 2000.0,
+  "upper_hz": 3000.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "sobol_subset",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_f"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    5
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_f"
+  ],
+  "equation": "(log10_lambda * -0.12518904) + (((log10_sigma * 0.65829855) + -3.397432) / alpha_infinity)",
+  "complexity": 11,
+  "loss": 0.0035899265,
+  "score": 0.09633632720417043,
+  "n_rows_used": 22100,
+  "n_train": 18200,
+  "n_validation": 3900,
+  "train_metrics": {
+    "rmse": 0.05991599943369635,
+    "mae": 0.040277074238174074,
+    "max_abs_error": 0.3025285898120639,
+    "r2": 0.770589747781957,
+    "true_min": -0.2232058095984081,
+    "true_max": 0.5167678250518587,
+    "prediction_min": -0.13186200109203877,
+    "prediction_max": 0.4743506511056036
+  },
+  "validation_metrics": {
+    "rmse": 0.054239415402285884,
+    "mae": 0.03876634762980259,
+    "max_abs_error": 0.22491564223020105,
+    "r2": 0.7715958663470921,
+    "true_min": -0.09728545628003002,
+    "true_max": 0.47458330608412,
+    "prediction_min": -0.00876058628146631,
+    "prediction_max": 0.46664245955175837
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260814_run1_sobol_phase1_sobol_subset\\equations\\upperlow_2000_3000_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260814_run1_sobol_phase1_sobol_subset\\models\\upperlow_2000_3000_pysr_model.pkl"
+}

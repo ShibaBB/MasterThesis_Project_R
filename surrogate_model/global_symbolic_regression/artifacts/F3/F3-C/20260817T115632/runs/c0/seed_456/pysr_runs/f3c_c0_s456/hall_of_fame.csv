@@ -1,0 +1,6 @@
+Complexity,Loss,Equation
+1,0.036960658,"0.369181"
+3,0.023843972,"1.236994 / log10_f"
+4,0.011914512,"log(log10_sigma / log10_f)"
+10,0.010667093,"0.38849577 / (1.6566261 - sqrt(0.23351267 / (0.15291743 - log10_lambda__sobol_mod)))"
+19,0.010048336,"-1.1276532 / ((((log10_lambda__sobol_mod + -0.9226537) / 0.2977528) - ((log10_lambda__sobol_mod * (alpha_infinity__sobol_mod - (log10_sigma__sobol_mod * -0.23482758))) + log10_lambda_prime__sobol_mod)) / 1.3062167)"

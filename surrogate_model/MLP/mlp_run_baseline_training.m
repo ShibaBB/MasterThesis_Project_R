@@ -10,9 +10,11 @@ addpath(surrogate_root);
 run_config = resolve_dataset_run_config();
 
 surrogate_training_config = struct();
+surrogate_training_config.dataset_run = run_config.run_id;
 surrogate_training_config.dataset_file = run_config.paths.teacher_dataset_file;
 surrogate_training_config.shared_split_file = run_config.paths.shared_split_file;
-surrogate_training_config.experiment_name = sprintf('%s_baseline', char(string(run_config.run_id)));
+surrogate_training_config.experiment_name = sprintf('%s_re', char(string(run_config.run_id)));
+surrogate_training_config.target = 're';
 
 surrogate_training_config.apply_log10_to_inputs = true;
 surrogate_training_config.log10_feature_indices = [3, 5, 6, 7];
@@ -33,4 +35,9 @@ surrogate_training_config.scatter_max_points = 3000;
 
 fprintf('Training MLP baseline for %s using %s\n', ...
     char(string(run_config.run_id)), run_config.config_file);
+run(fullfile(script_dir, 'mlp_train_surrogate_baseline.m'));
+
+% Train the imaginary component independently with the identical settings.
+surrogate_training_config.target = 'im';
+surrogate_training_config.experiment_name = sprintf('%s_im', char(string(run_config.run_id)));
 run(fullfile(script_dir, 'mlp_train_surrogate_baseline.m'));

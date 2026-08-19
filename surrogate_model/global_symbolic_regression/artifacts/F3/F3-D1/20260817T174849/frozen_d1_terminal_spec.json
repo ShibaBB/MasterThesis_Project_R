@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "stage_frozen": "F3-D1",
+  "name": "re_f3_lambda_local_bandpass_v1",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "source_feature": "log10_lambda",
+  "standardized_feature": "z_lambda",
+  "standardization": {
+    "center": -4.054707568194597,
+    "scale": 0.15659974937128981,
+    "fitted_partition": "train",
+    "fitted_unique_curve_count": 700,
+    "method": "training_unique_curve_population_mean_std_ddof0",
+    "ddof": 0,
+    "source_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\training_only_standardization.json"
+  },
+  "envelope": {
+    "name": "g_mid",
+    "source_stage": "F3-B",
+    "source_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\frozen_sigma_local_spec.json",
+    "kind": "smooth_log10_bandpass_product",
+    "frequency_coordinate": "log10_hz",
+    "low_hz": 1250.0,
+    "high_hz": 2100.0,
+    "low_transition_log10": 0.06,
+    "high_transition_log10": 0.06,
+    "normalization_method": "maximum_on_fixed_log10_reference_grid",
+    "normalization_frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "normalization_reference_grid_size": 4096,
+    "normalization_max": 0.7522658139641833
+  },
+  "terminal": {
+    "name": "z_lambda__f3_mid",
+    "analytic_definition": "((log10_lambda - center) / scale) * g_mid(log10_f)"
+  },
+  "branch_b_feature_names": [
+    "z_sigma__f3_mid",
+    "z_lambda__f3_mid"
+  ],
+  "teacher_or_sobol_values_used_as_row_inputs": false,
+  "test_rows_accessed": false
+}

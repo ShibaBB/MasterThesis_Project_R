@@ -1,0 +1,2 @@
+global_name,lower_hz,upper_hz,equation,complexity,loss,train_rmse,validation_rmse,test_rmse,train_mae,validation_mae,test_mae,test_r2,n_rows_used
+global_100_4950,100.0,4950.0,(((log10_sigma + alpha_infinity__sobol_mod) - sqrt(alpha_infinity__sobol_mod)) / log10_f) - 1.0957044,10,0.0076780613,0.08762454925585175,0.08346331985844226,0.08079912770343832,0.06186885845833294,0.061277087037690664,0.05879428574846751,0.8148197442947969,128000

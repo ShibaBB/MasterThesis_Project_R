@@ -1,0 +1,50 @@
+{
+  "segment_id": 3,
+  "segment_name": "midhigh_1000_1300",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 1000.0,
+  "upper_hz": 1300.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "equation": "1.8092678 - (((log10_lambda / (log10_sigma + ((alpha_infinity * (log10_sigma + ((log10_lambda + -0.71090996) * (log10_f - sqrt(log10_f))))) - -1.9512942))) - -11.003548) / log10_sigma)",
+  "complexity": 24,
+  "loss": 0.00066679175,
+  "score": 0.28668134987168054,
+  "n_rows_used": 8000,
+  "n_train": 5600,
+  "n_validation": 1200,
+  "n_test": 1200,
+  "train_metrics": {
+    "rmse": 0.0258223198323439,
+    "mae": 0.01961623392492461,
+    "max_abs_error": 0.15330187593318356,
+    "r2": 0.9093299971927238,
+    "true_min": -0.6402337713396006,
+    "true_max": -0.0013514792600999989,
+    "prediction_min": -0.6079620571096667,
+    "prediction_max": 0.05998031680957361
+  },
+  "validation_metrics": {
+    "rmse": 0.02380211955278511,
+    "mae": 0.018271942136209973,
+    "max_abs_error": 0.12381048550064155,
+    "r2": 0.9067429440752235,
+    "true_min": -0.5640983638338812,
+    "true_max": -0.10728271801054544,
+    "prediction_min": -0.5351465830713134,
+    "prediction_max": -0.11145029769611736
+  },
+  "test_metrics": {
+    "rmse": 0.025694010949854067,
+    "mae": 0.018432811732339575,
+    "max_abs_error": 0.13235693222572154,
+    "r2": 0.8901107154310176,
+    "true_min": -0.6232806310869826,
+    "true_max": -0.03135224675664663,
+    "prediction_min": -0.5689659115881815,
+    "prediction_max": 0.033742069642425765
+  },
+  "equations_csv": "surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260809_run1_log10_i60_p12\\equations\\midhigh_1000_1300_equations.csv",
+  "model_file": "surrogate_model\\segmented_symbolic_regression\\artifacts\\im\\train\\20260809_run1_log10_i60_p12\\models\\midhigh_1000_1300_pysr_model.pkl"
+}

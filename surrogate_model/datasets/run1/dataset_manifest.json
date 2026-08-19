@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "run_id": "run1",
+  "status": "generated",
+  "description": "Wool paired complex-reflection surrogate dataset over 100-4950 Hz.",
+  "config_path": "surrogate_model/datasets/run1/dataset_config.json",
+  "target_schema": {
+    "target_names": [
+      "R_real",
+      "R_imag"
+    ],
+    "target_keys": {
+      "re": "Y_re",
+      "im": "Y_im"
+    },
+    "symbolic_target_keys": {
+      "re": "y_re_symbolic",
+      "im": "y_im_symbolic"
+    },
+    "complex_source": "Reflect",
+    "definitions": {
+      "R_real": "real(Reflect)",
+      "R_imag": "imag(Reflect)"
+    }
+  },
+  "generation": {
+    "material": "Wool",
+    "porosity_cases": [
+      "92"
+    ],
+    "sampling_method": "lhs",
+    "random_seed": 44,
+    "curve_samples": 1000,
+    "frequency_points": 128,
+    "frequency_range_hz": [
+      100,
+      4950
+    ]
+  },
+  "teacher_dataset": {
+    "path": "surrogate_model/datasets/run1/MLP/Wool_R.mat",
+    "status": "generated"
+  },
+  "shared_curve_split": {
+    "path": "surrogate_model/datasets/run1/shared_curve_split.json",
+    "status": "generated",
+    "frequency_grid_independent": true,
+    "split_hash_algorithm": "sha256",
+    "split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+    "train_curves": 700,
+    "validation_curves": 150,
+    "test_curves": 150
+  },
+  "derived_datasets": [
+    {
+      "model_branch": "segmented_SR",
+      "path": "surrogate_model/datasets/run1/segmented_SR/Wool_R_segmented.mat",
+      "status": "generated",
+      "segments_hz": [
+        {
+          "name": "low_100_700",
+          "bounds_hz": [
+            100,
+            700
+          ]
+        },
+        {
+          "name": "midlow_700_1000",
+          "bounds_hz": [
+            700,
+            1000
+          ]
+        },
+        {
+          "name": "midhigh_1000_1300",
+          "bounds_hz": [
+            1000,
+            1300
+          ]
+        },
+        {
+          "name": "highlow_1300_1650",
+          "bounds_hz": [
+            1300,
+            1650
+          ]
+        },
+        {
+          "name": "high_1650_2000",
+          "bounds_hz": [
+            1650,
+            2000
+          ]
+        },
+        {
+          "name": "upperlow_2000_3000",
+          "bounds_hz": [
+            2000,
+            3000
+          ]
+        },
+        {
+          "name": "uppermid_3000_4000",
+          "bounds_hz": [
+            3000,
+            4000
+          ]
+        },
+        {
+          "name": "upperhigh_4000_4950",
+          "bounds_hz": [
+            4000,
+            4950
+          ]
+        }
+      ]
+    },
+    {
+      "model_branch": "global_SR",
+      "path": "surrogate_model/datasets/run1/global_SR/Wool_R_global.mat",
+      "status": "generated",
+      "domain": {
+        "name": "global_100_4950",
+        "bounds_hz": [
+          100,
+          4950
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "global_name": "global_100_4950",
+  "target": "im",
+  "target_name": "R_imag",
+  "lower_hz": 100.0,
+  "upper_hz": 4950.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "equation": "(f / sigma) + -0.26708558",
+  "complexity": 5,
+  "loss": 0.010358939,
+  "score": 0.17445634605716784,
+  "n_rows_used": 128000,
+  "n_train": 89600,
+  "n_validation": 19200,
+  "n_test": 19200,
+  "train_metrics": {
+    "rmse": 0.10177887169663533,
+    "mae": 0.06951927484384113,
+    "max_abs_error": 0.43831424418684656,
+    "r2": 0.2758609989950285,
+    "true_min": -0.6557487363608505,
+    "true_max": 0.258125011124402,
+    "prediction_min": -0.2660301526579224,
+    "prediction_max": 0.05791710357496732
+  },
+  "validation_metrics": {
+    "rmse": 0.09851151357732685,
+    "mae": 0.06722306684824061,
+    "max_abs_error": 0.37418480464308723,
+    "r2": 0.2745253465235805,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.26602773153679155,
+    "prediction_max": 0.0335952102926958
+  },
+  "test_metrics": {
+    "rmse": 0.09259347633687427,
+    "mae": 0.06239470060677514,
+    "max_abs_error": 0.42285831537597435,
+    "r2": 0.2819754739879712,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.20213411538375756,
+    "prediction_min": -0.26602658565525067,
+    "prediction_max": 0.05404213091885157
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260809_run1\\equations\\global_100_4950_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\im\\train\\20260809_run1\\models\\global_100_4950_pysr_model.pkl"
+}

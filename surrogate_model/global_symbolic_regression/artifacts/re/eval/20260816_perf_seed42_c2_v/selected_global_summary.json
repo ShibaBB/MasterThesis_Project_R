@@ -1,0 +1,1152 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+  "dataset_run": "run1",
+  "target": "re",
+  "target_name": "R_real",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "training_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_perf_seed42_c2",
+  "candidate_selection_split": "validation",
+  "final_evaluation_split": null,
+  "test_rows_accessed": false,
+  "selection_rule": "best_loss",
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "selected_candidate": 10,
+  "global_name": "global_100_4950",
+  "global_bounds_hz": [
+    100.0,
+    4950.0
+  ],
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "log10_sigma__sobol_mod",
+    "alpha_infinity__sobol_mod",
+    "log10_lambda__sobol_mod",
+    "log10_lambda_prime__sobol_mod",
+    "log10_k0_prime__sobol_mod"
+  ],
+  "original_feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "transformed_feature_names_before_policy": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_policy": {
+    "schema_version": 1,
+    "name": "teacher_sobol_smooth_modulation_base_features",
+    "source": "teacher Sobol run1 N=1024, variance-weighted 100-4950 Hz ST",
+    "branch": "sobol_modulated",
+    "target": "re",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "frequency_always_retained": true,
+    "selection_stage": "after_training_fitted_base_transform",
+    "feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ],
+    "feature_indices_0based": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "excluded_transformed_features": []
+  },
+  "frequency_modulation": {
+    "schema_version": 1,
+    "name": "teacher_sobol_smooth_parameter_envelopes",
+    "source": "teacher Sobol run1 N=1024 frequency and segment ST diagnostics",
+    "target": "re",
+    "frequency_feature": "log10_f",
+    "frequency_range_hz": [
+      100.0,
+      4950.0
+    ],
+    "base_features_retained": true,
+    "teacher_st_values_used_as_model_inputs": false,
+    "features": [
+      {
+        "name": "log10_sigma__sobol_mod",
+        "base_feature": "log10_sigma",
+        "components": [
+          {
+            "kind": "gaussian",
+            "center_hz": 1437.0,
+            "width_log10": 0.366,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.9999999998577954
+      },
+      {
+        "name": "alpha_infinity__sobol_mod",
+        "base_feature": "alpha_infinity",
+        "components": [
+          {
+            "kind": "gaussian",
+            "center_hz": 3422.0,
+            "width_log10": 0.22,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.9999996811212064
+      },
+      {
+        "name": "log10_lambda__sobol_mod",
+        "base_feature": "log10_lambda",
+        "components": [
+          {
+            "kind": "highpass",
+            "center_hz": 2200.0,
+            "transition_log10": 0.14,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.9252274953084788
+      },
+      {
+        "name": "log10_lambda_prime__sobol_mod",
+        "base_feature": "log10_lambda_prime",
+        "components": [
+          {
+            "kind": "lowpass",
+            "center_hz": 700.0,
+            "transition_log10": 0.12,
+            "weight": 0.3
+          },
+          {
+            "kind": "highpass",
+            "center_hz": 3800.0,
+            "transition_log10": 0.1,
+            "weight": 1.0
+          }
+        ],
+        "normalization_max": 0.759437430128616
+      },
+      {
+        "name": "log10_k0_prime__sobol_mod",
+        "base_feature": "log10_k0_prime",
+        "components": [
+          {
+            "kind": "lowpass",
+            "center_hz": 850.0,
+            "transition_log10": 0.12,
+            "weight": 1.0
+          },
+          {
+            "kind": "highpass",
+            "center_hz": 3400.0,
+            "transition_log10": 0.12,
+            "weight": 0.65
+          }
+        ],
+        "normalization_max": 0.9995692172822197
+      }
+    ]
+  },
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f",
+    "log10_sigma__sobol_mod",
+    "alpha_infinity__sobol_mod",
+    "log10_lambda__sobol_mod",
+    "log10_lambda_prime__sobol_mod",
+    "log10_k0_prime__sobol_mod"
+  ],
+  "overall_metrics": null,
+  "validation_selection_metrics": {
+    "rmse": 0.09042102029262367,
+    "mae": 0.06767141183261977,
+    "max_abs_error": 0.3403285063401931,
+    "r2": 0.7737993989651962,
+    "true_min": -0.1274621043189832,
+    "true_max": 0.9838400807547939,
+    "prediction_min": 0.15899491747964342,
+    "prediction_max": 0.9384091829157327
+  },
+  "validation_regional_metrics": [
+    {
+      "lower_hz": 100.0,
+      "upper_hz": 700.0,
+      "n_rows": 2400,
+      "bias": 0.0005313415611364179,
+      "rmse": 0.04896630733414678,
+      "mae": 0.040549702403310066,
+      "max_abs_error": 0.20454003075102922,
+      "r2": 0.8605514129711266,
+      "true_min": 0.3902374023758223,
+      "true_max": 0.9838400807547939,
+      "prediction_min": 0.3899586965239789,
+      "prediction_max": 0.9384091829157327
+    },
+    {
+      "lower_hz": 700.0,
+      "upper_hz": 1000.0,
+      "n_rows": 1200,
+      "bias": 0.029701414846700528,
+      "rmse": 0.058873921272047595,
+      "mae": 0.04290787604998562,
+      "max_abs_error": 0.2582875497656438,
+      "r2": 0.6118451055774303,
+      "true_min": 0.11276548224853884,
+      "true_max": 0.6386577393534976,
+      "prediction_min": 0.2972853983216645,
+      "prediction_max": 0.6232618478880699
+    },
+    {
+      "lower_hz": 1000.0,
+      "upper_hz": 1300.0,
+      "n_rows": 1200,
+      "bias": 0.0479263061896644,
+      "rmse": 0.10819242290060041,
+      "mae": 0.08411951418252031,
+      "max_abs_error": 0.33783389616643245,
+      "r2": 0.37702656516896316,
+      "true_min": -0.02336393732203304,
+      "true_max": 0.5683402048542382,
+      "prediction_min": 0.246924729345665,
+      "prediction_max": 0.4973725158708278
+    },
+    {
+      "lower_hz": 1300.0,
+      "upper_hz": 1650.0,
+      "n_rows": 1350,
+      "bias": 0.05243670616438902,
+      "rmse": 0.1363546316252514,
+      "mae": 0.10821950682781074,
+      "max_abs_error": 0.3403285063401931,
+      "r2": 0.2790742893845741,
+      "true_min": -0.12179783660446854,
+      "true_max": 0.5275390762338282,
+      "prediction_min": 0.2138829780073178,
+      "prediction_max": 0.4206557314035568
+    },
+    {
+      "lower_hz": 1650.0,
+      "upper_hz": 2000.0,
+      "n_rows": 1350,
+      "bias": 0.03747677204270396,
+      "rmse": 0.1333698253597517,
+      "mae": 0.10710108689114535,
+      "max_abs_error": 0.34011271319983793,
+      "r2": 0.28642705653370937,
+      "true_min": -0.1274621043189832,
+      "true_max": 0.49479130253237835,
+      "prediction_min": 0.19414766332005243,
+      "prediction_max": 0.36814918218807713
+    },
+    {
+      "lower_hz": 2000.0,
+      "upper_hz": 3000.0,
+      "n_rows": 3900,
+      "bias": -0.01977017271794015,
+      "rmse": 0.09841347947232582,
+      "mae": 0.08157748416520948,
+      "max_abs_error": 0.32124570399045793,
+      "r2": 0.24806009506548932,
+      "true_min": -0.09728545628003002,
+      "true_max": 0.47458330608412,
+      "prediction_min": 0.16950494707451896,
+      "prediction_max": 0.33617779504981266
+    },
+    {
+      "lower_hz": 3000.0,
+      "upper_hz": 4000.0,
+      "n_rows": 4050,
+      "bias": -0.06618499039654417,
+      "rmse": 0.09461762394938848,
+      "mae": 0.07601799300989591,
+      "max_abs_error": 0.32797137588953873,
+      "r2": -1.2934339413173475,
+      "true_min": -0.011939655203690778,
+      "true_max": 0.49121110639266774,
+      "prediction_min": 0.16172631114100292,
+      "prediction_max": 0.29569320976144214
+    },
+    {
+      "lower_hz": 4000.0,
+      "upper_hz": 4950.0,
+      "n_rows": 3750,
+      "bias": -0.015975319160173838,
+      "rmse": 0.05131554878782849,
+      "mae": 0.03542162444916317,
+      "max_abs_error": 0.2932324733896,
+      "r2": -0.13784373250640414,
+      "true_min": 0.06334118152049058,
+      "true_max": 0.4547990806221563,
+      "prediction_min": 0.15899491747964342,
+      "prediction_max": 0.28274056070003284
+    }
+  ],
+  "validation_frequency_wise_metrics": [
+    {
+      "frequency_hz": 100.0,
+      "n_rows": 150,
+      "rmse": 0.06192597462598394,
+      "bias": -0.06031488299655446
+    },
+    {
+      "frequency_hz": 138.18897637795277,
+      "n_rows": 150,
+      "rmse": 0.04774106472377615,
+      "bias": -0.04410811606473967
+    },
+    {
+      "frequency_hz": 176.3779527559055,
+      "n_rows": 150,
+      "rmse": 0.037346704477938815,
+      "bias": -0.028132243184806355
+    },
+    {
+      "frequency_hz": 214.56692913385825,
+      "n_rows": 150,
+      "rmse": 0.03507133075027565,
+      "bias": -0.01417099128303794
+    },
+    {
+      "frequency_hz": 252.75590551181102,
+      "n_rows": 150,
+      "rmse": 0.03985981018675256,
+      "bias": -0.003141732437476863
+    },
+    {
+      "frequency_hz": 290.9448818897638,
+      "n_rows": 150,
+      "rmse": 0.046768698759693146,
+      "bias": 0.004786563907147659
+    },
+    {
+      "frequency_hz": 329.1338582677165,
+      "n_rows": 150,
+      "rmse": 0.05266440849238849,
+      "bias": 0.009956209026322575
+    },
+    {
+      "frequency_hz": 367.3228346456693,
+      "n_rows": 150,
+      "rmse": 0.056437640006600544,
+      "bias": 0.012971136760197179
+    },
+    {
+      "frequency_hz": 405.51181102362204,
+      "n_rows": 150,
+      "rmse": 0.05792993261866192,
+      "bias": 0.01449939681620671
+    },
+    {
+      "frequency_hz": 443.7007874015748,
+      "n_rows": 150,
+      "rmse": 0.057384797007402163,
+      "bias": 0.015148387344745082
+    },
+    {
+      "frequency_hz": 481.8897637795276,
+      "n_rows": 150,
+      "rmse": 0.05521553734111065,
+      "bias": 0.015405061766932236
+    },
+    {
+      "frequency_hz": 520.0787401574803,
+      "n_rows": 150,
+      "rmse": 0.05191388406751717,
+      "bias": 0.015621821173942842
+    },
+    {
+      "frequency_hz": 558.267716535433,
+      "n_rows": 150,
+      "rmse": 0.04802858374861751,
+      "bias": 0.01602844389001014
+    },
+    {
+      "frequency_hz": 596.4566929133858,
+      "n_rows": 150,
+      "rmse": 0.04417842051371718,
+      "bias": 0.01675516213325653
+    },
+    {
+      "frequency_hz": 634.6456692913385,
+      "n_rows": 150,
+      "rmse": 0.04106203691072025,
+      "bias": 0.01785768727044074
+    },
+    {
+      "frequency_hz": 672.8346456692914,
+      "n_rows": 150,
+      "rmse": 0.03939857351152301,
+      "bias": 0.01933956085559628
+    },
+    {
+      "frequency_hz": 711.0236220472441,
+      "n_rows": 150,
+      "rmse": 0.03973557237373882,
+      "bias": 0.0211701621756221
+    },
+    {
+      "frequency_hz": 749.2125984251968,
+      "n_rows": 150,
+      "rmse": 0.042213896677817435,
+      "bias": 0.023298293063295342
+    },
+    {
+      "frequency_hz": 787.4015748031496,
+      "n_rows": 150,
+      "rmse": 0.04654177028262918,
+      "bias": 0.02566195022378201
+    },
+    {
+      "frequency_hz": 825.5905511811023,
+      "n_rows": 150,
+      "rmse": 0.052214220073657315,
+      "bias": 0.028195083863161906
+    },
+    {
+      "frequency_hz": 863.7795275590552,
+      "n_rows": 150,
+      "rmse": 0.05873615761258644,
+      "bias": 0.030832095194773288
+    },
+    {
+      "frequency_hz": 901.9685039370079,
+      "n_rows": 150,
+      "rmse": 0.06571533524330558,
+      "bias": 0.033510694723060105
+    },
+    {
+      "frequency_hz": 940.1574803149606,
+      "n_rows": 150,
+      "rmse": 0.07286620382549396,
+      "bias": 0.036173601294410274
+    },
+    {
+      "frequency_hz": 978.3464566929134,
+      "n_rows": 150,
+      "rmse": 0.0799862097293876,
+      "bias": 0.038769438235499186
+    },
+    {
+      "frequency_hz": 1016.5354330708661,
+      "n_rows": 150,
+      "rmse": 0.08693190129395043,
+      "bias": 0.04125308514927576
+    },
+    {
+      "frequency_hz": 1054.7244094488187,
+      "n_rows": 150,
+      "rmse": 0.0936011333117942,
+      "bias": 0.04358567046821013
+    },
+    {
+      "frequency_hz": 1092.9133858267717,
+      "n_rows": 150,
+      "rmse": 0.09992088570090353,
+      "bias": 0.04573433603317192
+    },
+    {
+      "frequency_hz": 1131.1023622047244,
+      "n_rows": 150,
+      "rmse": 0.10583906335053538,
+      "bias": 0.047671865941239476
+    },
+    {
+      "frequency_hz": 1169.291338582677,
+      "n_rows": 150,
+      "rmse": 0.11131892777553012,
+      "bias": 0.04937624367214371
+    },
+    {
+      "frequency_hz": 1207.4803149606298,
+      "n_rows": 150,
+      "rmse": 0.11633525272193439,
+      "bias": 0.050830181047933125
+    },
+    {
+      "frequency_hz": 1245.6692913385828,
+      "n_rows": 150,
+      "rmse": 0.1208716262551284,
+      "bias": 0.052020647754410516
+    },
+    {
+      "frequency_hz": 1283.8582677165355,
+      "n_rows": 150,
+      "rmse": 0.12491853302966843,
+      "bias": 0.05293841945093052
+    },
+    {
+      "frequency_hz": 1322.0472440944882,
+      "n_rows": 150,
+      "rmse": 0.12847197920044226,
+      "bias": 0.05357765485708229
+    },
+    {
+      "frequency_hz": 1360.236220472441,
+      "n_rows": 150,
+      "rmse": 0.13153250078972645,
+      "bias": 0.05393550686535425
+    },
+    {
+      "frequency_hz": 1398.4251968503936,
+      "n_rows": 150,
+      "rmse": 0.13410444515583583,
+      "bias": 0.05401176911741797
+    },
+    {
+      "frequency_hz": 1436.6141732283465,
+      "n_rows": 150,
+      "rmse": 0.13619544688371144,
+      "bias": 0.05380855715974026
+    },
+    {
+      "frequency_hz": 1474.8031496062993,
+      "n_rows": 150,
+      "rmse": 0.13781604095865355,
+      "bias": 0.053330021918605114
+    },
+    {
+      "frequency_hz": 1512.992125984252,
+      "n_rows": 150,
+      "rmse": 0.13897937141009814,
+      "bias": 0.05258209253521674
+    },
+    {
+      "frequency_hz": 1551.1811023622047,
+      "n_rows": 150,
+      "rmse": 0.13970096491035172,
+      "bias": 0.05157224536740228
+    },
+    {
+      "frequency_hz": 1589.3700787401574,
+      "n_rows": 150,
+      "rmse": 0.13999854732942163,
+      "bias": 0.05030929603352246
+    },
+    {
+      "frequency_hz": 1627.5590551181103,
+      "n_rows": 150,
+      "rmse": 0.13989188772241395,
+      "bias": 0.048803211625159854
+    },
+    {
+      "frequency_hz": 1665.748031496063,
+      "n_rows": 150,
+      "rmse": 0.13940265913035246,
+      "bias": 0.047064940559865216
+    },
+    {
+      "frequency_hz": 1703.9370078740158,
+      "n_rows": 150,
+      "rmse": 0.13855430922933695,
+      "bias": 0.04510625792226065
+    },
+    {
+      "frequency_hz": 1742.1259842519685,
+      "n_rows": 150,
+      "rmse": 0.13737193649954754,
+      "bias": 0.04293962451047654
+    },
+    {
+      "frequency_hz": 1780.3149606299212,
+      "n_rows": 150,
+      "rmse": 0.1358821693802515,
+      "bias": 0.04057805814034445
+    },
+    {
+      "frequency_hz": 1818.5039370078741,
+      "n_rows": 150,
+      "rmse": 0.1341130469632592,
+      "bias": 0.03803501604871414
+    },
+    {
+      "frequency_hz": 1856.6929133858268,
+      "n_rows": 150,
+      "rmse": 0.13209390025532167,
+      "bias": 0.03532428747459741
+    },
+    {
+      "frequency_hz": 1894.8818897637796,
+      "n_rows": 150,
+      "rmse": 0.1298552329825666,
+      "bias": 0.03245989568303222
+    },
+    {
+      "frequency_hz": 1933.0708661417323,
+      "n_rows": 150,
+      "rmse": 0.12742860036902015,
+      "bias": 0.029456008835602752
+    },
+    {
+      "frequency_hz": 1971.259842519685,
+      "n_rows": 150,
+      "rmse": 0.12484648333560958,
+      "bias": 0.026326859209442256
+    },
+    {
+      "frequency_hz": 2009.4488188976377,
+      "n_rows": 150,
+      "rmse": 0.12214215417424701,
+      "bias": 0.023086670330231852
+    },
+    {
+      "frequency_hz": 2047.6377952755906,
+      "n_rows": 150,
+      "rmse": 0.11934952800931106,
+      "bias": 0.019749591621305143
+    },
+    {
+      "frequency_hz": 2085.8267716535433,
+      "n_rows": 150,
+      "rmse": 0.11650299236434718,
+      "bias": 0.016329640187229728
+    },
+    {
+      "frequency_hz": 2124.015748031496,
+      "n_rows": 150,
+      "rmse": 0.11363720507981856,
+      "bias": 0.012840649352283535
+    },
+    {
+      "frequency_hz": 2162.2047244094488,
+      "n_rows": 150,
+      "rmse": 0.1107868489698776,
+      "bias": 0.009296223567312509
+    },
+    {
+      "frequency_hz": 2200.3937007874015,
+      "n_rows": 150,
+      "rmse": 0.10798633041071282,
+      "bias": 0.005709699286920863
+    },
+    {
+      "frequency_hz": 2238.582677165354,
+      "n_rows": 150,
+      "rmse": 0.10526940914802162,
+      "bias": 0.002094111406199386
+    },
+    {
+      "frequency_hz": 2276.771653543307,
+      "n_rows": 150,
+      "rmse": 0.10266874878234944,
+      "bias": -0.0015378351651554522
+    },
+    {
+      "frequency_hz": 2314.9606299212596,
+      "n_rows": 150,
+      "rmse": 0.1002153824774959,
+      "bias": -0.005173789221666417
+    },
+    {
+      "frequency_hz": 2353.149606299213,
+      "n_rows": 150,
+      "rmse": 0.09793809710686627,
+      "bias": -0.00880177270806242
+    },
+    {
+      "frequency_hz": 2391.3385826771655,
+      "n_rows": 150,
+      "rmse": 0.09586275144786091,
+      "bias": -0.01241019632564233
+    },
+    {
+      "frequency_hz": 2429.527559055118,
+      "n_rows": 150,
+      "rmse": 0.09401155934284705,
+      "bias": -0.015987871726206176
+    },
+    {
+      "frequency_hz": 2467.716535433071,
+      "n_rows": 150,
+      "rmse": 0.09240238485330991,
+      "bias": -0.019524020709879495
+    },
+    {
+      "frequency_hz": 2505.9055118110236,
+      "n_rows": 150,
+      "rmse": 0.09104810991184371,
+      "bias": -0.023008281827880832
+    },
+    {
+      "frequency_hz": 2544.0944881889764,
+      "n_rows": 150,
+      "rmse": 0.0899561416460069,
+      "bias": -0.02643071477215445
+    },
+    {
+      "frequency_hz": 2582.283464566929,
+      "n_rows": 150,
+      "rmse": 0.08912812269383658,
+      "bias": -0.029781802911478934
+    },
+    {
+      "frequency_hz": 2620.472440944882,
+      "n_rows": 150,
+      "rmse": 0.08855989175866653,
+      "bias": -0.033052454308831546
+    },
+    {
+      "frequency_hz": 2658.6614173228345,
+      "n_rows": 150,
+      "rmse": 0.0882417149101602,
+      "bias": -0.03623400152811218
+    },
+    {
+      "frequency_hz": 2696.850393700787,
+      "n_rows": 150,
+      "rmse": 0.08815877565527258,
+      "bias": -0.03931820051043463
+    },
+    {
+      "frequency_hz": 2735.0393700787404,
+      "n_rows": 150,
+      "rmse": 0.08829188058575409,
+      "bias": -0.04229722877163171
+    },
+    {
+      "frequency_hz": 2773.228346456693,
+      "n_rows": 150,
+      "rmse": 0.08861831425378495,
+      "bias": -0.04516368314389011
+    },
+    {
+      "frequency_hz": 2811.417322834646,
+      "n_rows": 150,
+      "rmse": 0.08911276616224588,
+      "bias": -0.047910577255957654
+    },
+    {
+      "frequency_hz": 2849.6062992125985,
+      "n_rows": 150,
+      "rmse": 0.08974825506565595,
+      "bias": -0.05053133891848364
+    },
+    {
+      "frequency_hz": 2887.7952755905512,
+      "n_rows": 150,
+      "rmse": 0.09049698852329724,
+      "bias": -0.05301980755406472
+    },
+    {
+      "frequency_hz": 2925.984251968504,
+      "n_rows": 150,
+      "rmse": 0.09133111429784105,
+      "bias": -0.05537023178569042
+    },
+    {
+      "frequency_hz": 2964.1732283464567,
+      "n_rows": 150,
+      "rmse": 0.09222334005006123,
+      "bias": -0.057577267272703736
+    },
+    {
+      "frequency_hz": 3002.3622047244094,
+      "n_rows": 150,
+      "rmse": 0.09314741524706871,
+      "bias": -0.05963597486025511
+    },
+    {
+      "frequency_hz": 3040.551181102362,
+      "n_rows": 150,
+      "rmse": 0.09407848230966351,
+      "bias": -0.061541819086652745
+    },
+    {
+      "frequency_hz": 3078.740157480315,
+      "n_rows": 150,
+      "rmse": 0.09499331230474772,
+      "bias": -0.06329066707308656
+    },
+    {
+      "frequency_hz": 3116.9291338582675,
+      "n_rows": 150,
+      "rmse": 0.09587044449541028,
+      "bias": -0.06487878780201027
+    },
+    {
+      "frequency_hz": 3155.1181102362207,
+      "n_rows": 150,
+      "rmse": 0.0966902498407798,
+      "bias": -0.06630285177407376
+    },
+    {
+      "frequency_hz": 3193.3070866141734,
+      "n_rows": 150,
+      "rmse": 0.09743493721723505,
+      "bias": -0.06755993101894639
+    },
+    {
+      "frequency_hz": 3231.496062992126,
+      "n_rows": 150,
+      "rmse": 0.09808851867948988,
+      "bias": -0.06864749942271985
+    },
+    {
+      "frequency_hz": 3269.685039370079,
+      "n_rows": 150,
+      "rmse": 0.09863674720842847,
+      "bias": -0.06956343332383073
+    },
+    {
+      "frequency_hz": 3307.8740157480315,
+      "n_rows": 150,
+      "rmse": 0.0990670375640031,
+      "bias": -0.07030601232062086
+    },
+    {
+      "frequency_hz": 3346.0629921259842,
+      "n_rows": 150,
+      "rmse": 0.09936837833233939,
+      "bias": -0.07087392022672162
+    },
+    {
+      "frequency_hz": 3384.251968503937,
+      "n_rows": 150,
+      "rmse": 0.09953124113674604,
+      "bias": -0.07126624610536224
+    },
+    {
+      "frequency_hz": 3422.4409448818897,
+      "n_rows": 150,
+      "rmse": 0.09954749129062095,
+      "bias": -0.07148248531036995
+    },
+    {
+      "frequency_hz": 3460.6299212598424,
+      "n_rows": 150,
+      "rmse": 0.09941030287311318,
+      "bias": -0.0715225404599165
+    },
+    {
+      "frequency_hz": 3498.818897637795,
+      "n_rows": 150,
+      "rmse": 0.09911408024960315,
+      "bias": -0.07138672226880198
+    },
+    {
+      "frequency_hz": 3537.0078740157483,
+      "n_rows": 150,
+      "rmse": 0.09865438737665086,
+      "bias": -0.07107575016602055
+    },
+    {
+      "frequency_hz": 3575.196850393701,
+      "n_rows": 150,
+      "rmse": 0.09802788576704347,
+      "bias": -0.07059075262627412
+    },
+    {
+      "frequency_hz": 3613.3858267716537,
+      "n_rows": 150,
+      "rmse": 0.09723228169549775,
+      "bias": -0.06993326714667188
+    },
+    {
+      "frequency_hz": 3651.5748031496064,
+      "n_rows": 150,
+      "rmse": 0.09626628306017379,
+      "bias": -0.06910523980276259
+    },
+    {
+      "frequency_hz": 3689.763779527559,
+      "n_rows": 150,
+      "rmse": 0.09512956625037897,
+      "bias": -0.0681090243209377
+    },
+    {
+      "frequency_hz": 3727.952755905512,
+      "n_rows": 150,
+      "rmse": 0.0938227533872256,
+      "bias": -0.066947380606783
+    },
+    {
+      "frequency_hz": 3766.1417322834645,
+      "n_rows": 150,
+      "rmse": 0.092347400390918,
+      "bias": -0.06562347267081402
+    },
+    {
+      "frequency_hz": 3804.3307086614172,
+      "n_rows": 150,
+      "rmse": 0.09070599648339316,
+      "bias": -0.06414086589392752
+    },
+    {
+      "frequency_hz": 3842.51968503937,
+      "n_rows": 150,
+      "rmse": 0.08890197596378081,
+      "bias": -0.06250352357460104
+    },
+    {
+      "frequency_hz": 3880.7086614173227,
+      "n_rows": 150,
+      "rmse": 0.08693974341022487,
+      "bias": -0.0607158026982327
+    },
+    {
+      "frequency_hz": 3918.8976377952754,
+      "n_rows": 150,
+      "rmse": 0.08482471388717129,
+      "bias": -0.05878244886596788
+    },
+    {
+      "frequency_hz": 3957.0866141732286,
+      "n_rows": 150,
+      "rmse": 0.08256337030366978,
+      "bias": -0.05670859031595515
+    },
+    {
+      "frequency_hz": 3995.2755905511813,
+      "n_rows": 150,
+      "rmse": 0.08016334081676606,
+      "bias": -0.05449973096437593
+    },
+    {
+      "frequency_hz": 4033.464566929134,
+      "n_rows": 150,
+      "rmse": 0.07763350015543853,
+      "bias": -0.05216174238707313
+    },
+    {
+      "frequency_hz": 4071.6535433070867,
+      "n_rows": 150,
+      "rmse": 0.07498410001234745,
+      "bias": -0.04970085465556096
+    },
+    {
+      "frequency_hz": 4109.842519685039,
+      "n_rows": 150,
+      "rmse": 0.07222693526879942,
+      "bias": -0.04712364593413
+    },
+    {
+      "frequency_hz": 4148.031496062992,
+      "n_rows": 150,
+      "rmse": 0.0693755548159936,
+      "bias": -0.044437030738260976
+    },
+    {
+      "frequency_hz": 4186.220472440945,
+      "n_rows": 150,
+      "rmse": 0.06644552807698907,
+      "bias": -0.04164824674928635
+    },
+    {
+      "frequency_hz": 4224.4094488188975,
+      "n_rows": 150,
+      "rmse": 0.06345478081793568,
+      "bias": -0.03876484007690484
+    },
+    {
+      "frequency_hz": 4262.59842519685,
+      "n_rows": 150,
+      "rmse": 0.06042401590772049,
+      "bias": -0.03579464886046963
+    },
+    {
+      "frequency_hz": 4300.787401574803,
+      "n_rows": 150,
+      "rmse": 0.057377235072126706,
+      "bias": -0.03274578510264242
+    },
+    {
+      "frequency_hz": 4338.976377952756,
+      "n_rows": 150,
+      "rmse": 0.05434237376819129,
+      "bias": -0.029626614635663427
+    },
+    {
+      "frequency_hz": 4377.165354330708,
+      "n_rows": 150,
+      "rmse": 0.05135204805436586,
+      "bias": -0.026445735131679863
+    },
+    {
+      "frequency_hz": 4415.354330708661,
+      "n_rows": 150,
+      "rmse": 0.04844438088076036,
+      "bias": -0.0232119520846998
+    },
+    {
+      "frequency_hz": 4453.543307086614,
+      "n_rows": 150,
+      "rmse": 0.04566381156906418,
+      "bias": -0.019934252713046233
+    },
+    {
+      "frequency_hz": 4491.7322834645665,
+      "n_rows": 150,
+      "rmse": 0.043061678408410145,
+      "bias": -0.016621777757707783
+    },
+    {
+      "frequency_hz": 4529.921259842519,
+      "n_rows": 150,
+      "rmse": 0.04069618775525968,
+      "bias": -0.013283791183552118
+    },
+    {
+      "frequency_hz": 4568.110236220473,
+      "n_rows": 150,
+      "rmse": 0.03863116506947502,
+      "bias": -0.009929647826570758
+    },
+    {
+      "frequency_hz": 4606.299212598426,
+      "n_rows": 150,
+      "rmse": 0.036932833263484885,
+      "bias": -0.006568759070520808
+    },
+    {
+      "frequency_hz": 4644.488188976378,
+      "n_rows": 150,
+      "rmse": 0.03566402929522641,
+      "bias": -0.00321055667963992
+    },
+    {
+      "frequency_hz": 4682.677165354331,
+      "n_rows": 150,
+      "rmse": 0.034876063591078095,
+      "bias": 0.0001355450405281707
+    },
+    {
+      "frequency_hz": 4720.866141732284,
+      "n_rows": 150,
+      "rmse": 0.03459986766270426,
+      "bias": 0.0034601885360329037
+    },
+    {
+      "frequency_hz": 4759.055118110236,
+      "n_rows": 150,
+      "rmse": 0.03483940485376051,
+      "bias": 0.0067541134874406945
+    },
+    {
+      "frequency_hz": 4797.244094488189,
+      "n_rows": 150,
+      "rmse": 0.03557020185621095,
+      "bias": 0.010008198175645069
+    },
+    {
+      "frequency_hz": 4835.433070866142,
+      "n_rows": 150,
+      "rmse": 0.03674376910087319,
+      "bias": 0.013213501383553629
+    },
+    {
+      "frequency_hz": 4873.622047244095,
+      "n_rows": 150,
+      "rmse": 0.0382959755286751,
+      "bias": 0.01636130445180821
+    },
+    {
+      "frequency_hz": 4911.811023622047,
+      "n_rows": 150,
+      "rmse": 0.04015616293829549,
+      "bias": 0.019443153078234885
+    },
+    {
+      "frequency_hz": 4950.0,
+      "n_rows": 150,
+      "rmse": 0.0422544818958143,
+      "bias": 0.022450898429819507
+    }
+  ],
+  "raw_prediction_diagnostics": null,
+  "prediction_diagnostics": null
+}

@@ -1,0 +1,8 @@
+Paired Symbolic Dataset Inspection
+Run: run1
+Curves: 1000
+Rows: 128000
+Features: 8
+R_real: min=-2.23205810e-01 max=9.85434804e-01 mean=3.69875493e-01 std=1.91273964e-01
+R_imag: min=-6.55748736e-01 max=2.58125011e-01 mean=-2.09325093e-01 std=1.17537989e-01
+global_100_4950: 128000 rows

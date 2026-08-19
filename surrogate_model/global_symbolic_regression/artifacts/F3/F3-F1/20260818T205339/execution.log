@@ -1,0 +1,5 @@
+[2026-08-18T18:53:41.983897+00:00] F3-F1 preflight frozen: branch A, original unconstrained search, seed=42, budget=100/12/80/24, Plan B, validation-only.
+[2026-08-18T18:53:41.986897+00:00] Starting formal PySR run: branch=A, seed=42.
+[2026-08-18T18:55:58.138640+00:00] Formal search completed: validation_RMSE=0.051734604.
+[2026-08-18T18:55:58.441641+00:00] F3-F1 complete: stage_passed=True, decision=freeze_formal_Re_F3_candidate_for_separately_authorized_F3_F2, test_rows_accessed=False.
+[2026-08-18T18:55:58.442643+00:00] Artifacts written to C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\F3\F3-F1\20260818T205339

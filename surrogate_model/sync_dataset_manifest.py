@@ -20,14 +20,38 @@ def relative(path):
     return path.resolve().relative_to(SURROGATE_ROOT.parent).as_posix()
 
 
+def validate_mat_contract(path: Path, required: tuple[str, ...]) -> bool:
+    if not path.exists():
+        return False
+    try:
+        import h5py
+
+        with h5py.File(path, "r") as file:
+            missing = [key for key in required if key not in file]
+    except (ImportError, OSError):
+        try:
+            from scipy.io import loadmat
+        except ImportError as exc:
+            raise RuntimeError(
+                f"h5py or scipy is required to validate generated MAT file: {path}"
+            ) from exc
+        data = loadmat(path, variable_names=list(required))
+        missing = [key for key in required if key not in data]
+    if missing:
+        raise ValueError(f"Generated MAT file is missing required paired-target variables {missing}: {path}")
+    return True
+
+
 def build_manifest(config: dict) -> dict:
     run_id = config["run_id"]
     generation = config["generation"]
     frequency = generation["frequency_grid_hz"]
     paths = config["paths"]
     file_status = {
-        key: paths[key].exists()
-        for key in ("teacher_dataset", "shared_split", "segmented_dataset", "global_dataset")
+        "teacher_dataset": validate_mat_contract(paths["teacher_dataset"], ("X", "Y_re", "Y_im", "freq_grid", "dataset_info")),
+        "shared_split": paths["shared_split"].exists(),
+        "segmented_dataset": validate_mat_contract(paths["segmented_dataset"], ("X_symbolic", "y_re_symbolic", "y_im_symbolic", "source_curve_index", "segment_index", "symbolic_dataset_info")),
+        "global_dataset": validate_mat_contract(paths["global_dataset"], ("X_symbolic", "y_re_symbolic", "y_im_symbolic", "source_curve_index", "segment_index", "symbolic_dataset_info")),
     }
     generated_count = sum(file_status.values())
     overall_status = (
@@ -43,6 +67,7 @@ def build_manifest(config: dict) -> dict:
         "status": overall_status,
         "description": config.get("description", ""),
         "config_path": relative(Path(config["config_file"])),
+        "target_schema": config["target_schema"],
         "generation": {
             "material": generation["material"],
             "porosity_cases": generation["porosity_cases"],

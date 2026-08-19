@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "stage": "F3-F1S",
+  "created_utc": "2026-08-18T19:15:28.376567+00:00",
+  "operation": "validation-only safety freeze; no training and no search",
+  "explicit_user_authorization": "freeze safe candidate 5 and prepare F3-F2",
+  "authorized_candidate_index": 5,
+  "selection_policy_frozen_before_replay": {
+    "eligibility_first": [
+      "expression evaluates successfully on observed train/validation rows",
+      "expression is finite and continuous over the entire real terminal domain",
+      "residual is continuous at z_sigma__f3_mid = 0",
+      "residual equals exactly zero at z_sigma__f3_mid = 0"
+    ],
+    "ranking_among_eligible": "minimum complete-validation RMSE, then minimum complexity, then candidate index",
+    "purpose": "deployment-safety resolution before any test access"
+  },
+  "validation_acceptance_rules": {
+    "full_validation": "candidate RMSE must be strictly below formal Re F1",
+    "curve_behavior": "curve-mean and worst-curve RMSE must both be strictly below formal Re F1",
+    "target_region": "1300-2000 Hz RMSE must be strictly below formal Re F1",
+    "guardrails": "no declared regional RMSE may worsen more than 10% versus formal Re F1"
+  },
+  "source_files": {
+    "dataset": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+      "sha256": "42388dae24304760f9e4c8ad686cbc40ffaad4ab06a579061b3b96e831b16a58"
+    },
+    "split": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+      "sha256": "77c70adb5a57f55476a808e43ae1e85a54ee3fd82f1636bc51e737c4f324c562"
+    },
+    "f1_metadata": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated\\training_metadata.json",
+      "sha256": "bd1dfaaebd231e03764f0e5285c8e209b7c81a129b732aa1ea32d28575ed7b62"
+    },
+    "f3a_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\decision_report.json",
+      "sha256": "bac0608b4c63eb2932df502a6404a201df20e451ad90d96d4bf8db7e8fe82fc2"
+    },
+    "f3a_predictions": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\f1_and_selected_sigma_predictions.npz",
+      "sha256": "d1da3653755f68dd9d0901ac6a3314d0beba776df7e2313dd6c132e8ed6cc9da"
+    },
+    "f3b_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\decision_report.json",
+      "sha256": "8c1fcc5e3e3ebc9858696412239ca54c0b3de8ce85d16c2309f82c079a74b2c3"
+    },
+    "f3b_spec": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\frozen_sigma_local_spec.json",
+      "sha256": "ea8deda5d8e3b1178c52c1df78350169c2d420928bba424e011fe34ff84dca7e"
+    },
+    "f3b_terminals": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\terminal_values_train_validation.npz",
+      "sha256": "f3d04c92c95d46311372079fd6ec82f73b1eb95f519c3d580860a0fc81e0752c"
+    },
+    "f3c_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-C\\20260817T115632\\comparison_decision.json",
+      "sha256": "cc5b5e900845903804bd7afc1b0ff07d6d5b6b5f57cc94996b4a56d8023bace3"
+    },
+    "f3c_manifest": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-C\\20260817T115632\\stage_manifest.json",
+      "sha256": "6a97bfde2d394e53f0d1916d8de6e726745392ff19a0d8053552ff97dd32eba3"
+    },
+    "f3d1_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-D1\\20260817T174849\\comparison_decision.json",
+      "sha256": "3ba722aecc589581abff17a07b3b06a43d6ba4a6f25c51b3146a5ff4e7bd61a2"
+    },
+    "f3e1_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-E1\\20260818T203958\\comparison_decision.json",
+      "sha256": "5b407a187c1f017cc6d784ea4d25f830083c38ef38fa5a040e02da09e4d76d5e"
+    },
+    "f1_selection": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_run1_sobol_modulated_best_loss\\selected_candidate.csv",
+      "sha256": "11fd0c9c0734614c80a7ec8f6251b6a011c100a50a633f029836134987089923"
+    },
+    "f3f1_preflight": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\preflight_manifest.json",
+      "sha256": "5df9b558a4e2828cf6f4b8ce6ee66fbec963e97b2b6f6f1f55e405a36066b6a1"
+    },
+    "f3f1_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\comparison_decision.json",
+      "sha256": "1c888f24546b4b359b0dcf4d82f152a44f321bc8162d3513f63a9fcdf3d35bba"
+    },
+    "f3f1_manifest": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\stage_manifest.json",
+      "sha256": "30045d9e4a1361824a795eceb3b039e374906f07d223662573f89f709b6944f5"
+    },
+    "f3f1_formula_audit": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\formula_domain_audit.json",
+      "sha256": "f8fdeca1aa9e0999fd8803238678c02126dd4bd3670a1137d9070f8388629001"
+    },
+    "f3f1_equations": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\runs\\formal_a\\equations.csv",
+      "sha256": "1311ebe0237df2ddecb33a5c74248caf54061e8a1dbcfdc808671461e61b3f56"
+    },
+    "f3f1_candidate_metrics": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\runs\\formal_a\\candidate_metrics.csv",
+      "sha256": "b5aa09dfe217d2f582668130d4e553d1b368ea976a95adb3b635b63eed6de8d3"
+    },
+    "f3f1_selected_summary": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\runs\\formal_a\\selected_run_summary.json",
+      "sha256": "29bb21577597e3b82aa9c1e47bcee0e4b8a9b36560f3a4616924d819afb09186"
+    },
+    "f3f2_runner": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\run_f3f2_one_time_test.py",
+      "sha256": "899e8fcda9e49e9438ab1d434149767a8fe947f6412ef709cae8c0d30413e1da"
+    }
+  },
+  "test_access_contract": "test features, targets, and predictions remain inaccessible",
+  "test_features_read": false,
+  "test_targets_read": false,
+  "test_predictions_computed": false
+}

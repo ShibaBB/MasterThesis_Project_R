@@ -1,0 +1,576 @@
+{
+  "dataset_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\segmented_SR\\Wool_R_segmented.mat",
+  "dataset_run": "run1",
+  "target": "re",
+  "target_name": "R_real",
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "training_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260814_run1_sobol_phase1_sobol_subset",
+  "candidate_selection_split": "validation",
+  "final_evaluation_split": "test",
+  "selection_rule": "best_loss",
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "selected_candidates": {
+    "low_100_700": 17,
+    "midlow_700_1000": 12,
+    "midhigh_1000_1300": 12,
+    "highlow_1300_1650": 11,
+    "high_1650_2000": 7,
+    "upperlow_2000_3000": 12,
+    "uppermid_3000_4000": 17,
+    "upperhigh_4000_4950": 10
+  },
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "original_feature_names": [
+    "phi",
+    "h",
+    "sigma",
+    "alpha_infinity",
+    "lambda",
+    "lambda_prime",
+    "k0_prime",
+    "f"
+  ],
+  "feature_transform": {
+    "schema_version": 1,
+    "method": "recommended_log10_then_drop_training_constants",
+    "original_feature_names": [
+      "phi",
+      "h",
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "recommended_log10_indices_1based": [
+      3,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log10_feature_indices_0based": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "log10_feature_names": [
+      "sigma",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "constant_feature_indices_0based": [
+      0,
+      1
+    ],
+    "constant_feature_names": [
+      "phi",
+      "h"
+    ],
+    "retained_feature_indices_0based": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retained_feature_names": [
+      "sigma",
+      "alpha_infinity",
+      "lambda",
+      "lambda_prime",
+      "k0_prime",
+      "f"
+    ],
+    "transformed_feature_names": [
+      "log10_sigma",
+      "alpha_infinity",
+      "log10_lambda",
+      "log10_lambda_prime",
+      "log10_k0_prime",
+      "log10_f"
+    ]
+  },
+  "feature_policy": {
+    "schema_version": 1,
+    "name": "teacher_sobol_phase1_segment_features",
+    "source": "teacher Sobol run1 N=1024",
+    "branch": "sobol_subset",
+    "target": "re",
+    "frequency_always_retained": true,
+    "selection_stage": "after_training_fitted_base_transform",
+    "per_segment": {
+      "low_100_700": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          4,
+          5
+        ]
+      },
+      "midlow_700_1000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          4,
+          5
+        ]
+      },
+      "midhigh_1000_1300": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          4,
+          5
+        ]
+      },
+      "highlow_1300_1650": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          5
+        ]
+      },
+      "high_1650_2000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          5
+        ]
+      },
+      "upperlow_2000_3000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          5
+        ]
+      },
+      "uppermid_3000_4000": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          4,
+          5
+        ]
+      },
+      "upperhigh_4000_4950": {
+        "feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "feature_indices_0based": [
+          0,
+          1,
+          2,
+          4,
+          5
+        ]
+      }
+    }
+  },
+  "selected_segment_metrics": [
+    {
+      "split": "validation",
+      "segment_id": 1,
+      "segment_name": "low_100_700",
+      "n_rows": 2400,
+      "rmse": 0.021229590105221748,
+      "mae": 0.01659386633288669,
+      "max_abs_error": 0.12158295862575902,
+      "r2": 0.973787850999608,
+      "true_min": 0.3902374023758223,
+      "true_max": 0.9838400807547939,
+      "prediction_min": 0.4041574359856857,
+      "prediction_max": 1.000661233409931
+    },
+    {
+      "split": "validation",
+      "segment_id": 2,
+      "segment_name": "midlow_700_1000",
+      "n_rows": 1200,
+      "rmse": 0.03130603369529016,
+      "mae": 0.022793827205299964,
+      "max_abs_error": 0.14436486945458243,
+      "r2": 0.8902472937122838,
+      "true_min": 0.11276548224853884,
+      "true_max": 0.6386577393534976,
+      "prediction_min": 0.23286239221138338,
+      "prediction_max": 0.6818755588174417
+    },
+    {
+      "split": "validation",
+      "segment_id": 3,
+      "segment_name": "midhigh_1000_1300",
+      "n_rows": 1200,
+      "rmse": 0.023834034253508482,
+      "mae": 0.017130233625974774,
+      "max_abs_error": 0.11766849095436216,
+      "r2": 0.9697677164178178,
+      "true_min": -0.02336393732203304,
+      "true_max": 0.5683402048542382,
+      "prediction_min": 0.02662292705662983,
+      "prediction_max": 0.6025789011014515
+    },
+    {
+      "split": "validation",
+      "segment_id": 4,
+      "segment_name": "highlow_1300_1650",
+      "n_rows": 1350,
+      "rmse": 0.024130696621617917,
+      "mae": 0.01689167857610537,
+      "max_abs_error": 0.13474994493424503,
+      "r2": 0.9774217413154963,
+      "true_min": -0.12179783660446854,
+      "true_max": 0.5275390762338282,
+      "prediction_min": -0.08736533172351457,
+      "prediction_max": 0.5301571443892779
+    },
+    {
+      "split": "validation",
+      "segment_id": 5,
+      "segment_name": "high_1650_2000",
+      "n_rows": 1350,
+      "rmse": 0.029401558929263272,
+      "mae": 0.01741283478505972,
+      "max_abs_error": 0.23683450477942947,
+      "r2": 0.9653212107897019,
+      "true_min": -0.1274621043189832,
+      "true_max": 0.49479130253237835,
+      "prediction_min": -0.12143949923838754,
+      "prediction_max": 0.48370458193728916
+    },
+    {
+      "split": "validation",
+      "segment_id": 6,
+      "segment_name": "upperlow_2000_3000",
+      "n_rows": 3900,
+      "rmse": 0.05044815651828244,
+      "mae": 0.038690963832575226,
+      "max_abs_error": 0.21429206942633677,
+      "r2": 0.8024101820353468,
+      "true_min": -0.09728545628003002,
+      "true_max": 0.47458330608412,
+      "prediction_min": -0.06767354679493254,
+      "prediction_max": 0.47766797317520276
+    },
+    {
+      "split": "validation",
+      "segment_id": 7,
+      "segment_name": "uppermid_3000_4000",
+      "n_rows": 4050,
+      "rmse": 0.04457683825365695,
+      "mae": 0.03396825676235741,
+      "max_abs_error": 0.1757691424959859,
+      "r2": 0.4909497171366505,
+      "true_min": -0.011939655203690778,
+      "true_max": 0.49121110639266774,
+      "prediction_min": 0.16382948729229513,
+      "prediction_max": 0.39893597238536954
+    },
+    {
+      "split": "validation",
+      "segment_id": 8,
+      "segment_name": "upperhigh_4000_4950",
+      "n_rows": 3750,
+      "rmse": 0.03727183346728122,
+      "mae": 0.026500843925524858,
+      "max_abs_error": 0.17721349882358234,
+      "r2": 0.39973063420130583,
+      "true_min": 0.06334118152049058,
+      "true_max": 0.4547990806221563,
+      "prediction_min": 0.1781429820028271,
+      "prediction_max": 0.3328312597553909
+    },
+    {
+      "split": "test",
+      "segment_id": 1,
+      "segment_name": "low_100_700",
+      "n_rows": 2400,
+      "rmse": 0.020783472475649493,
+      "mae": 0.016262745524503554,
+      "max_abs_error": 0.09091716296684188,
+      "r2": 0.9744795265761484,
+      "true_min": 0.34538680984747167,
+      "true_max": 0.9848472521819153,
+      "prediction_min": 0.42096471379475753,
+      "prediction_max": 1.0008208560910123
+    },
+    {
+      "split": "test",
+      "segment_id": 2,
+      "segment_name": "midlow_700_1000",
+      "n_rows": 1200,
+      "rmse": 0.029311603255785093,
+      "mae": 0.02149239476415022,
+      "max_abs_error": 0.1538636892101955,
+      "r2": 0.9028944492296112,
+      "true_min": 0.07654023781686807,
+      "true_max": 0.637593381931226,
+      "prediction_min": 0.22674687161391038,
+      "prediction_max": 0.6792389629173791
+    },
+    {
+      "split": "test",
+      "segment_id": 3,
+      "segment_name": "midhigh_1000_1300",
+      "n_rows": 1200,
+      "rmse": 0.021100934536890655,
+      "mae": 0.015081121540248184,
+      "max_abs_error": 0.11132007160737697,
+      "r2": 0.9748652949823814,
+      "true_min": -0.06344754160339555,
+      "true_max": 0.5708802751585569,
+      "prediction_min": 0.00966344079523962,
+      "prediction_max": 0.6008157044402638
+    },
+    {
+      "split": "test",
+      "segment_id": 4,
+      "segment_name": "highlow_1300_1650",
+      "n_rows": 1350,
+      "rmse": 0.026528698101384418,
+      "mae": 0.015576736245232373,
+      "max_abs_error": 0.21144650932956988,
+      "r2": 0.9694385508308084,
+      "true_min": -0.13837020579513812,
+      "true_max": 0.5280661360715874,
+      "prediction_min": -0.06926757500537306,
+      "prediction_max": 0.5257708912473986
+    },
+    {
+      "split": "test",
+      "segment_id": 5,
+      "segment_name": "high_1650_2000",
+      "n_rows": 1350,
+      "rmse": 0.04741676130919533,
+      "mae": 0.02472478034382075,
+      "max_abs_error": 0.3151551027037497,
+      "r2": 0.8956685254970954,
+      "true_min": -0.16743174725624047,
+      "true_max": 0.49439989401671003,
+      "prediction_min": -0.07143460009387442,
+      "prediction_max": 0.47930066095026697
+    },
+    {
+      "split": "test",
+      "segment_id": 6,
+      "segment_name": "upperlow_2000_3000",
+      "n_rows": 3900,
+      "rmse": 0.05380542727515152,
+      "mae": 0.03864202295181751,
+      "max_abs_error": 0.26823120678207774,
+      "r2": 0.7735111955226964,
+      "true_min": -0.16768789543909363,
+      "true_max": 0.5105399220151453,
+      "prediction_min": -0.18171895926109782,
+      "prediction_max": 0.4779388972708494
+    },
+    {
+      "split": "test",
+      "segment_id": 7,
+      "segment_name": "uppermid_3000_4000",
+      "n_rows": 4050,
+      "rmse": 0.04389251864112805,
+      "mae": 0.033766354600428275,
+      "max_abs_error": 0.15700361518631245,
+      "r2": 0.5505522986444338,
+      "true_min": 0.04606729999624382,
+      "true_max": 0.5103597441524076,
+      "prediction_min": 0.17640051875564866,
+      "prediction_max": 0.40379633265415277
+    },
+    {
+      "split": "test",
+      "segment_id": 8,
+      "segment_name": "upperhigh_4000_4950",
+      "n_rows": 3750,
+      "rmse": 0.033806117056987516,
+      "mae": 0.024776994403755352,
+      "max_abs_error": 0.15951312249044675,
+      "r2": 0.46384341817501895,
+      "true_min": 0.07520258126563813,
+      "true_max": 0.4174028764209703,
+      "prediction_min": 0.1799850073135066,
+      "prediction_max": 0.3361954666326935
+    }
+  ],
+  "overall_metrics": {
+    "rmse": 0.039506189052207555,
+    "mae": 0.02696339639985488,
+    "max_abs_error": 0.3151551027037497,
+    "r2": 0.9557297871191468,
+    "true_min": -0.16768789543909363,
+    "true_max": 0.9848472521819153,
+    "prediction_min": -0.18171895926109782,
+    "prediction_max": 1.0008208560910123
+  },
+  "validation_selection_metrics": {
+    "rmse": 0.038239434711033075,
+    "mae": 0.02718175045777811,
+    "max_abs_error": 0.23683450477942947,
+    "r2": 0.9595444718613707,
+    "true_min": -0.1274621043189832,
+    "true_max": 0.9838400807547939,
+    "prediction_min": -0.12143949923838754,
+    "prediction_max": 1.000661233409931
+  },
+  "raw_prediction_diagnostics": {
+    "prediction_min": -0.18171895926109782,
+    "prediction_max": 1.0008208560910123,
+    "finite_count": 19200
+  },
+  "prediction_diagnostics": {
+    "prediction_min": -0.18171895926109782,
+    "prediction_max": 1.0008208560910123,
+    "finite_count": 19200
+  },
+  "boundary_transition_diagnostics": [
+    {
+      "left_segment": "low_100_700",
+      "right_segment": "midlow_700_1000",
+      "boundary_hz": 700.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.04940112379788682,
+      "max_abs_prediction_change": 0.14589290294645985,
+      "mean_abs_teacher_change": 0.021400045247244405,
+      "mean_abs_excess_change": 0.04771631563995216,
+      "max_abs_excess_change": 0.10736645282978763
+    },
+    {
+      "left_segment": "midlow_700_1000",
+      "right_segment": "midhigh_1000_1300",
+      "boundary_hz": 1000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.04816847062641416,
+      "max_abs_prediction_change": 0.1642116599794382,
+      "mean_abs_teacher_change": 0.01353174758659554,
+      "mean_abs_excess_change": 0.04312816656757586,
+      "max_abs_excess_change": 0.13615389761058094
+    },
+    {
+      "left_segment": "midhigh_1000_1300",
+      "right_segment": "highlow_1300_1650",
+      "boundary_hz": 1300.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.027327991104174974,
+      "max_abs_prediction_change": 0.10593688865339868,
+      "mean_abs_teacher_change": 0.007410585083911741,
+      "mean_abs_excess_change": 0.02382055143983305,
+      "max_abs_excess_change": 0.08243703330443293
+    },
+    {
+      "left_segment": "highlow_1300_1650",
+      "right_segment": "high_1650_2000",
+      "boundary_hz": 1650.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.011389584006526541,
+      "max_abs_prediction_change": 0.031849558956872914,
+      "mean_abs_teacher_change": 0.003847134450935526,
+      "mean_abs_excess_change": 0.009710386578167397,
+      "max_abs_excess_change": 0.03172748963553999
+    },
+    {
+      "left_segment": "high_1650_2000",
+      "right_segment": "upperlow_2000_3000",
+      "boundary_hz": 2000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.07477000370365869,
+      "max_abs_prediction_change": 0.24924420488414883,
+      "mean_abs_teacher_change": 0.00315345484631334,
+      "mean_abs_excess_change": 0.07175559979214186,
+      "max_abs_excess_change": 0.23056173680425726
+    },
+    {
+      "left_segment": "upperlow_2000_3000",
+      "right_segment": "uppermid_3000_4000",
+      "boundary_hz": 3000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.06582801228943976,
+      "max_abs_prediction_change": 0.2884395623368248,
+      "mean_abs_teacher_change": 0.002684932087640582,
+      "mean_abs_excess_change": 0.06356025203687343,
+      "max_abs_excess_change": 0.27615455932681
+    },
+    {
+      "left_segment": "uppermid_3000_4000",
+      "right_segment": "upperhigh_4000_4950",
+      "boundary_hz": 4000.0,
+      "num_curves": 150,
+      "mean_abs_prediction_change": 0.0371716385488577,
+      "max_abs_prediction_change": 0.10644115697442713,
+      "mean_abs_teacher_change": 0.0028897162184739486,
+      "mean_abs_excess_change": 0.03504476458945941,
+      "max_abs_excess_change": 0.10348790414742365
+    }
+  ]
+}

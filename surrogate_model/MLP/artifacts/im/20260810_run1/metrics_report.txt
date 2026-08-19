@@ -1,0 +1,31 @@
+Surrogate Baseline Metrics Report
+Target Selector: im
+Target Name: R_imag
+Fiber: Wool
+Total Samples: 1000
+Frequency Range: 100.00 Hz to 4950.00 Hz
+Frequency Points: 128
+Dataset Run: run1
+Shared Split File: C:\MasterThesis_Project_R\surrogate_model\datasets\run1\shared_curve_split.json
+Shared Split Hash: cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0
+
+Train Metrics
+MSE  : 3.70372777e-06
+RMSE : 1.92450720e-03
+MAE  : 1.41578133e-03
+R2   : 0.99946350
+
+Validation Metrics
+MSE  : 8.40689700e-06
+RMSE : 2.89946492e-03
+MAE  : 1.99526385e-03
+R2   : 0.99867755
+
+Test Metrics
+MSE  : 8.48874151e-06
+RMSE : 2.91354442e-03
+MAE  : 1.91410247e-03
+MaxAE: 3.17515582e-02
+R2   : 0.99854738
+True range: [-6.43079362e-01, 2.02134115e-01]
+Prediction range: [-6.43229067e-01, 2.05146626e-01]

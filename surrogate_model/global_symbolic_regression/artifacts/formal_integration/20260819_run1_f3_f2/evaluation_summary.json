@@ -1,0 +1,140 @@
+{
+  "model_id": "run1_global_sr_re_f3_im_f2",
+  "dataset_run": "run1",
+  "partition": "test",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "curve_count": 150,
+  "row_count": 19200,
+  "active_models": {
+    "re": "Re_F3",
+    "im": "Im_F2"
+  },
+  "candidate_selection_performed": false,
+  "output_postprocessing": {
+    "method": "none"
+  },
+  "metrics": {
+    "re": {
+      "rmse": 0.061697052842910646,
+      "mae": 0.042342503427319295,
+      "max_abs_error": 0.33547306779145347,
+      "r2": 0.8920282418697033,
+      "true_min": -0.16768789543909363,
+      "true_max": 0.9848472521819153,
+      "prediction_min": -0.10873871006546824,
+      "prediction_max": 1.0714080961773835
+    },
+    "im": {
+      "rmse": 0.06303179171217158,
+      "mae": 0.048076400687495885,
+      "max_abs_error": 0.2979369347037859,
+      "r2": 0.6672655222882877,
+      "true_min": -0.6430793623150733,
+      "true_max": 0.20213411538375756,
+      "prediction_min": -0.43270175099021213,
+      "prediction_max": 0.36415096353117676
+    },
+    "complex": {
+      "complex_rmse": 0.0882016615260024,
+      "complex_mae": 0.07193429307587096,
+      "complex_max_abs_error": 0.34094750229581666
+    }
+  },
+  "reference_metric_regression": {
+    "applicable": true,
+    "re": {
+      "tolerance": 1e-12,
+      "passed": true,
+      "metrics": {
+        "rmse": {
+          "actual": 0.061697052842910646,
+          "expected": 0.061697052842910646,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "mae": {
+          "actual": 0.042342503427319295,
+          "expected": 0.042342503427319295,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "max_abs_error": {
+          "actual": 0.33547306779145347,
+          "expected": 0.33547306779145347,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "r2": {
+          "actual": 0.8920282418697033,
+          "expected": 0.8920282418697033,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "prediction_min": {
+          "actual": -0.10873871006546824,
+          "expected": -0.10873871006546824,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "prediction_max": {
+          "actual": 1.0714080961773835,
+          "expected": 1.0714080961773835,
+          "absolute_difference": 0.0,
+          "passed": true
+        }
+      }
+    },
+    "im": {
+      "tolerance": 1e-12,
+      "passed": true,
+      "metrics": {
+        "rmse": {
+          "actual": 0.06303179171217158,
+          "expected": 0.06303179171217158,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "mae": {
+          "actual": 0.048076400687495885,
+          "expected": 0.048076400687495885,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "max_abs_error": {
+          "actual": 0.2979369347037859,
+          "expected": 0.2979369347037859,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "r2": {
+          "actual": 0.6672655222882877,
+          "expected": 0.6672655222882877,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "prediction_min": {
+          "actual": -0.43270175099021213,
+          "expected": -0.43270175099021213,
+          "absolute_difference": 0.0,
+          "passed": true
+        },
+        "prediction_max": {
+          "actual": 0.36415096353117676,
+          "expected": 0.36415096353117676,
+          "absolute_difference": 0.0,
+          "passed": true
+        }
+      }
+    }
+  },
+  "exact_re_prediction_regression": {
+    "applicable": true,
+    "reference_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F2\\20260818T213528\\test_predictions.npz",
+    "source_curve_order_exact": true,
+    "frequency_order_exact": true,
+    "prediction_exact": true,
+    "f3_terminal_exact": true,
+    "maximum_absolute_prediction_difference": 0.0,
+    "passed": true
+  }
+}

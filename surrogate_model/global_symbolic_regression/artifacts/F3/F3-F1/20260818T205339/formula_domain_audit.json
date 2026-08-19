@@ -1,0 +1,179 @@
+{
+  "audit_kind": "post_selection_deployment_safety_audit",
+  "predeclared_validation_selection_rule_changed": false,
+  "selected_candidate_index": 11,
+  "selected_equation": "(z_sigma__f3_mid * ((0.052617513 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) + -0.3566766)) / ((sqrt(z_sigma__f3_mid * z_sigma__f3_mid) * -1.6001033) + -1.4250554)",
+  "selected_expression_for_eval": "z_sigma__f3_mid*(-0.3566766 + 0.052617513/sqrt(z_sigma__f3_mid**2))/(-1.6001033*sqrt(z_sigma__f3_mid**2) - 1.4250554)",
+  "valid_terminal_value_audited": 0.0,
+  "terminal_zero_corresponds_to_training_standardization_center": true,
+  "log10_sigma_center": 4.689187575130151,
+  "center_within_observed_train_validation_range": true,
+  "observed_terminal_minimum": -2.3560071951001302,
+  "observed_terminal_maximum": 1.3368607704294968,
+  "observed_minimum_absolute_terminal": 1.9959049772405438e-11,
+  "observed_exact_zero_count": 0,
+  "symbolic_zero_behavior": {
+    "value_at_zero": "nan",
+    "left_limit": "52617513/1425055400",
+    "right_limit": "-52617513/1425055400",
+    "finite_at_zero": false,
+    "left_and_right_limits_equal": false,
+    "continuous_at_zero": false,
+    "localized_terminal_has_zero_residual_limit": false
+  },
+  "numeric_probe": {
+    "terminal_values": [
+      -1e-12,
+      0.0,
+      1e-12
+    ],
+    "residual_values": [
+      0.03692313505817686,
+      "nan",
+      -0.03692313505817686
+    ],
+    "warnings": [
+      "divide by zero encountered in divide",
+      "invalid value encountered in multiply"
+    ]
+  },
+  "selected_formula_domain_audit_passed": false,
+  "f3f2_readiness": false,
+  "reason": "Selected residual is non-finite and discontinuous at the valid zero of z_sigma__f3_mid; test must remain sealed pending an explicit formula-safety resolution.",
+  "best_continuous_hall_of_fame_candidate_diagnostic_only": {
+    "candidate_index": 5,
+    "complexity": 9,
+    "validation_rmse": 0.0578499948037714,
+    "equation": "(z_sigma__f3_mid * -4.196377) / (-44.352028 - (z_sigma__f3_mid * z_sigma__f3_mid))",
+    "expression_for_eval": "z_sigma__f3_mid*(-4.196377)/(-z_sigma__f3_mid*z_sigma__f3_mid - 44.352028)",
+    "value_at_zero": "0",
+    "left_limit": "0",
+    "right_limit": "0",
+    "finite_at_zero": true,
+    "left_and_right_limits_equal": true,
+    "continuous_at_zero": true,
+    "localized_terminal_has_zero_residual_limit": true,
+    "diagnostic_validation_metrics": {
+      "rmse": 0.05784999480377146,
+      "mae": 0.041313796341665626,
+      "max_abs_error": 0.2568526431969135,
+      "r2": 0.9074105303087001,
+      "bias": 0.004342225967410324,
+      "prediction_min": -0.08256375143229609,
+      "prediction_max": 1.0714975611617756
+    },
+    "diagnostic_validation_curve_summary": {
+      "curve_mean_rmse": 0.04955928311551556,
+      "curve_median_rmse": 0.04019150793796812,
+      "curve_p95_rmse": 0.11640314257861223,
+      "worst_curve_rmse": 0.14803572707685836,
+      "worst_curve_id": 953
+    },
+    "diagnostic_validation_regional_metrics": [
+      {
+        "lower_hz": 100.0,
+        "upper_hz": 700.0,
+        "row_count": 2400,
+        "rmse": 0.07293245723110042,
+        "mae": 0.057716678205964475,
+        "bias": -0.014649986662210693
+      },
+      {
+        "lower_hz": 700.0,
+        "upper_hz": 1000.0,
+        "row_count": 1200,
+        "rmse": 0.04399466105216296,
+        "mae": 0.03471744408245993,
+        "bias": 0.027820902884871823
+      },
+      {
+        "lower_hz": 1000.0,
+        "upper_hz": 1300.0,
+        "row_count": 1200,
+        "rmse": 0.038097385340272766,
+        "mae": 0.025779142779582365,
+        "bias": 0.022594628339133876
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 1650.0,
+        "row_count": 1350,
+        "rmse": 0.024789094684014763,
+        "mae": 0.015758303331526856,
+        "bias": 0.007900630762247602
+      },
+      {
+        "lower_hz": 1650.0,
+        "upper_hz": 2000.0,
+        "row_count": 1350,
+        "rmse": 0.03621126854434519,
+        "mae": 0.019806987841955115,
+        "bias": 0.0007078791300610962
+      },
+      {
+        "lower_hz": 2000.0,
+        "upper_hz": 3000.0,
+        "row_count": 3900,
+        "rmse": 0.052493241018270215,
+        "mae": 0.037615603453605435,
+        "bias": 0.004994833314715698
+      },
+      {
+        "lower_hz": 3000.0,
+        "upper_hz": 4000.0,
+        "row_count": 4050,
+        "rmse": 0.06653001562546638,
+        "mae": 0.05050180872119809,
+        "bias": 6.695025509925773e-05
+      },
+      {
+        "lower_hz": 4000.0,
+        "upper_hz": 4950.0,
+        "row_count": 3750,
+        "rmse": 0.06562968106799744,
+        "mae": 0.048763369588560104,
+        "bias": 0.007109221941231222
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 2000.0,
+        "row_count": 2700,
+        "rmse": 0.031030268971149223,
+        "mae": 0.017782645586740985,
+        "bias": 0.00430425494615435
+      }
+    ],
+    "diagnostic_formal_f1_guardrails": [
+      {
+        "lower_hz": 700.0,
+        "upper_hz": 1000.0,
+        "formal_f1_control_rmse": 0.04544491052184621,
+        "diagnostic_candidate_rmse": 0.04399466105216296,
+        "relative_change": -0.031912252725992074
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 1650.0,
+        "formal_f1_control_rmse": 0.08807740122553251,
+        "diagnostic_candidate_rmse": 0.024789094684014763,
+        "relative_change": -0.7185532913199905
+      },
+      {
+        "lower_hz": 1650.0,
+        "upper_hz": 2000.0,
+        "formal_f1_control_rmse": 0.09383708894027783,
+        "diagnostic_candidate_rmse": 0.03621126854434519,
+        "relative_change": -0.6141049455680399
+      }
+    ],
+    "would_pass_predeclared_numerical_gates": true,
+    "diagnostic_checks": {
+      "beats_formal_f1_full_validation_rmse": true,
+      "improves_curve_mean_rmse": true,
+      "improves_worst_curve_rmse": true,
+      "improves_target_region": true,
+      "all_formal_f1_regional_guardrails_pass": true
+    }
+  },
+  "diagnostic_candidate_not_selected_post_hoc": true
+}

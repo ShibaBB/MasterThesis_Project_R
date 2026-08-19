@@ -1,0 +1,9 @@
+complexity,loss,equation,score,sympy_format,lambda_format
+1,0.03696064,0.3690577,0.0,0.369057700000000,PySRFunction(X=>0.369057700000000)
+3,0.023842005,1.2415081 / log10_f,0.21920231081557054,1.2415081/log10_f,PySRFunction(X=>1.2415081/log10_f)
+5,0.013327671,(3.6612957 / log10_f) + -0.76012313,0.2908032703819386,-0.76012313 + 3.6612957/log10_f,PySRFunction(X=>-0.76012313 + 3.6612957/log10_f)
+6,0.013124169,0.32285956 / sqrt(alpha_infinity__f2_onset + 0.09673479),0.01538690805832155,0.32285956/sqrt(alpha_infinity__f2_onset + 0.09673479),PySRFunction(X=>0.32285956/sqrt(alpha_infinity__f2_onset + 0.09673479))
+8,0.01158993,log(log10_f / log10_sigma) * (-3.0295944 / log10_f),0.06215943727175258,-3.0295944*log(log10_f/log10_sigma)/log10_f,PySRFunction(X=>-3.0295944*log(log10_f/log10_sigma)/log10_f)
+11,0.010442148,log(log10_f / log10_sigma) * (-3.2747748 / sqrt(log10_f / 0.32038456)),0.03476210307538056,-1.85360515648539*log(log10_f/log10_sigma)/sqrt(log10_f),PySRFunction(X=>-1.85360515648539*log(log10_f/log10_sigma)/sqrt(log10_f))
+16,0.010321743,(log10_sigma / (-2.9709842 - ((log10_f * 0.50573677) * sqrt(log(log10_f))))) * log(log10_f / log10_sigma),0.0023195334553704075,log10_sigma*log(log10_f/log10_sigma)/(-0.50573677*log10_f*sqrt(log(log10_f)) - 2.9709842),PySRFunction(X=>log10_sigma*log(log10_f/log10_sigma)/(-0.50573677*log10_f*sqrt(log(log10_f)) - 2.9709842))
+23,0.0103094485,(((0.03782539 * log(0.73639965 - log10_lambda)) - log((log10_f * (0.73639965 - log10_lambda)) * sqrt(log10_f))) / log10_f) * log(log10_f / log10_sigma),0.00017026232835481032,(-log(log10_f**(3/2)*(0.73639965 - log10_lambda)) + 0.03782539*log(0.73639965 - log10_lambda))*log(log10_f/log10_sigma)/log10_f,PySRFunction(X=>(-log(log10_f**(3/2)*(0.73639965 - log10_lambda)) + 0.03782539*log(0.73639965 - log10_lambda))*log(log10_f/log10_sigma)/log10_f)

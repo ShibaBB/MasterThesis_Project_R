@@ -1,0 +1,64 @@
+{
+  "segment_id": 3,
+  "segment_name": "midhigh_1000_1300",
+  "target": "re",
+  "target_name": "R_real",
+  "lower_hz": 1000.0,
+  "upper_hz": 1300.0,
+  "shared_split_file": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "feature_branch": "all",
+  "feature_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "feature_indices_0based": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "pysr_variable_names": [
+    "log10_sigma",
+    "alpha_infinity",
+    "log10_lambda",
+    "log10_lambda_prime",
+    "log10_k0_prime",
+    "log10_f"
+  ],
+  "equation": "((log10_f / (alpha_infinity - log10_k0_prime)) + 0.24730724) - ((log10_sigma * -0.6108497) + log10_f)",
+  "complexity": 13,
+  "loss": 0.0007048889,
+  "score": 0.121897869401943,
+  "n_rows_used": 6800,
+  "n_train": 5600,
+  "n_validation": 1200,
+  "train_metrics": {
+    "rmse": 0.026549743871816387,
+    "mae": 0.019491521890746353,
+    "max_abs_error": 0.1469243764689039,
+    "r2": 0.9627368783638823,
+    "true_min": -0.08955501903698421,
+    "true_max": 0.5728718633144628,
+    "prediction_min": -0.02956711881882687,
+    "prediction_max": 0.607254337539711
+  },
+  "validation_metrics": {
+    "rmse": 0.02611366286305802,
+    "mae": 0.019376266005856038,
+    "max_abs_error": 0.11035827437989423,
+    "r2": 0.9637079567171707,
+    "true_min": -0.02336393732203304,
+    "true_max": 0.5683402048542382,
+    "prediction_min": 0.015706622738438286,
+    "prediction_max": 0.5934547201010468
+  },
+  "equations_csv": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260814_run1_sobol_phase1_all\\equations\\midhigh_1000_1300_equations.csv",
+  "model_file": "C:\\MasterThesis_Project_R\\surrogate_model\\segmented_symbolic_regression\\artifacts\\re\\train\\20260814_run1_sobol_phase1_all\\models\\midhigh_1000_1300_pysr_model.pkl"
+}

@@ -32,10 +32,22 @@ from shared_split_utils import (  # noqa: E402
     resolve_and_load_shared_split,
     source_curve_mask,
 )
+from symbolic_feature_transform import (  # noqa: E402
+    apply_feature_transform,
+    fit_feature_transform,
+)
+from sobol_feature_policy import (  # noqa: E402
+    FREQUENCY_ENHANCED_BRANCH,
+    SUPPORTED_BRANCHES,
+    build_feature_policy,
+)
+from frequency_feature_engineering import (  # noqa: E402
+    apply_local_frequency_features,
+    build_local_frequency_spec,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_OUTPUT_ROOT = SCRIPT_DIR / "artifacts" / "wool_segmented_symbolic_pysr_runs"
 VENV_JULIA_EXE = (
     SCRIPT_DIR
     / ".venv_py311"
@@ -63,11 +75,19 @@ RESERVED_VARIABLE_NAMES = {
     "oo",
     "nan",
 }
+PY_SR_BINARY_OPERATORS = ["+", "-", "*", "/"]
+PY_SR_UNARY_OPERATORS = ["log", "sqrt"]
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Train one PySR symbolic-regression model per frequency segment."
+    )
+    parser.add_argument(
+        "--target",
+        required=True,
+        choices=("re", "im"),
+        help="Reflection-coefficient component to train.",
     )
     parser.add_argument(
         "--dataset-run",
@@ -89,7 +109,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-root",
         type=Path,
-        default=DEFAULT_OUTPUT_ROOT,
+        default=None,
         help="Parent directory for automatically named training runs.",
     )
     parser.add_argument(
@@ -105,13 +125,22 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--random-seed", type=int, default=42)
     parser.add_argument(
+        "--feature-branch",
+        choices=SUPPORTED_BRANCHES,
+        default="all",
+        help=(
+            "Per-segment input policy: matched all-feature control, Sobol subset, "
+            "or the Sobol subset with the high-frequency lambda_prime diagnostic."
+        ),
+    )
+    parser.add_argument(
         "--max-samples-per-segment",
         type=int,
         default=None,
         help="Optional cap for quick pipeline tests. Use all rows when omitted.",
     )
-    parser.add_argument("--niterations", type=int, default=40)
-    parser.add_argument("--populations", type=int, default=8)
+    parser.add_argument("--niterations", type=int, default=100)
+    parser.add_argument("--populations", type=int, default=12)
     parser.add_argument("--population-size", type=int, default=80)
     parser.add_argument("--maxsize", type=int, default=24)
     parser.add_argument("--model-selection", choices=["best", "accuracy", "score"], default="best")
@@ -146,19 +175,10 @@ def resolve_output_dir(args: argparse.Namespace) -> Path:
     if args.output_dir is not None:
         return args.output_dir
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    sample_tag = (
-        "all"
-        if args.max_samples_per_segment is None
-        else f"cap{args.max_samples_per_segment}"
-    )
-    config_tag = (
-        f"{sanitize_name(args.dataset_run)}_i{args.niterations}_p{args.populations}_"
-        f"ps{args.population_size}_s{args.maxsize}_{sample_tag}"
-    )
-    run_label = sanitize_name(args.run_name)[:24]
-    run_suffix = f"_{run_label}" if run_label else ""
-    return unique_path(args.output_root / f"{timestamp}_{config_tag}{run_suffix}")
+    output_root = args.output_root or SCRIPT_DIR / "artifacts" / args.target / "train"
+    timestamp = datetime.now().strftime("%Y%m%d")
+    suffix = "_limited" if args.max_samples_per_segment is not None else ""
+    return unique_path(output_root / f"{timestamp}_{sanitize_name(args.dataset_run)}{suffix}")
 
 
 def validate_output_path_length(output_dir: Path, segment_names: list[str]) -> None:
@@ -212,13 +232,20 @@ def read_numeric_dataset(dataset: h5py.Dataset) -> np.ndarray:
     return np.array(dataset).T
 
 
-def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
+def read_symbolic_dataset(dataset_file: Path, target: str, dataset_run: str) -> dict[str, Any]:
     if not dataset_file.exists():
         raise FileNotFoundError(f"Symbolic dataset file not found: {dataset_file}")
 
     with h5py.File(dataset_file, "r") as file:
+        missing_targets = [key for key in ("y_re_symbolic", "y_im_symbolic") if key not in file]
+        if missing_targets:
+            raise ValueError(f"Symbolic dataset is missing paired target arrays {missing_targets}.")
         x_symbolic = read_numeric_dataset(file["X_symbolic"])
-        y_symbolic = np.array(file["y_symbolic"]).reshape(-1)
+        target_key = {"re": "y_re_symbolic", "im": "y_im_symbolic"}[target]
+        if target_key not in file:
+            raise ValueError(f"Symbolic dataset is missing target array {target_key}.")
+        y_symbolic = np.array(file[target_key]).reshape(-1)
+        paired_shape = np.array(file["y_re_symbolic"]).size, np.array(file["y_im_symbolic"]).size
         segment_index = np.array(file["segment_index"]).reshape(-1).astype(int)
         source_curve_index = np.array(file["source_curve_index"]).reshape(-1).astype(int)
 
@@ -226,21 +253,38 @@ def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
         feature_names = decode_matlab_string_array(file, info_group["feature_names"])
         segment_bounds = np.array(info_group["segment_bounds_hz"]).T
         segment_names = decode_matlab_string_array(file, info_group["segment_names"])
+        target_names = decode_matlab_string_array(file, info_group["target_names"])
+        complex_source = decode_matlab_string(file, info_group["complex_source"])
+        recorded_run = decode_matlab_string(file, info_group["dataset_run"])
 
         fiberfolder = decode_matlab_string(file, info_group["fiberfolder"])
         num_curve_samples = int(np.array(info_group["num_curve_samples"]).reshape(-1)[0])
         num_symbolic_samples = int(np.array(info_group["num_symbolic_samples"]).reshape(-1)[0])
+        recommended_log10_indices = (
+            np.array(info_group["recommended_log10_feature_indices"])
+            .reshape(-1)
+            .astype(int)
+            .tolist()
+        )
 
     if x_symbolic.shape[0] != y_symbolic.shape[0]:
         raise ValueError("X_symbolic row count does not match y_symbolic length.")
+    if paired_shape != (x_symbolic.shape[0], x_symbolic.shape[0]):
+        raise ValueError("Paired symbolic target arrays are not aligned with X_symbolic.")
     if x_symbolic.shape[0] != segment_index.shape[0]:
         raise ValueError("X_symbolic row count does not match segment_index length.")
     if x_symbolic.shape[0] != source_curve_index.shape[0]:
         raise ValueError("X_symbolic row count does not match source_curve_index length.")
+    if target_names != ["R_real", "R_imag"] or complex_source != "Reflect":
+        raise ValueError("Symbolic dataset metadata does not match paired Reflect targets.")
+    if dataset_run != "custom" and recorded_run != dataset_run:
+        raise ValueError(f"Dataset metadata run {recorded_run!r} does not match {dataset_run!r}.")
 
     return {
         "X": x_symbolic,
         "y": y_symbolic,
+        "target": target,
+        "target_name": {"re": "R_real", "im": "R_imag"}[target],
         "segment_index": segment_index,
         "source_curve_index": source_curve_index,
         "feature_names": feature_names,
@@ -249,6 +293,7 @@ def read_symbolic_dataset(dataset_file: Path) -> dict[str, Any]:
         "fiberfolder": fiberfolder,
         "num_curve_samples": num_curve_samples,
         "num_symbolic_samples": num_symbolic_samples,
+        "recommended_log10_feature_indices_1based": recommended_log10_indices,
     }
 
 
@@ -289,8 +334,8 @@ def build_model(args: argparse.Namespace, pysr_output_dir: Path, run_id: str) ->
         "niterations": args.niterations,
         "populations": args.populations,
         "population_size": args.population_size,
-        "binary_operators": ["+", "-", "*", "/"],
-        "unary_operators": ["log", "sqrt"],
+        "binary_operators": PY_SR_BINARY_OPERATORS,
+        "unary_operators": PY_SR_UNARY_OPERATORS,
         "maxsize": args.maxsize,
         "model_selection": args.model_selection,
         "random_state": args.random_seed,
@@ -315,6 +360,10 @@ def regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, floa
         "mae": float(mae),
         "max_abs_error": max_abs_error,
         "r2": float(r2),
+        "true_min": float(np.min(y_true)),
+        "true_max": float(np.max(y_true)),
+        "prediction_min": float(np.min(y_pred)),
+        "prediction_max": float(np.max(y_pred)),
     }
 
 
@@ -334,9 +383,6 @@ def train_one_segment(
         segment_mask
         & source_curve_mask(data["source_curve_index"], data["shared_split"], "validation")
     )
-    test_indices = np.flatnonzero(
-        segment_mask & source_curve_mask(data["source_curve_index"], data["shared_split"], "test")
-    )
 
     rng = np.random.default_rng(args.random_seed + segment_id)
     if (
@@ -347,15 +393,20 @@ def train_one_segment(
             train_indices, size=args.max_samples_per_segment, replace=False
         )
 
-    if min(train_indices.size, validation_indices.size, test_indices.size) == 0:
+    if min(train_indices.size, validation_indices.size) == 0:
         raise ValueError(f"Segment {segment_name} has an empty shared split partition.")
 
     X_train = data["X"][train_indices, :]
     y_train = data["y"][train_indices]
     X_validation = data["X"][validation_indices, :]
     y_validation = data["y"][validation_indices]
-    X_test = data["X"][test_indices, :]
-    y_test = data["y"][test_indices]
+
+    segment_feature_spec = data["feature_policy"]["per_segment"][segment_name]
+    feature_indices = segment_feature_spec["feature_indices_0based"]
+    segment_feature_names = segment_feature_spec["feature_names"]
+    segment_variable_names = make_pysr_variable_names(segment_feature_names)
+    X_train = X_train[:, feature_indices]
+    X_validation = X_validation[:, feature_indices]
 
     segment_slug = sanitize_name(segment_name)
     equations_dir = output_dir / "equations"
@@ -368,15 +419,13 @@ def train_one_segment(
     print(
         f"\nTraining segment {segment_id}: {segment_name} "
         f"({bounds[0]:.2f}-{bounds[1]:.2f} Hz), "
-        f"train/validation/test rows="
-        f"{len(train_indices)}/{len(validation_indices)}/{len(test_indices)}"
+        f"train/validation rows={len(train_indices)}/{len(validation_indices)}"
     )
     model = build_model(args, pysr_runs_dir, segment_slug)
-    model.fit(X_train, y_train, variable_names=data["pysr_variable_names"])
+    model.fit(X_train, y_train, variable_names=segment_variable_names)
 
     train_pred = model.predict(X_train)
     validation_pred = model.predict(X_validation)
-    test_pred = model.predict(X_test)
     selected = model.get_best()
 
     equations = model.equations_.copy()
@@ -390,23 +439,25 @@ def train_one_segment(
     selected_equation = {
         "segment_id": segment_id,
         "segment_name": segment_name,
+        "target": data["target"],
+        "target_name": data["target_name"],
         "lower_hz": float(bounds[0]),
         "upper_hz": float(bounds[1]),
         "shared_split_file": data["shared_split"]["split_file"],
         "shared_split_hash": data["shared_split"]["split_hash"],
+        "feature_branch": data["feature_policy"]["branch"],
+        "feature_names": segment_feature_names,
+        "feature_indices_0based": feature_indices,
+        "pysr_variable_names": segment_variable_names,
         "equation": str(selected["equation"]),
         "complexity": int(selected["complexity"]),
         "loss": float(selected["loss"]),
         "score": float(selected["score"]) if "score" in selected and pd.notna(selected["score"]) else None,
-        "n_rows_used": int(
-            len(train_indices) + len(validation_indices) + len(test_indices)
-        ),
+        "n_rows_used": int(len(train_indices) + len(validation_indices)),
         "n_train": int(len(y_train)),
         "n_validation": int(len(y_validation)),
-        "n_test": int(len(y_test)),
         "train_metrics": regression_metrics(y_train, train_pred),
         "validation_metrics": regression_metrics(y_validation, validation_pred),
-        "test_metrics": regression_metrics(y_test, test_pred),
         "equations_csv": str(equations_csv),
         "model_file": str(model_path),
     }
@@ -428,27 +479,74 @@ def main() -> None:
         os.environ.setdefault("PYTHON_JULIAPKG_EXE", str(args.julia_exe))
 
     args.output_dir = resolve_output_dir(args)
-    data = read_symbolic_dataset(args.dataset_file)
+    data = read_symbolic_dataset(args.dataset_file, args.target, resolved_dataset_run)
     data["shared_split"] = resolve_and_load_shared_split(
         resolved_dataset_run, args.split_file, data["num_curve_samples"]
     )
+    training_mask = source_curve_mask(
+        data["source_curve_index"], data["shared_split"], "train"
+    )
+    original_feature_names = list(data["feature_names"])
+    physical_frequency_hz = data["X"][:, original_feature_names.index("f")].copy()
+    feature_transform = fit_feature_transform(
+        data["X"][training_mask],
+        original_feature_names,
+        data["recommended_log10_feature_indices_1based"],
+    )
+    data["X"] = apply_feature_transform(
+        data["X"], original_feature_names, feature_transform
+    )
+    data["feature_names"] = feature_transform["transformed_feature_names"]
+    frequency_feature_engineering = None
+    if args.feature_branch == FREQUENCY_ENHANCED_BRANCH:
+        frequency_feature_engineering = build_local_frequency_spec(
+            data["segment_names"], data["segment_bounds"]
+        )
+        data["X"], data["feature_names"] = apply_local_frequency_features(
+            data["X"],
+            data["feature_names"],
+            physical_frequency_hz,
+            data["segment_index"],
+            data["segment_names"],
+            frequency_feature_engineering,
+        )
+    data["feature_policy"] = build_feature_policy(
+        args.target,
+        args.feature_branch,
+        data["feature_names"],
+        data["segment_names"],
+    )
     validate_output_path_length(args.output_dir, data["segment_names"])
+    if args.output_dir.exists() and any(args.output_dir.iterdir()):
+        raise FileExistsError(f"Refusing to overwrite non-empty training directory: {args.output_dir}")
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    data["pysr_variable_names"] = make_pysr_variable_names(data["feature_names"])
 
     metadata = {
         "dataset_file": str(args.dataset_file),
         "dataset_run": resolved_dataset_run,
+        "target": args.target,
+        "target_name": data["target_name"],
         "shared_split_file": data["shared_split"]["split_file"],
         "shared_split_hash": data["shared_split"]["split_hash"],
         "fiberfolder": data["fiberfolder"],
         "num_curve_samples": data["num_curve_samples"],
         "num_symbolic_samples": data["num_symbolic_samples"],
+        "original_feature_names": original_feature_names,
         "feature_names": data["feature_names"],
-        "pysr_variable_names": data["pysr_variable_names"],
-        "feature_name_mapping": dict(zip(data["feature_names"], data["pysr_variable_names"])),
+        "feature_transform": feature_transform,
+        "frequency_feature_engineering": frequency_feature_engineering,
+        "feature_policy": data["feature_policy"],
         "segment_names": data["segment_names"],
         "segment_bounds": data["segment_bounds"].tolist(),
+        "search_contract": {
+            "binary_operators": PY_SR_BINARY_OPERATORS,
+            "unary_operators": PY_SR_UNARY_OPERATORS,
+            "deterministic": True,
+            "parallelism": "serial",
+            "output_postprocessing": "none",
+            "partitions_accessed_during_training": ["train", "validation"],
+            "test_partition_accessed": False,
+        },
         "training_args": {
             key: str(value) if isinstance(value, Path) else value
             for key, value in vars(args).items()
@@ -473,11 +571,9 @@ def main() -> None:
                 "loss": item["loss"],
                 "train_rmse": item["train_metrics"]["rmse"],
                 "validation_rmse": item["validation_metrics"]["rmse"],
-                "test_rmse": item["test_metrics"]["rmse"],
                 "train_mae": item["train_metrics"]["mae"],
                 "validation_mae": item["validation_metrics"]["mae"],
-                "test_mae": item["test_metrics"]["mae"],
-                "test_r2": item["test_metrics"]["r2"],
+                "validation_r2": item["validation_metrics"]["r2"],
                 "n_rows_used": item["n_rows_used"],
             }
             for item in summaries
@@ -488,7 +584,11 @@ def main() -> None:
         json.dump(summaries, file, indent=2)
 
     print("\nSegment-wise PySR training complete.")
-    print(summary_df[["segment_name", "complexity", "test_rmse", "test_mae", "test_r2"]].to_string(index=False))
+    print(
+        summary_df[
+            ["segment_name", "complexity", "validation_rmse", "validation_mae", "validation_r2"]
+        ].to_string(index=False)
+    )
     print(f"Artifacts saved to: {args.output_dir}")
 
 

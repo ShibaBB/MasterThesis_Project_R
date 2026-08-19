@@ -1,0 +1,885 @@
+{
+  "schema_version": 1,
+  "stage": "F3-F1S",
+  "created_utc": "2026-08-18T19:15:28.376567+00:00",
+  "operation": "validation-only safety freeze; no training and no search",
+  "explicit_user_authorization": "freeze safe candidate 5 and prepare F3-F2",
+  "authorized_candidate_index": 5,
+  "selection_policy_frozen_before_replay": {
+    "eligibility_first": [
+      "expression evaluates successfully on observed train/validation rows",
+      "expression is finite and continuous over the entire real terminal domain",
+      "residual is continuous at z_sigma__f3_mid = 0",
+      "residual equals exactly zero at z_sigma__f3_mid = 0"
+    ],
+    "ranking_among_eligible": "minimum complete-validation RMSE, then minimum complexity, then candidate index",
+    "purpose": "deployment-safety resolution before any test access"
+  },
+  "validation_acceptance_rules": {
+    "full_validation": "candidate RMSE must be strictly below formal Re F1",
+    "curve_behavior": "curve-mean and worst-curve RMSE must both be strictly below formal Re F1",
+    "target_region": "1300-2000 Hz RMSE must be strictly below formal Re F1",
+    "guardrails": "no declared regional RMSE may worsen more than 10% versus formal Re F1"
+  },
+  "source_files": {
+    "dataset": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+      "sha256": "42388dae24304760f9e4c8ad686cbc40ffaad4ab06a579061b3b96e831b16a58"
+    },
+    "split": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+      "sha256": "77c70adb5a57f55476a808e43ae1e85a54ee3fd82f1636bc51e737c4f324c562"
+    },
+    "f1_metadata": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated\\training_metadata.json",
+      "sha256": "bd1dfaaebd231e03764f0e5285c8e209b7c81a129b732aa1ea32d28575ed7b62"
+    },
+    "f3a_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\decision_report.json",
+      "sha256": "bac0608b4c63eb2932df502a6404a201df20e451ad90d96d4bf8db7e8fe82fc2"
+    },
+    "f3a_predictions": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\f1_and_selected_sigma_predictions.npz",
+      "sha256": "d1da3653755f68dd9d0901ac6a3314d0beba776df7e2313dd6c132e8ed6cc9da"
+    },
+    "f3b_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\decision_report.json",
+      "sha256": "8c1fcc5e3e3ebc9858696412239ca54c0b3de8ce85d16c2309f82c079a74b2c3"
+    },
+    "f3b_spec": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\frozen_sigma_local_spec.json",
+      "sha256": "ea8deda5d8e3b1178c52c1df78350169c2d420928bba424e011fe34ff84dca7e"
+    },
+    "f3b_terminals": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\terminal_values_train_validation.npz",
+      "sha256": "f3d04c92c95d46311372079fd6ec82f73b1eb95f519c3d580860a0fc81e0752c"
+    },
+    "f3c_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-C\\20260817T115632\\comparison_decision.json",
+      "sha256": "cc5b5e900845903804bd7afc1b0ff07d6d5b6b5f57cc94996b4a56d8023bace3"
+    },
+    "f3c_manifest": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-C\\20260817T115632\\stage_manifest.json",
+      "sha256": "6a97bfde2d394e53f0d1916d8de6e726745392ff19a0d8053552ff97dd32eba3"
+    },
+    "f3d1_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-D1\\20260817T174849\\comparison_decision.json",
+      "sha256": "3ba722aecc589581abff17a07b3b06a43d6ba4a6f25c51b3146a5ff4e7bd61a2"
+    },
+    "f3e1_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-E1\\20260818T203958\\comparison_decision.json",
+      "sha256": "5b407a187c1f017cc6d784ea4d25f830083c38ef38fa5a040e02da09e4d76d5e"
+    },
+    "f1_selection": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_run1_sobol_modulated_best_loss\\selected_candidate.csv",
+      "sha256": "11fd0c9c0734614c80a7ec8f6251b6a011c100a50a633f029836134987089923"
+    },
+    "f3f1_preflight": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\preflight_manifest.json",
+      "sha256": "5df9b558a4e2828cf6f4b8ce6ee66fbec963e97b2b6f6f1f55e405a36066b6a1"
+    },
+    "f3f1_decision": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\comparison_decision.json",
+      "sha256": "1c888f24546b4b359b0dcf4d82f152a44f321bc8162d3513f63a9fcdf3d35bba"
+    },
+    "f3f1_manifest": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\stage_manifest.json",
+      "sha256": "30045d9e4a1361824a795eceb3b039e374906f07d223662573f89f709b6944f5"
+    },
+    "f3f1_formula_audit": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\formula_domain_audit.json",
+      "sha256": "f8fdeca1aa9e0999fd8803238678c02126dd4bd3670a1137d9070f8388629001"
+    },
+    "f3f1_equations": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\runs\\formal_a\\equations.csv",
+      "sha256": "1311ebe0237df2ddecb33a5c74248caf54061e8a1dbcfdc808671461e61b3f56"
+    },
+    "f3f1_candidate_metrics": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\runs\\formal_a\\candidate_metrics.csv",
+      "sha256": "b5aa09dfe217d2f582668130d4e553d1b368ea976a95adb3b635b63eed6de8d3"
+    },
+    "f3f1_selected_summary": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1\\20260818T205339\\runs\\formal_a\\selected_run_summary.json",
+      "sha256": "29bb21577597e3b82aa9c1e47bcee0e4b8a9b36560f3a4616924d819afb09186"
+    },
+    "f3f2_runner": {
+      "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\run_f3f2_one_time_test.py",
+      "sha256": "899e8fcda9e49e9438ab1d434149767a8fe947f6412ef709cae8c0d30413e1da"
+    }
+  },
+  "test_access_contract": "test features, targets, and predictions remain inaccessible",
+  "test_features_read": false,
+  "test_targets_read": false,
+  "test_predictions_computed": false,
+  "completed_utc": "2026-08-18T19:15:29.832089+00:00",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "train_curve_count": 700,
+  "validation_curve_count": 150,
+  "test_curve_count_declared_but_not_loaded": 150,
+  "train_row_count": 89600,
+  "validation_row_count": 19200,
+  "candidate_selection": [
+    {
+      "candidate_index": 0,
+      "candidate_source": "explicit_zero_residual_fallback",
+      "complexity": 0,
+      "validation_rmse": 0.0699786548806741,
+      "equation": "0.0",
+      "expression_for_eval": "0.0",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Reals",
+      "all_real_continuous_and_finite": true,
+      "value_at_zero": "0.0",
+      "left_limit_at_zero": "0.0",
+      "right_limit_at_zero": "0.0",
+      "continuous_at_zero": true,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 1,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 1,
+      "validation_rmse": 0.0699903819502015,
+      "equation": "0.0002631839",
+      "expression_for_eval": "0.000263183900000000",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Reals",
+      "all_real_continuous_and_finite": true,
+      "value_at_zero": "0.000263183900000000",
+      "left_limit_at_zero": "0.000263183900000000",
+      "right_limit_at_zero": "0.000263183900000000",
+      "continuous_at_zero": true,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 2,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 3,
+      "validation_rmse": 0.0578656607390277,
+      "equation": "z_sigma__f3_mid * 0.091197625",
+      "expression_for_eval": "z_sigma__f3_mid*0.091197625",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Reals",
+      "all_real_continuous_and_finite": true,
+      "value_at_zero": "0",
+      "left_limit_at_zero": "0",
+      "right_limit_at_zero": "0",
+      "continuous_at_zero": true,
+      "zero_terminal_gives_exact_zero_residual": true,
+      "safety_eligible": true,
+      "eligible_for_safety_first_selection": true,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 3,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 5,
+      "validation_rmse": 0.0578674338176836,
+      "equation": "(z_sigma__f3_mid * 0.09131265) + 6.69572e-5",
+      "expression_for_eval": "z_sigma__f3_mid*0.09131265 + 6.69572e-5",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Reals",
+      "all_real_continuous_and_finite": true,
+      "value_at_zero": "6.69572000000000e-5",
+      "left_limit_at_zero": "167393/2500000000",
+      "right_limit_at_zero": "167393/2500000000",
+      "continuous_at_zero": true,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 4,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 7,
+      "validation_rmse": 0.0579097483300395,
+      "equation": "(z_sigma__f3_mid * -2.906929) / (z_sigma__f3_mid + -31.378103)",
+      "expression_for_eval": "z_sigma__f3_mid*(-2.906929)/(z_sigma__f3_mid - 31.378103)",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 31.3781030000000), Interval.open(31.3781030000000, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "0",
+      "left_limit_at_zero": "0",
+      "right_limit_at_zero": "0",
+      "continuous_at_zero": true,
+      "zero_terminal_gives_exact_zero_residual": true,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 5,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 9,
+      "validation_rmse": 0.0578499948037714,
+      "equation": "(z_sigma__f3_mid * -4.196377) / (-44.352028 - (z_sigma__f3_mid * z_sigma__f3_mid))",
+      "expression_for_eval": "z_sigma__f3_mid*(-4.196377)/(-z_sigma__f3_mid*z_sigma__f3_mid - 44.352028)",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Reals",
+      "all_real_continuous_and_finite": true,
+      "value_at_zero": "0",
+      "left_limit_at_zero": "0",
+      "right_limit_at_zero": "0",
+      "continuous_at_zero": true,
+      "zero_terminal_gives_exact_zero_residual": true,
+      "safety_eligible": true,
+      "eligible_for_safety_first_selection": true,
+      "selected_by_safety_first_policy": true
+    },
+    {
+      "candidate_index": 6,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 10,
+      "validation_rmse": 0.0529797487776146,
+      "equation": "z_sigma__f3_mid * ((-0.02866452 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) - -0.12705992)",
+      "expression_for_eval": "z_sigma__f3_mid*(0.12705992 - 0.02866452/sqrt(z_sigma__f3_mid**2))",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "716613/25000000",
+      "right_limit_at_zero": "-716613/25000000",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 7,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 12,
+      "validation_rmse": 0.053366601358298,
+      "equation": "(z_sigma__f3_mid * ((-0.029275147 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) - -0.1258218)) - -0.0048447847",
+      "expression_for_eval": "z_sigma__f3_mid*(0.1258218 - 0.029275147/sqrt(z_sigma__f3_mid**2)) + 0.0048447847",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "341199317/10000000000",
+      "right_limit_at_zero": "-244303623/10000000000",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 8,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 14,
+      "validation_rmse": 0.0534017056988393,
+      "equation": "((((0.13614485 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) - 0.580563) * z_sigma__f3_mid) / -4.555435) + 0.0053555346",
+      "expression_for_eval": "-0.219518004317919*z_sigma__f3_mid*(-0.580563 + 0.13614485/sqrt(z_sigma__f3_mid**2)) + 0.0053555346",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "704835607403248691343/20000000000000000000000",
+      "right_limit_at_zero": "-490614223403248691343/20000000000000000000000",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 9,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 16,
+      "validation_rmse": 0.0530863540563414,
+      "equation": "z_sigma__f3_mid * (((0.08323676 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) - 0.37151352) / ((z_sigma__f3_mid * 0.25585827) + -2.8118165))",
+      "expression_for_eval": "z_sigma__f3_mid*(-0.37151352 + 0.08323676/sqrt(z_sigma__f3_mid**2))/(0.25585827*z_sigma__f3_mid - 2.8118165)",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, 10.9897424851657), Interval.open(10.9897424851657, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "4161838/140590825",
+      "right_limit_at_zero": "-4161838/140590825",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 10,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 17,
+      "validation_rmse": 0.0517923788558254,
+      "equation": "(z_sigma__f3_mid / sqrt(sqrt(z_sigma__f3_mid * z_sigma__f3_mid))) * ((-0.04788096 / sqrt(sqrt(z_sigma__f3_mid * z_sigma__f3_mid))) - -0.14268242)",
+      "expression_for_eval": "z_sigma__f3_mid*(0.14268242 - 0.04788096/(z_sigma__f3_mid**2)**(1/4))/(z_sigma__f3_mid**2)**(1/4)",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "37407/781250",
+      "right_limit_at_zero": "-37407/781250",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 11,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 19,
+      "validation_rmse": 0.051734603653489,
+      "equation": "(z_sigma__f3_mid * ((0.052617513 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) + -0.3566766)) / ((sqrt(z_sigma__f3_mid * z_sigma__f3_mid) * -1.6001033) + -1.4250554)",
+      "expression_for_eval": "z_sigma__f3_mid*(-0.3566766 + 0.052617513/sqrt(z_sigma__f3_mid**2))/(-1.6001033*sqrt(z_sigma__f3_mid**2) - 1.4250554)",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "52617513/1425055400",
+      "right_limit_at_zero": "-52617513/1425055400",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 12,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 21,
+      "validation_rmse": 0.0518651063324254,
+      "equation": "((z_sigma__f3_mid * ((0.046520136 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) - 0.31753007)) / ((sqrt(z_sigma__f3_mid * z_sigma__f3_mid) * -1.4187653) + -1.2265295)) + 0.0024237665",
+      "expression_for_eval": "z_sigma__f3_mid*(-0.31753007 + 0.046520136/sqrt(z_sigma__f3_mid**2))/(-1.4187653*sqrt(z_sigma__f3_mid**2) - 1.2265295) + 0.0024237665",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "197971828453447/4906118000000000",
+      "right_limit_at_zero": "-174189259546553/4906118000000000",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    },
+    {
+      "candidate_index": 13,
+      "candidate_source": "pysr_hall_of_fame",
+      "complexity": 23,
+      "validation_rmse": 0.0519484594819073,
+      "equation": "(((((0.047465317 / sqrt(z_sigma__f3_mid * z_sigma__f3_mid)) - 0.31094784) * z_sigma__f3_mid) + -0.027308322) / ((sqrt(z_sigma__f3_mid * z_sigma__f3_mid) * -1.4044532) + -1.2273693)) - 0.014993926",
+      "expression_for_eval": "(z_sigma__f3_mid*(-0.31094784 + 0.047465317/sqrt(z_sigma__f3_mid**2)) - 0.027308322)/(-1.4044532*sqrt(z_sigma__f3_mid**2) - 1.2273693) - 0.014993926",
+      "observed_train_validation_eval_ok": true,
+      "parse_status": "ok",
+      "continuous_domain": "Union(Interval.open(-oo, 0), Interval.open(0, oo))",
+      "all_real_continuous_and_finite": false,
+      "value_at_zero": "nan",
+      "left_limit_at_zero": "281852772705641/6136846500000000",
+      "right_limit_at_zero": "-192800397294359/6136846500000000",
+      "continuous_at_zero": false,
+      "zero_terminal_gives_exact_zero_residual": false,
+      "safety_eligible": false,
+      "eligible_for_safety_first_selection": false,
+      "selected_by_safety_first_policy": false
+    }
+  ],
+  "formula_domain_safety_audit": {
+    "candidate_index": 5,
+    "source_equation": "(z_sigma__f3_mid * -4.196377) / (-44.352028 - (z_sigma__f3_mid * z_sigma__f3_mid))",
+    "source_expression_for_eval": "z_sigma__f3_mid*(-4.196377)/(-z_sigma__f3_mid*z_sigma__f3_mid - 44.352028)",
+    "canonical_equation": "delta_Re = 4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid^2)",
+    "canonical_expression_for_eval": "4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid**2)",
+    "symbolically_equivalent_to_source": true,
+    "analytic_proof": {
+      "denominator": "44.352028 + z_sigma__f3_mid^2",
+      "denominator_strict_lower_bound_for_all_real_z": 44.352028,
+      "has_real_singularity": false,
+      "continuous_and_finite_domain": "all real z_sigma__f3_mid",
+      "residual_at_zero": 0.0,
+      "limit_at_positive_and_negative_infinity": 0.0
+    },
+    "dense_numeric_audit": {
+      "grid_min": -1000000.0,
+      "grid_max": 1000000.0,
+      "grid_size": 27999,
+      "all_finite": true,
+      "value_at_zero": 0.0,
+      "maximum_absolute_residual": 0.31505600420293056
+    },
+    "source_to_canonical_validation_max_abs_difference": 0.0,
+    "passed": true
+  },
+  "decision": {
+    "stage": "F3-F1S",
+    "stage_passed": true,
+    "decision": "freeze_domain_safe_formal_Re_F3_candidate_for_separately_authorized_F3_F2",
+    "selected_candidate_index": 5,
+    "selected_complexity": 9,
+    "frozen_candidate": {
+      "schema_version": 1,
+      "stage_frozen": "F3-F1S",
+      "source_formal_stage": "F3-F1",
+      "source_formal_seed": 42,
+      "source_candidate_index": 5,
+      "source_candidate_complexity": 9,
+      "source_equation": "(z_sigma__f3_mid * -4.196377) / (-44.352028 - (z_sigma__f3_mid * z_sigma__f3_mid))",
+      "source_expression_for_eval": "z_sigma__f3_mid*(-4.196377)/(-z_sigma__f3_mid*z_sigma__f3_mid - 44.352028)",
+      "canonical_equation": "delta_Re = 4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid^2)",
+      "canonical_expression_for_eval": "4.196377*z_sigma__f3_mid/(44.352028 + z_sigma__f3_mid**2)",
+      "terminal_name": "z_sigma__f3_mid",
+      "terminal_coefficient": 4.196377,
+      "positive_denominator_constant": 44.352028,
+      "model_definition": "Re_F3 = frozen_formal_Re_F1 + delta_Re",
+      "f1_fallback_at_terminal_zero": true,
+      "input_feature_names": [
+        "z_sigma__f3_mid"
+      ],
+      "f3_output_feature_names": [
+        "log10_sigma",
+        "alpha_infinity",
+        "log10_lambda",
+        "log10_lambda_prime",
+        "log10_k0_prime",
+        "log10_f",
+        "z_sigma__f3_mid"
+      ],
+      "f3b_terminal_spec": {
+        "schema_version": 1,
+        "name": "re_f3_sigma_local_bandpass_v1",
+        "stage_frozen": "F3-B",
+        "source_evidence_stage": "F3-A",
+        "source_f3a_dir": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654",
+        "target": "re",
+        "dataset_run": "run1",
+        "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+        "frequency_range_hz": [
+          100.0,
+          4950.0
+        ],
+        "input_feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f"
+        ],
+        "base_features_retained": true,
+        "frequency_feature": "log10_f",
+        "standardizations": {
+          "z_sigma": {
+            "source_feature": "log10_sigma",
+            "center": 4.689187575130151,
+            "scale": 0.21494263391550147,
+            "fitted_partition": "train",
+            "fitted_unique_curve_count": 700,
+            "method": "training_unique_curve_population_mean_std_ddof0",
+            "ddof": 0
+          }
+        },
+        "envelopes": {
+          "g_mid": {
+            "name": "g_mid",
+            "kind": "smooth_log10_bandpass_product",
+            "frequency_coordinate": "log10_hz",
+            "low_hz": 1250.0,
+            "high_hz": 2100.0,
+            "low_transition_log10": 0.06,
+            "high_transition_log10": 0.06,
+            "normalization_method": "maximum_on_fixed_log10_reference_grid",
+            "normalization_frequency_range_hz": [
+              100.0,
+              4950.0
+            ],
+            "normalization_reference_grid_size": 4096,
+            "normalization_max": 0.7522658139641833
+          }
+        },
+        "terminals": [
+          {
+            "name": "z_sigma__f3_mid",
+            "standardized_feature": "z_sigma",
+            "envelope": "g_mid",
+            "analytic_definition": "((log10_sigma - center) / scale) * g_mid(log10_f)"
+          }
+        ],
+        "terminal_feature_names": [
+          "z_sigma__f3_mid"
+        ],
+        "output_feature_names": [
+          "log10_sigma",
+          "alpha_infinity",
+          "log10_lambda",
+          "log10_lambda_prime",
+          "log10_k0_prime",
+          "log10_f",
+          "z_sigma__f3_mid"
+        ],
+        "terminal_order_contract": "append_after_base_features_in_declared_order",
+        "teacher_or_sobol_values_used_as_row_inputs": false,
+        "output_postprocessing": {
+          "method": "none"
+        },
+        "f3a_selection_evidence": {
+          "selected_candidate": "sigma_bandpass_1250_2100",
+          "ridge_coefficient_reference_only": 0.09117886714681851,
+          "ridge_coefficient_is_part_of_terminal": false,
+          "decision_file": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-A\\20260816T153654\\decision_report.json",
+          "decision_file_sha256": "bac0608b4c63eb2932df502a6404a201df20e451ad90d96d4bf8db7e8fe82fc2"
+        }
+      },
+      "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+      "selection_policy": {
+        "eligibility_first": [
+          "expression evaluates successfully on observed train/validation rows",
+          "expression is finite and continuous over the entire real terminal domain",
+          "residual is continuous at z_sigma__f3_mid = 0",
+          "residual equals exactly zero at z_sigma__f3_mid = 0"
+        ],
+        "ranking_among_eligible": "minimum complete-validation RMSE, then minimum complexity, then candidate index",
+        "purpose": "deployment-safety resolution before any test access"
+      },
+      "validation_metrics": {
+        "rmse": 0.05784999480377146,
+        "mae": 0.041313796341665626,
+        "max_abs_error": 0.2568526431969135,
+        "r2": 0.9074105303087001,
+        "bias": 0.004342225967410324,
+        "prediction_min": -0.08256375143229609,
+        "prediction_max": 1.0714975611617756
+      },
+      "validation_curve_summary": {
+        "curve_mean_rmse": 0.04955928311551556,
+        "curve_median_rmse": 0.04019150793796812,
+        "curve_p95_rmse": 0.11640314257861223,
+        "worst_curve_rmse": 0.14803572707685836,
+        "worst_curve_id": 953
+      },
+      "validation_regional_metrics": [
+        {
+          "lower_hz": 100.0,
+          "upper_hz": 700.0,
+          "row_count": 2400,
+          "rmse": 0.07293245723110042,
+          "mae": 0.057716678205964475,
+          "bias": -0.014649986662210693
+        },
+        {
+          "lower_hz": 700.0,
+          "upper_hz": 1000.0,
+          "row_count": 1200,
+          "rmse": 0.04399466105216296,
+          "mae": 0.03471744408245993,
+          "bias": 0.027820902884871823
+        },
+        {
+          "lower_hz": 1000.0,
+          "upper_hz": 1300.0,
+          "row_count": 1200,
+          "rmse": 0.038097385340272766,
+          "mae": 0.025779142779582365,
+          "bias": 0.022594628339133876
+        },
+        {
+          "lower_hz": 1300.0,
+          "upper_hz": 1650.0,
+          "row_count": 1350,
+          "rmse": 0.024789094684014763,
+          "mae": 0.015758303331526856,
+          "bias": 0.007900630762247602
+        },
+        {
+          "lower_hz": 1650.0,
+          "upper_hz": 2000.0,
+          "row_count": 1350,
+          "rmse": 0.03621126854434519,
+          "mae": 0.019806987841955115,
+          "bias": 0.0007078791300610962
+        },
+        {
+          "lower_hz": 2000.0,
+          "upper_hz": 3000.0,
+          "row_count": 3900,
+          "rmse": 0.052493241018270215,
+          "mae": 0.037615603453605435,
+          "bias": 0.004994833314715698
+        },
+        {
+          "lower_hz": 3000.0,
+          "upper_hz": 4000.0,
+          "row_count": 4050,
+          "rmse": 0.06653001562546638,
+          "mae": 0.05050180872119809,
+          "bias": 6.695025509925773e-05
+        },
+        {
+          "lower_hz": 4000.0,
+          "upper_hz": 4950.0,
+          "row_count": 3750,
+          "rmse": 0.06562968106799744,
+          "mae": 0.048763369588560104,
+          "bias": 0.007109221941231222
+        },
+        {
+          "lower_hz": 1300.0,
+          "upper_hz": 2000.0,
+          "row_count": 2700,
+          "rmse": 0.031030268971149223,
+          "mae": 0.017782645586740985,
+          "bias": 0.00430425494615435
+        }
+      ],
+      "train_metrics": {
+        "rmse": 0.06541349710518894,
+        "mae": 0.04453743231071634,
+        "max_abs_error": 0.4436603965593379,
+        "r2": 0.884230213526665,
+        "bias": -0.00010430902375814644,
+        "prediction_min": -0.11105337444080715,
+        "prediction_max": 1.0717607474577222
+      },
+      "train_curve_summary": {
+        "curve_mean_rmse": 0.053372556300186134,
+        "curve_median_rmse": 0.04045252575438689,
+        "curve_p95_rmse": 0.137468314489008,
+        "worst_curve_rmse": 0.2200092204085023,
+        "worst_curve_id": 459
+      },
+      "formula_domain_safety_passed": true,
+      "test_rows_accessed": false
+    },
+    "formal_f1_validation_reference": {
+      "validation_metrics": {
+        "rmse": 0.06997865488067417,
+        "mae": 0.0539982673677811,
+        "max_abs_error": 0.2549097475756308,
+        "r2": 0.864516586956995,
+        "bias": 0.002986810480004279,
+        "prediction_min": 0.0726826636225841,
+        "prediction_max": 1.0714975592363623
+      },
+      "validation_curve_summary": {
+        "curve_mean_rmse": 0.06226378248239593,
+        "curve_median_rmse": 0.05367115272322798,
+        "curve_p95_rmse": 0.12723338150020871,
+        "worst_curve_rmse": 0.16927367878579033,
+        "worst_curve_id": 953
+      },
+      "validation_regional_metrics": [
+        {
+          "lower_hz": 100.0,
+          "upper_hz": 700.0,
+          "row_count": 2400,
+          "rmse": 0.0728056266670498,
+          "mae": 0.05755686783925331,
+          "bias": -0.014663104499207285
+        },
+        {
+          "lower_hz": 700.0,
+          "upper_hz": 1000.0,
+          "row_count": 1200,
+          "rmse": 0.04544491052184621,
+          "mae": 0.03418260514755525,
+          "bias": 0.027356761283747824
+        },
+        {
+          "lower_hz": 1000.0,
+          "upper_hz": 1300.0,
+          "row_count": 1200,
+          "rmse": 0.06651851844199297,
+          "mae": 0.05081275153805298,
+          "bias": 0.02004850869810642
+        },
+        {
+          "lower_hz": 1300.0,
+          "upper_hz": 1650.0,
+          "row_count": 1350,
+          "rmse": 0.08807740122553251,
+          "mae": 0.07432354595860732,
+          "bias": 0.0026373388185151505
+        },
+        {
+          "lower_hz": 1650.0,
+          "upper_hz": 2000.0,
+          "row_count": 1350,
+          "rmse": 0.09383708894027783,
+          "mae": 0.07937062877759993,
+          "bias": -0.004470664775111991
+        },
+        {
+          "lower_hz": 2000.0,
+          "upper_hz": 3000.0,
+          "row_count": 3900,
+          "rmse": 0.06827285179699469,
+          "mae": 0.05315994656697831,
+          "bias": 0.0031160677742184473
+        },
+        {
+          "lower_hz": 3000.0,
+          "upper_hz": 4000.0,
+          "row_count": 4050,
+          "rmse": 0.06474804083095217,
+          "mae": 0.049346312584718346,
+          "bias": -0.00013985196458844257
+        },
+        {
+          "lower_hz": 4000.0,
+          "upper_hz": 4950.0,
+          "row_count": 3750,
+          "rmse": 0.06531065827411411,
+          "mae": 0.048525954440334605,
+          "bias": 0.0070774971238644095
+        },
+        {
+          "lower_hz": 1300.0,
+          "upper_hz": 2000.0,
+          "row_count": 2700,
+          "rmse": 0.09100282376780693,
+          "mae": 0.07684708736810363,
+          "bias": -0.0009166629782984219
+        }
+      ]
+    },
+    "formal_f1_guardrails": [
+      {
+        "lower_hz": 700.0,
+        "upper_hz": 1000.0,
+        "formal_f1_control_rmse": 0.04544491052184621,
+        "frozen_safe_candidate_rmse": 0.04399466105216296,
+        "relative_change": -0.031912252725992074,
+        "maximum_allowed_relative_worsening": 0.1,
+        "passed": true
+      },
+      {
+        "lower_hz": 1300.0,
+        "upper_hz": 1650.0,
+        "formal_f1_control_rmse": 0.08807740122553251,
+        "frozen_safe_candidate_rmse": 0.024789094684014763,
+        "relative_change": -0.7185532913199905,
+        "maximum_allowed_relative_worsening": 0.1,
+        "passed": true
+      },
+      {
+        "lower_hz": 1650.0,
+        "upper_hz": 2000.0,
+        "formal_f1_control_rmse": 0.09383708894027783,
+        "frozen_safe_candidate_rmse": 0.03621126854434519,
+        "relative_change": -0.6141049455680399,
+        "maximum_allowed_relative_worsening": 0.1,
+        "passed": true
+      }
+    ],
+    "checks": {
+      "beats_formal_f1_full_validation_rmse": true,
+      "improves_curve_mean_rmse": true,
+      "improves_worst_curve_rmse": true,
+      "improves_target_region": true,
+      "all_formal_f1_regional_guardrails_pass": true,
+      "train_residual_exact_reload_replay": true,
+      "validation_residual_exact_reload_replay": true,
+      "train_prediction_all_finite": true,
+      "validation_prediction_all_finite": true,
+      "candidate_5_selected_by_frozen_safety_first_policy": true,
+      "formula_domain_safety_passed": true
+    },
+    "validation_rmse_relative_improvement": 0.17331942286664692,
+    "formal_model_replacement_decision": false,
+    "f3f2_readiness": true,
+    "test_evaluation_authorized": false,
+    "explicit_f3f2_command_still_required": true,
+    "test_rows_accessed": false,
+    "next_command_if_user_accepts": "执行 F3-F2"
+  },
+  "f3f2_protocol": {
+    "schema_version": 1,
+    "stage_prepared_for": "F3-F2",
+    "prepared_by": "F3-F1S",
+    "prepared_utc": "2026-08-18T19:15:29.828091+00:00",
+    "f3f1s_stage_passed": true,
+    "explicit_user_command_required": true,
+    "one_time_access_enforcement": "exclusive receipt keyed by frozen candidate spec SHA256 is written before test row load",
+    "frozen_candidate_spec_path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-F1S\\20260818T211526\\frozen_candidate_spec.json",
+    "frozen_candidate_spec_sha256": "1e9119f780764db79c867328581242919dc9e6e3c77fa1fde209a908035dc0b7",
+    "f3f2_runner_path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\run_f3f2_one_time_test.py",
+    "f3f2_runner_sha256": "899e8fcda9e49e9438ab1d434149767a8fe947f6412ef709cae8c0d30413e1da",
+    "frozen_input_files": {
+      "dataset": {
+        "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\global_SR\\Wool_R_global.mat",
+        "sha256": "42388dae24304760f9e4c8ad686cbc40ffaad4ab06a579061b3b96e831b16a58"
+      },
+      "split": {
+        "path": "C:\\MasterThesis_Project_R\\surrogate_model\\datasets\\run1\\shared_curve_split.json",
+        "sha256": "77c70adb5a57f55476a808e43ae1e85a54ee3fd82f1636bc51e737c4f324c562"
+      },
+      "f1_metadata": {
+        "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\train\\20260816_run1_sobol_modulated\\training_metadata.json",
+        "sha256": "bd1dfaaebd231e03764f0e5285c8e209b7c81a129b732aa1ea32d28575ed7b62"
+      },
+      "f1_selection": {
+        "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\re\\eval\\20260816_run1_sobol_modulated_best_loss\\selected_candidate.csv",
+        "sha256": "11fd0c9c0734614c80a7ec8f6251b6a011c100a50a633f029836134987089923"
+      },
+      "f3b_spec": {
+        "path": "C:\\MasterThesis_Project_R\\surrogate_model\\global_symbolic_regression\\artifacts\\F3\\F3-B\\20260816T155822\\frozen_sigma_local_spec.json",
+        "sha256": "ea8deda5d8e3b1178c52c1df78350169c2d420928bba424e011fe34ff84dca7e"
+      }
+    },
+    "expected_partition": {
+      "name": "test",
+      "curve_count": 150,
+      "rows_per_curve": 128,
+      "row_count": 19200,
+      "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0"
+    },
+    "acceptance_rules": {
+      "full_test": "frozen Re F3 RMSE must be strictly below formal Re F1 on the same test rows",
+      "curve_behavior": "curve-mean and worst-curve RMSE must both be strictly below formal Re F1",
+      "target_region": "1300-2000 Hz RMSE must be strictly below formal Re F1",
+      "guardrails": "none of 700-1000, 1300-1650, or 1650-2000 Hz RMSE may worsen more than 10% versus formal Re F1",
+      "numerical_safety": "F1, residual, and final predictions must all be finite",
+      "all_checks_required": true,
+      "failure_action": "retain formal Re F1"
+    },
+    "reporting_contract": [
+      "raw full-range RMSE/MAE/max-absolute-error/R2/bias/prediction range",
+      "curve mean/median/p95/worst RMSE and per-curve metrics",
+      "frequency-wise RMSE/MAE/bias",
+      "all reporting regions, target region, and guardrails",
+      "frozen predictions and diagnostic figures"
+    ],
+    "no_post_test_formula_or_threshold_changes": true,
+    "test_rows_accessed_during_protocol_preparation": false
+  },
+  "artifact_files": [
+    "candidate_safety_selection.csv",
+    "comparison_decision.json",
+    "decision_report.md",
+    "f3f2_test_protocol.json",
+    "formula_domain_safety_audit.json",
+    "frozen_candidate_spec.json",
+    "frozen_predictions_train_validation.npz",
+    "preflight_manifest.json",
+    "stage_manifest.json",
+    "validation_curve_metrics.csv",
+    "validation_guardrails.csv",
+    "validation_overall_comparison.csv",
+    "validation_regional_comparison.csv"
+  ]
+}

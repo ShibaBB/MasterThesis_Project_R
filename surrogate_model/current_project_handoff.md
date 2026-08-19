@@ -1,1084 +1,1016 @@
-# Surrogate Model Project Handoff
+# MasterThesis Project R - Current Handoff
 
-This handoff describes the current state of `surrogate_model`: model branches,
-run logic, shared dataset structure, artifact layout, and Git/GitHub sync
-policy. It is intended to give a new conversation enough context to continue
-work without rediscovering the repository.
+Last updated: 2026-08-19.
 
-Last updated: 2026-08-08, after validating MLP, segmented SR, and global SR
-end to end following the workspace-root rename.
+## Training Monitoring Convention
 
-## Run3 Transition (active configuration)
+For every long-running training job, keep the active conversation open until
+training and evaluation finish. Launch the job with persistent log capture,
+poll the live process and new log/artifact output about every 180-240 seconds,
+and proactively report major milestones: job start, completion of each search
+stage or target, formal training start/finish, evaluation/comparison completion,
+and any error or unexpected stall. Do not end the turn merely because a job is
+still running; if the user asks a question during training, answer it and then
+continue monitoring. Avoid repetitive messages when no meaningful state has
+changed.
 
-The active workflow uses a centralized dataset-run protocol. All three active
-model branches now have completed run3 baselines, and all active generation
-and model entry points resolve `run3` from:
+## Project Purpose
+
+This repository builds surrogate models for the complex acoustic reflection
+coefficient produced by the JCAL teacher model. The learning targets are two
+independent real-valued frequency-response curves:
 
 ```text
-surrogate_model/dataset_run_config.json
+R_real(f) = real(Reflect(f))
+R_imag(f) = imag(Reflect(f))
 ```
 
-Run3 teacher data, shared curve split, both SR scalar datasets, and all three
-model baselines have now been generated. Its per-run configuration is:
+The repository contains three surrogate families:
 
-```text
-surrogate_model/datasets/run3/dataset_config.json
-Wool / porosity 92 / 1000 LHS curves / seed 44
-100-4950 Hz / 128 linearly spaced frequency points
-```
-
-Future run4/run5 experiments clone a per-run configuration with
-`create_dataset_run.py`; model code must not be changed just to select a new
-run. See `DATASET_RUN_WORKFLOW.md`. Existing run1/run2 manifests and artifacts
-retain their historical 100-2000 Hz metadata for provenance.
-
-The first full run3 MLP baseline completed successfully on 2026-08-08:
-
-```text
-artifact: MLP/artifacts/wool_baseline_mlp_runs/20260808_164951_run3_baseline
-split: 700 train / 150 validation / 150 test curves
-raw test RMSE: 0.0025906994
-raw test MAE:  0.0018582958
-raw test R2:   0.9978877902
-```
-
-The 2000-4950 Hz test band was not harder than the retained lower band: raw
-RMSE was 0.00229737 above 2000 Hz versus 0.00299138 below 2000 Hz. Raw MLP
-predictions ranged from 0.0107055 to 1.0096585; 22 of 19,200 test predictions
-were above 1. Clipping to [0,1] changed full-range RMSE only slightly, from
-0.00259070 to 0.00258475. See the run's `extended_evaluation_report.txt`.
-
-The first full run3 segmented SR baseline also completed successfully on
-2026-08-08:
-
-```text
-dataset: datasets/run3/segmented_SR/Wool_symbolic_segmented.mat
-training: segmented_symbolic_regression/artifacts/
-  wool_segmented_symbolic_pysr_runs/20260808_run3_full
-recommended evaluation: segmented_symbolic_regression/artifacts/
-  wool_segmented_symbolic_candidate_evaluation_runs/20260808_run3_c21
-```
-
-The dataset contains 128,000 scalar rows across eight configured frequency
-segments. Training used the 89,600 rows belonging to the 700 training curves;
-validation and test each used 19,200 rows. Each model used 100 iterations, 12
-populations, population size 100, maxsize 28, and deterministic serial
-execution. The eight models completed in about 37 minutes. PySR emitted only
-its expected performance advisory for segments containing more than 10,000
-training points.
-
-Validation comparison favored `max_complexity=21` over the historical c16
-ceiling (validation RMSE 0.0255686 versus 0.0270282). The recommended c21
-test-only clipped result is:
-
-```text
-RMSE          0.0252275807
-MAE           0.0183131128
-max_abs_error 0.1904615675
-R2            0.9853420448
-```
-
-The selected formula complexities are 20, 21, 21, 20, 19, 20, 20, and 20.
-Raw predictions ranged from -0.0067388 to 1.0177128; 46 of 19,200 test values
-were clipped to [0,1]. Boundary discontinuity remains the main segmented-model
-limitation. The largest c21 excess boundary change occurred at 2000 Hz
-(maximum 0.18431), and visible steps also remain near 3000 and 4000 Hz. The c16
-evaluation is retained as the simpler comparison and has test RMSE 0.0270428.
-
-The first full run3 global SR baseline completed successfully on 2026-08-08:
-
-```text
-dataset: datasets/run3/global_SR/Wool_symbolic_global.mat
-inspection: global_symbolic_regression/artifacts/
-  wool_symbolic_global_dataset_inspection_run3
-training: global_symbolic_regression/artifacts/
-  wool_global_symbolic_pysr_runs/20260808_run3_full
-recommended evaluation: global_symbolic_regression/artifacts/
-  wool_global_symbolic_candidate_evaluation_runs/20260808_run3_c21
-```
-
-The dataset contains 128,000 scalar rows in one `global_100_4950` domain.
-Training used 89,600 rows from the 700 training curves; validation and test each
-used 19,200 rows. PySR used 100 iterations, 12 populations, population size 100,
-maxsize 28, and completed in about 46 minutes 50 seconds. Validation selection
-with `max_complexity=21` chose candidate 14, complexity 19. Its test result is
-RMSE `0.0578571752`, MAE `0.0456781372`, max absolute error `0.2638560413`, and
-R2 `0.9229031506`. Predictions stayed in `[0.031824, 0.927263]`, so no clipping
-was required. The formula depends only on frequency and captures the mean curve
-shape, but not enough material-to-material variation. A retained c28 sensitivity
-run improved test RMSE to `0.0553558465` and R2 to `0.9294252787`, but required
-clipping 150 negative predictions; c21 remains the cleaner recommended result.
-
-## Project Goal
-
-The project compares surrogate models for a MATLAB JCAL acoustic absorption
-teacher model.
-
-Target mapping:
-
-```text
-material/acoustic parameters + frequency -> absorption coefficient alpha
-```
-
-The planned horizontal comparison has three model branches:
-
-```text
 1. MLP
-2. segmented symbolic regression
-3. global symbolic regression
-```
+2. segmented symbolic regression with PySR
+3. global symbolic regression with PySR
 
-All three branches must use data from the same dataset run for a fair
-comparison. The current shared dataset run is now:
+Every family trains and evaluates `R_real` and `R_imag` separately while using
+the same material samples, frequency grid, source-curve split, and target
+definition. No model output is clipped. Absorption prediction and impedance
+component prediction are outside the project scope.
 
-```text
-surrogate_model/datasets/run3
-```
-
-`run1` and `run2` remain historical dataset runs. Do not mix models trained on
-different runs in one horizontal comparison.
-
-## Repository Location And Remote
-
-The active local working copy has been moved off OneDrive. The current intended
-workspace is:
+## Repository And Git State
 
 ```text
-C:/MasterThesis_Project_alpha
+Repository: C:/MasterThesis_Project_R
+GitHub:     https://github.com/ShibaBB/MasterThesis_Project_R
 ```
 
-The previous root `C:/MasterThesis_Project` is obsolete. Active code and the
-latest model artifacts were checked for references to that old absolute path.
+The repository history contains the paired-target implementation, the full
+`run1` datasets, formal MLP and PySR artifacts, dynamic evaluation-axis fix,
+shared symbolic feature transform, and the training/evaluation updates
+described in this handoff. Use `git log -1` and `git status` to verify the exact
+checkout.
 
-GitHub remote:
+The previously tracked obsolete artifact files were removed. New artifacts are
+generated independently under short `re/` and `im/` directories.
 
-```text
-https://github.com/ShibaBB/MasterThesis_Project_alpha
+## Target Definition
+
+`jcal_reflection.m` returns the complex reflection coefficient as its first
+output. Teacher generation uses that output directly:
+
+```matlab
+[Reflect, ~, ~, ~, ~, ~, ~] = jcal_reflection(...);
+R_real = real(Reflect);
+R_imag = imag(Reflect);
 ```
 
-Current working branch as last verified on 2026-08-03:
+The fourth and fifth outputs of `jcal_reflection.m` are normalized surface
+impedance components and must not be used as the surrogate targets.
+
+## Active Dataset Run
+
+The active dataset is `run1`.
 
 ```text
-agent/add-segmented-evaluation
+Teacher curves:          1000
+Material inputs:         7 per curve
+Frequency range:         100-4950 Hz
+Frequency points:        128
+Teacher X shape:         [1000, 7]
+Teacher Y_re shape:      [1000, 128]
+Teacher Y_im shape:      [1000, 128]
+Symbolic X shape:        [128000, 8]
+Symbolic target shape:   [128000, 1] for each target
+Curve split:             700 train / 150 validation / 150 test
+Split hash:              cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0
 ```
 
-The repository default branch remains `main`. The current working branch adds
-the latest formal segmented SR evaluation and is published in draft PR #1:
+Canonical files:
 
 ```text
-https://github.com/ShibaBB/MasterThesis_Project_alpha/pull/1
+surrogate_model/datasets/run1/dataset_config.json
+surrogate_model/datasets/run1/dataset_manifest.json
+surrogate_model/datasets/run1/shared_curve_split.json
+surrogate_model/datasets/run1/MLP/Wool_R.mat
+surrogate_model/datasets/run1/global_SR/Wool_R_global.mat
+surrogate_model/datasets/run1/segmented_SR/Wool_R_segmented.mat
 ```
 
-Current synchronization logic:
+Both symbolic MAT files contain `y_re_symbolic` and `y_im_symbolic` aligned to
+the same scalar rows, curve IDs, frequency values, and segment IDs. Splitting
+is always performed by source curve, never by scalar frequency row.
+
+## Symbolic Feature Processing
+
+The current global and segmented Python trainers share
+`surrogate_model/symbolic_feature_transform.py`.
+
+The transform is fitted on the training partition only:
+
+1. read the recommended base-10-log feature indices from dataset metadata;
+2. apply `log10` to the five positive scale-sensitive inputs, including
+   frequency;
+3. detect and remove columns that are exactly constant in the training split;
+4. store the complete transform specification in `training_metadata.json`;
+5. require evaluators to reuse that stored transform without refitting it.
+
+For `run1`, two fixed material columns are removed and the PySR input width is
+reduced from eight to six. Transformed variables have explicit names such as
+`log10_f`, so exported equations cannot be mistaken for formulas operating on
+raw values. Evaluators retain a separate physical-frequency array for plots
+and boundary diagnostics.
+
+Older training runs without transform metadata remain evaluable through the
+identity-transform compatibility path.
+
+## Current Progress Summary
+
+| Area | Re | Im | Current state |
+|---|---|---|---|
+| Paired teacher dataset | Complete | Complete | Full `run1` generated and inspected |
+| Shared curve split | Complete | Complete | Same split hash used by all families |
+| Scalar global dataset | Complete | Complete | Paired targets in one MAT file |
+| Scalar segmented dataset | Complete | Complete | Paired targets and eight segment IDs |
+| MLP code contract | Complete | Complete | Independent target loading and smoke training verified |
+| Full MLP training | Complete | Complete | Formal full `run1` training and evaluation completed |
+| Global SR full run | Complete | Complete | Both targets now use the current feature transform and matched search settings |
+| Global SR Sobol feature experiment | Complete | Complete | Full-range matched all/subset runs; Re selects subset, Im retains all |
+| Global SR smooth frequency modulation | Complete | Complete | All base parameters retained; validation selects modulated Re and Im |
+| Global SR target-specific modulation F2 | Stage 1 stopped | Complete | Re has no guardrail-feasible onset branch; Im F2 accepted after formal run |
+| Global SR staged residual F3 | Complete | Unchanged | Re F3 passed formal validation, formula-safety freeze, and one-time test; Im remains F2 |
+| Global SR production integration | Complete | Complete | Active pointer is Re F3 / Im F2; exact replay and system tests pass |
+| Segmented SR full run | Complete | Complete | Latest formal run uses 100 iterations per segment |
+| MLP Sobol pilot | Complete | Complete | Frequency-resolved S1/ST at N=4096 |
+| Teacher Sobol validation | Complete | Complete | Shared-design N=1024 check confirms MLP sensitivity structure |
+| Segmented SR Sobol feature experiment | Complete | Complete | Matched all-feature/subset runs and validation-only hybrid selection completed |
+| Segmented SR frequency F1 | Complete | Complete | F0 reused; local frequency features evaluated on validation/test and shape diagnostics |
+| Segmented SR curve-aware F1 reselection | Complete | Complete | Existing Hall-of-Fame candidates gated against F0; no retraining |
+| Validation-only SR candidate selection | Complete | Complete | Full validation rows used before final test evaluation |
+| Raw unclipped evaluation | Complete | Complete | Dynamic plot limits support negative values |
+
+All three model families now run end to end for both targets. The MLP is the
+clear accuracy baseline. Re F3 and Im F2 are the accepted Global SR target
+models, and their production integration and exact pipeline regression testing
+are complete. Do not refit the frozen Re F3 equation.
+
+## Latest MLP Results
+
+The MLP branch trains one independent 128-output network per target. Both
+formal runs used the shared `run1` curve split, training-only preprocessing,
+Adam, a `[128, 128, 64]` hidden-layer layout, a maximum of 400 epochs, and
+validation patience of 25. Test data was used only for final metrics and plots.
+
+### Re
 
 ```text
-Each computer keeps its own local hard-drive clone.
-Training and analysis are run from the local clone, not from OneDrive.
-GitHub is used to synchronize code, shared datasets, and analysis-ready
-artifacts between computers.
-Only one computer should train/write/push a given run at a time.
+Artifacts: surrogate_model/MLP/artifacts/re/20260810_run1
+
+Output network iteration: 2370 (237 epochs)
+Validation RMSE:         0.003727
+Validation R2:           0.998446
+Test RMSE:               0.003426
+Test MAE:                0.002314
+Test max abs error:      0.032793
+Test R2:                 0.998623
+Prediction range:        [-0.173306, 0.985038]
 ```
 
-OneDrive is no longer part of the intended training workflow. This avoids file
-locking, delayed sync, and slow frequent writes during PySR runs.
-
-## Top-Level Structure
-
-Relevant project layout:
+### Im
 
 ```text
-surrogate_model/
-  README.md
-  current_project_handoff.md
-  data_generation/
-  datasets/
-    run1/
-      historical baseline dataset run
-    run2/
-      dataset_manifest.json
-      MLP/
-        Wool_surrogate_dataset.mat
-      segmented_SR/
-        Wool_symbolic_segmented.mat
-      global_SR/
-        Wool_symbolic_global.mat
-  MLP/
-  segmented_symbolic_regression/
-  global_symbolic_regression/
-  docs/
+Artifacts: surrogate_model/MLP/artifacts/im/20260810_run1
+
+Output network iteration: 2810 (281 epochs)
+Validation RMSE:         0.002899
+Validation R2:           0.998678
+Test RMSE:               0.002914
+Test MAE:                0.001914
+Test max abs error:      0.031752
+Test R2:                 0.998547
+Prediction range:        [-0.643229, 0.205147]
 ```
 
-Directory roles:
+The MLP predictions cover the negative target regions without clipping and
+generalize closely from validation to test. They provide the current reference
+accuracy for evaluating future symbolic-regression improvements.
+
+## Latest Global SR Results
+
+Global SR trains one equation over the complete 100-4950 Hz range.
+
+### Re with current feature transform
 
 ```text
-data_generation/
-  Shared MATLAB teacher dataset generation and inspection scripts.
+Training: surrogate_model/global_symbolic_regression/artifacts/re/train/20260810_run1_log10_i100_p12
+Eval:     surrogate_model/global_symbolic_regression/artifacts/re/eval/20260810_run1_log10_i100_p12_best_loss
 
-datasets/
-  Shared dataset runs. Horizontal comparisons must use files from the same
-  run folder.
-
-MLP/
-  MLP baseline code, notes, and MLP artifacts.
-
-segmented_symbolic_regression/
-  Active segmented symbolic regression branch. Uses PySR and trains separate
-  formulas on predefined frequency segments.
-
-global_symbolic_regression/
-  Global symbolic regression branch. Fits and evaluates one PySR formula over
-  the full 100-2000 Hz range.
-
-docs/
-  Background notes, original task descriptions, and strategy/reference files.
+Iterations:         100
+Populations:        12
+Population size:    80
+Max complexity:     24
+Train rows:         89600
+Validation rows:    19200
+Test rows:          19200
+Validation RMSE:    0.081930
+Validation R2:      0.814286
+Test RMSE:          0.080918
+Test MAE:           0.062006
+Test max abs error: 0.329674
+Test R2:            0.814274
+Prediction range:   [0.050088, 1.255914]
 ```
 
-## Dataset Run Structure
+The prior identity-transform Re baseline had test RMSE `0.089386` and R2
+`0.773368`. The current transform and larger matched search improve RMSE by
+about 9.5 percent and reduce maximum error, but the selected equation still
+misses the negative Re region and overshoots above one. Predictions remain raw
+and unclipped by design.
 
-The current dataset run is `run2`. It was generated successfully on 2026-08-03
-with the same Wool/porosity/frequency configuration as run1, but with LHS
-sampling seed `43` instead of run1's seed `42`. The different seed makes run2 a
-new teacher sample rather than a byte-for-byte copy of run1.
-
-Manifest:
+### Im with current feature transform
 
 ```text
-surrogate_model/datasets/run2/dataset_manifest.json
+Training: surrogate_model/global_symbolic_regression/artifacts/im/train/20260809_run1_log10_i100_p12
+Eval:     surrogate_model/global_symbolic_regression/artifacts/im/eval/20260809_run1_log10_i100_p12_best_loss
+
+Iterations:         100
+Populations:        12
+Population size:    80
+Max complexity:     24
+Train rows:         89600
+Validation rows:    19200
+Test rows:          19200
+Test RMSE:          0.079741
+Test MAE:           0.057977
+Test max abs error: 0.350998
+Test R2:            0.467469
 ```
 
-Run contents:
+The Im global equation now captures the main low-frequency dip and recovery,
+but still underfits material-dependent trough depth, peak position, and the
+high-frequency downturn. A simple per-frequency training-mean baseline reaches
+test RMSE `0.077103` and R2 `0.502130`, so the global symbolic model remains
+below that baseline.
+
+### Full-range Global SR Sobol Phase-One Results
+
+The matched full-range experiment completed on 2026-08-15. Global SR remained
+one equation over the single 100-4950 Hz domain. For each target, `all` and
+`sobol_subset` used identical rows, split, seed 42, 100 iterations, 12
+populations, population size 80, max complexity 24, operators, and
+validation-only candidate selection. The subset retained `sigma`,
+`alpha_infinity`, `lambda`, `k0_prime`, and frequency while excluding
+`lambda_prime`.
 
 ```text
-surrogate_model/datasets/run2/MLP/Wool_surrogate_dataset.mat
-surrogate_model/datasets/run2/segmented_SR/Wool_symbolic_segmented.mat
-surrogate_model/datasets/run2/global_SR/Wool_symbolic_global.mat
+Target/branch       Validation RMSE   Test RMSE   Test R2
+Re all              0.081930          0.080918    0.814274
+Re Sobol subset     0.078143          0.077609    0.829153
+Im all              0.085952          0.079741    0.467469
+Im Sobol subset     0.089289          0.083572    0.415070
 ```
 
-Comparison rule:
+The frozen validation-only decision selects `sobol_subset` for Re and `all`
+for Im. Re validation RMSE improves by 4.62 percent and test RMSE by 4.09
+percent. Im subset validation RMSE worsens by 3.88 percent and is rejected;
+its test RMSE also worsens by 4.80 percent. There is no per-frequency-domain
+or hybrid decision.
 
 ```text
-Use only datasets within the same run_id for horizontal model comparison.
-Do not compare a model trained on one dataset run with a model trained on
-another dataset run.
+surrogate_model/global_symbolic_regression/artifacts/re/comparison/20260815_run1_sobol_phase1
+surrogate_model/global_symbolic_regression/artifacts/im/comparison/20260815_run1_sobol_phase1
 ```
 
-### Shared Source-Curve Split
+### Global SR Smooth Frequency-Modulation Results
 
-The current cross-model split is:
+The all-parameter modulation experiment completed on 2026-08-16. Each target
+retained all five transformed material parameters and `log10_f`, then added
+one smooth `parameter * envelope(log10_f)` terminal per material parameter.
+Envelope locations and shapes came from the teacher N=1024 pointwise and
+segment ST diagnostics; numerical ST values were not passed to PySR. Global SR
+remained one equation over the single 100-4950 Hz domain.
+
+The modulated runs matched the all-base control on rows, split, seed 42, 100
+iterations, 12 populations, population size 80, max complexity 24, operators,
+and validation-only candidate selection.
 
 ```text
-surrogate_model/datasets/run2/shared_curve_split.json
+Target/branch       Validation RMSE   Test RMSE   Test R2
+Re all              0.081930          0.080918    0.814274
+Re modulated        0.069979          0.069470    0.863110
+Im all              0.085952          0.079741    0.467469
+Im modulated        0.074101          0.070212    0.587141
 ```
 
-It assigns the 1000 source curves to 700 train, 150 validation, and 150 test
-curves. Its SHA-256 split hash is:
+Validation selects `sobol_modulated` for both targets. Relative to all-base,
+Re validation/test RMSE improves by 14.59/14.15 percent and Im by 13.79/11.95
+percent. Re candidate 15 has PySR complexity 24 and uses the modulated
+`alpha_infinity` terminal. Im candidate 12 has complexity 21 and uses the
+modulated `lambda_prime` and `k0_prime` terminals. All base parameters were
+available but final formulas were not forced to contain every variable.
 
 ```text
-512522db31338b940ba555d36ea567646fb112dbcd802c460e134dd6ff58d437
+surrogate_model/global_symbolic_regression/artifacts/re/comparison/20260816_run1_sobol_modulated
+surrogate_model/global_symbolic_regression/artifacts/im/comparison/20260816_run1_sobol_modulated
 ```
 
-The split is defined only over 1-based source curve indices and is deliberately
-independent of frequency range and frequency count. MLP consumes these curve
-indices directly. Segmented and global SR select scalar rows using
-`source_curve_index`. Candidate selection is performed on validation curves;
-final reported evaluation is performed on test curves. Training and evaluation
-artifacts record both the resolved split path and split hash, and SR evaluation
-rejects a training run with a missing or different hash.
+### Global SR Residual Diagnosis And F2 Decision
 
-### Teacher / MLP Dataset
+The next Global SR experiment will optimize the modulation representation
+before increasing iterations, populations, or expression complexity. Re and Im
+must be optimized independently because their selected F1 equations use
+different modulated terminals and their residual frequency structures differ.
+This remains one Global SR equation per target over the complete 100-4950 Hz
+domain; the frequency regions below are diagnostics and validation guardrails,
+not separate models or hard gates.
 
-Teacher dataset file:
+The formal F1 test residuals provide the following frozen diagnosis. These test
+results motivated the experiment design, but they must not be used to select an
+F2 candidate.
 
 ```text
-surrogate_model/datasets/run2/MLP/Wool_surrogate_dataset.mat
+Frequency Hz   Re all -> F1 RMSE       Im all -> F1 RMSE
+100-700        0.098911 -> 0.071750     0.077226 -> 0.074939
+700-1000       0.046452 -> 0.044482     0.117717 -> 0.107067
+1000-1300      0.069617 -> 0.061875     0.094793 -> 0.098425
+1300-1650      0.088940 -> 0.081863     0.068902 -> 0.076753
+1650-2000      0.090925 -> 0.087258     0.078991 -> 0.060653
+2000-3000      0.089865 -> 0.069167     0.091592 -> 0.072555
+3000-4000      0.069452 -> 0.065518     0.055123 -> 0.061550
+4000-4950      0.074763 -> 0.069218     0.073946 -> 0.043200
 ```
 
-Format:
+Re has its lowest frequency-wise RMSE near 787 Hz and a low-error region around
+1 kHz, while its main remaining broad weakness is approximately 1300-2000 Hz.
+The selected Re equation uses only the `alpha_infinity` modulation terminal.
+Im has its largest frequency-wise RMSE near 787 Hz; F1 also regresses locally
+over 1000-1650 and 3000-4000 Hz, despite a large gain over 4000-4950 Hz. The
+selected Im equation uses the `k0_prime` and `lambda_prime` modulation terminals.
+The dark band in a prediction-error scatter plot is therefore treated as a
+frequency-local residual distribution (including bias and spread), not as a
+higher sampling probability: every teacher curve uses the same frequency grid.
+
+#### Re F2 modulation search
+
+Keep all five transformed material parameters and `log10_f` as base terminals.
+Replace the single Re `alpha_infinity` envelope with two independently available
+smooth terminals:
 
 ```text
-X: 1000 x 7
-Y: 1000 x 64
+alpha_infinity * g_alpha_onset(log10_f)
+alpha_infinity * g_alpha_high(log10_f)
 ```
 
-Inputs:
+`g_alpha_onset` is a high-pass envelope. Screen centers 1500, 1800, and 2100 Hz
+against log10-frequency transitions 0.12, 0.18, and 0.24. Hold the high lobe at
+the current 3422 Hz Gaussian with width 0.22 during this nine-branch screen.
+Then hold the selected onset envelope fixed and screen high-lobe widths 0.18,
+0.22, and 0.28. The purpose is to improve 1300-2000 Hz without sacrificing the
+current 700-1000 Hz behavior.
+
+#### Im F2 modulation search
+
+Keep all five transformed material parameters and `log10_f` as base terminals.
+Split the Im `k0_prime` low- and high-frequency behavior into independently
+available terminals. First hold its high-pass component at 3900 Hz with a 0.10
+log10-frequency transition and screen low-pass centers 600, 750, and 900 Hz
+against transitions 0.10, 0.16, and 0.22. This targets the residual maximum near
+787 Hz while preserving the strong 4000-4950 Hz result.
+
+With the selected `k0_prime` split fixed, run a matched `lambda_prime` ablation:
 
 ```text
-phi, h, sigma, alpha_infinity, lambda, lambda_prime, k0_prime
+L0: current 0.35 low-pass(700 Hz) + 1.00 high-pass(4000 Hz)
+L1: high-pass(4000 Hz) only
+L2: no lambda_prime modulation terminal; raw lambda_prime remains available
 ```
 
-Output:
+The Im guardrails specifically cover 1000-1650 and 3000-4000 Hz, where F1
+regressed, and 4000-4950 Hz, where its gain must be retained.
+
+#### F2 execution and selection contract
+
+1. Create separate Re and Im modulation specifications, manifests, run names,
+   and artifact directories. Never select one target's envelope from the other
+   target's metrics.
+2. Run each screening branch with the same rows, shared curve split, operators,
+   seed 42, 20 iterations, 6 populations, population size 40, and max complexity
+   24. Change only the declared envelope shape in a matched stage.
+3. Select on complete 100-4950 Hz validation RMSE. Regional validation RMSE,
+   regional bias, and the frequency-wise RMSE distribution are guardrails: no
+   declared diagnostic region may worsen by more than 10 percent relative to F1
+   without an explicit documented tradeoff. Test rows remain inaccessible.
+4. Retrain the frozen Re and Im winners with the formal budget of 100 iterations,
+   12 populations, population size 80, and max complexity 24. Compare each
+   formal winner against the corresponding F1 modulation checkpoint using full
+   validation RMSE, then open the test partition once for final reporting.
+5. Preserve raw targets and unclipped predictions. Persist exact envelope
+   constants, feature order, split hash, branch metrics, chosen equation, and
+   acceptance decision in metadata and the Re/Im comparison directories.
+
+### Global SR F2 execution result
+
+F2 was executed on 2026-08-16 with the frozen screening and formal budgets.
+All 21 screening evaluations were validation-only and record no test-row
+access.
+
+For Re, all nine onset branches completed but none passed the declared
+700-1000, 1300-1650, and 1650-2000 Hz regional guardrails. The best full-range
+branch used center 1800 Hz and transition 0.12, with validation RMSE `0.084468`
+versus F1 `0.069979`. Its three regional RMSE regressions were 58.30, 59.00,
+and 47.57 percent. The Re width screen and formal run were therefore not
+started; Re retains F1.
+
+For Im, stage one selected the split `k0_prime` low-pass center 900 Hz and
+transition 0.10. Stage two selected L0 with validation RMSE `0.063067`; L1 and
+L2 reached `0.081258` and `0.088496` and failed the guardrails. The formal L0
+run used 100 iterations, 12 populations, population size 80, and max
+complexity 24. Validation selected candidate 14, complexity 23:
 
 ```text
-alpha curve on freq_grid
+Im model   Validation RMSE   Test RMSE   Test MAE   Test max error   Test R2
+F1         0.074101          0.070212    0.054466   0.316217         0.587141
+F2         0.066753          0.063032    0.048076   0.297937         0.667266
 ```
 
-Frequency range:
+Im F2 improves validation RMSE by 9.92 percent and test RMSE by 10.23 percent.
+All formal regional guardrails pass, so Im F2 is accepted as the current Im
+Global SR checkpoint. Raw test predictions span `[-0.432702, 0.364151]`.
+
+The first formal Im execution inherited a legacy trainer behavior that
+reported one training-selected candidate on test before the evaluator reported
+the validation-selected candidate. Test data did not influence either envelope
+or candidate selection, but it was read twice after the envelope freeze. The
+F2 runner now forces formal training to remain validation-only so future runs
+open test only in the final evaluator. The acceptance metadata records the
+actual access count for this run.
+
+### Global SR Re F3 staged residual result
+
+The staged Re F3 program completed on 2026-08-18. F3-B froze the atomic local
+terminal `z_sigma__f3_mid = z_sigma * g_mid`, where `g_mid` is the smooth
+log-frequency 1250-2100 Hz band-pass fitted and normalized from training data
+only. F3-C accepted the fixed-F1 residual representation. F3-D1's additional
+local `z_lambda` terminal and F3-E1's nested `log`/`sqrt` constraints were
+rejected by their validation gates, so the formal representation retained only
+the F3-B sigma-local terminal and the original unconstrained search grammar.
+
+F3-F1's lowest-validation-RMSE equation was held because it was non-finite and
+discontinuous at the valid terminal value zero. F3-F1S then applied the
+explicitly authorized formula-safety-first rule to the existing formal Hall of
+Fame and froze candidate 5, complexity 9, without retraining:
 
 ```text
-100-2000 Hz, 64 frequency points
+Re_F3 = Re_F1 + delta_Re
+delta_Re = 4.196377 * z_sigma__f3_mid
+           / (44.352028 + z_sigma__f3_mid^2)
 ```
 
-### Segmented SR Dataset
-
-Segmented SR dataset file:
+The denominator is strictly positive for every real terminal value, and the
+residual is exactly zero when `z_sigma__f3_mid` is zero. Exact train/validation
+serialization replay passed. The separately authorized F3-F2 evaluation then
+opened the 150 test curves once and accepted the frozen equation under all
+predeclared full-range, curve-level, target-region, numerical-safety, and
+regional-guardrail checks:
 
 ```text
-surrogate_model/datasets/run2/segmented_SR/Wool_symbolic_segmented.mat
+Re model   Validation RMSE   Test RMSE   Test MAE   Test max error   Test R2
+F1         0.069979          0.069470    0.053339   --               0.863110
+F3         0.057850          0.061697    0.042343   0.335473         0.892028
 ```
 
-Format:
+On test, F3 improves full-range RMSE by 11.19 percent, curve-mean RMSE by
+17.10 percent, worst-curve RMSE by 4.83 percent, and 1300-2000 Hz RMSE by
+49.88 percent. All three declared regional guardrails pass. The formal
+replacement decision is `accept_frozen_Re_F3_as_formal_Re_model`; the same
+frozen model must not be retuned against or reevaluated on the one-time test
+partition.
 
 ```text
-scalar_frequency_expanded
+Safety freeze: global_symbolic_regression/artifacts/F3/F3-F1S/20260818T211720
+Final test:    global_symbolic_regression/artifacts/F3/F3-F2/20260818T213528
 ```
 
-Inputs:
+### Global SR formal integration result
+
+Production integration completed on 2026-08-19 without training, candidate
+selection, clipping, smoothing, or formula changes. The active pointer now
+selects the self-contained `run1_global_sr_re_f3_im_f2` manifest:
 
 ```text
-phi, h, sigma, alpha_infinity, lambda, lambda_prime, k0_prime, f
+global_symbolic_regression/formal_models/active_model.json
+global_symbolic_regression/formal_models/run1_f3_f2/model_manifest.json
+global_symbolic_regression/formal_global_symbolic_model.py
+global_symbolic_regression/export_formal_global_symbolic_model.py
+global_symbolic_regression/evaluate_formal_global_symbolic_model.py
 ```
 
-Output:
+The formal inference path accepts the original eight raw inputs in their
+stored order, replays the common training-fitted transform, applies the frozen
+Re F1/F3-B and Im F2 frequency features independently, and returns `R_real`,
+`R_imag`, and `Reflect = R_real + 1j*R_imag`. It fails loudly if the two fixed
+run1 inputs change or frequency leaves 100-4950 Hz unless extrapolation is
+explicitly requested.
+
+The complete 150-curve test regression reproduces the saved Re F3-F2
+prediction and `z_sigma__f3_mid` arrays bit for bit; maximum absolute
+prediction difference is `0.0`. Re and Im test metrics and prediction ranges
+also match their frozen reports with zero numerical difference. The integrated
+paired complex diagnostic is:
 
 ```text
-alpha
+Complex RMSE:          0.0882016615260024
+Complex MAE:           0.0719342930758710
+Complex max abs error: 0.3409475022958167
 ```
 
-Size:
+Four system tests pass: active-pointer/freeze contract, exact saved prediction
+and metric replay, combined output plus boundary frequencies, and fixed-input
+plus JSON-serialization replay. The persisted integration report is:
 
 ```text
-64000 scalar samples
+global_symbolic_regression/artifacts/formal_integration/20260819_run1_f3_f2
+global_symbolic_regression/artifacts/formal_integration/20260819_run1_f3_f2/figures
 ```
 
-Current frequency segments:
+The figure directory contains Re/Im predicted-versus-teacher scatter plots,
+Re/Im error-versus-frequency plots, paired full-curve overlays, a complex-plane
+comparison, and complex-error-versus-frequency diagnostics. They are generated
+from the already saved formal integration predictions, with no additional fit
+or model decision.
+
+## Latest Segmented SR Results
+
+The configured frequency domains are:
 
 ```text
-low_100_700        100-700 Hz
-midlow_700_1000    700-1000 Hz
-midhigh_1000_1300  1000-1300 Hz
-highlow_1300_1650  1300-1650 Hz
-high_1650_2000     1650-2000 Hz
+100-700, 700-1000, 1000-1300, 1300-1650,
+1650-2000, 2000-3000, 3000-4000, 4000-4950 Hz
 ```
 
-### Global SR Dataset
-
-Global SR dataset file:
+Each target has eight independent PySR equations. The latest formal runs use:
 
 ```text
-surrogate_model/datasets/run2/global_SR/Wool_symbolic_global.mat
+Iterations per segment: 100
+Populations:            12
+Population size:        80
+Max complexity:         24
+Training data:          all rows in each segment's train curves
+Candidate selection:    full validation partition, independently per segment
+Final reporting:        full test partition after candidate selection
+Output postprocessing:  none
 ```
 
-Format:
+### Re
 
 ```text
-scalar_frequency_expanded
+Training: surrogate_model/segmented_symbolic_regression/artifacts/re/train/20260809_run1_log10_i100_p12
+Eval:     surrogate_model/segmented_symbolic_regression/artifacts/re/eval/20260809_run1_log10_i100_p12_best_loss
+
+Validation RMSE:    0.035596
+Validation R2:      0.964944
+Test RMSE:          0.034924
+Test MAE:           0.023899
+Test max abs error: 0.267284
+Test R2:            0.965403
 ```
 
-Inputs:
+### Im
 
 ```text
-phi, h, sigma, alpha_infinity, lambda, lambda_prime, k0_prime, f
+Training: surrogate_model/segmented_symbolic_regression/artifacts/im/train/20260809_run1_log10_i100_p12
+Eval:     surrogate_model/segmented_symbolic_regression/artifacts/im/eval/20260809_run1_log10_i100_p12_best_loss
+
+Validation RMSE:    0.031412
+Validation R2:      0.926237
+Test RMSE:          0.032371
+Test MAE:           0.020815
+Test max abs error: 0.286863
+Test R2:            0.912239
 ```
 
-Output:
+Increasing Im from 60 to 100 iterations improved test RMSE from `0.035293` to
+`0.032371` and test R2 from `0.895681` to `0.912239`. It improved within-segment
+fit but did not solve boundary discontinuities.
+
+## Segmented SR Sobol Phase-One Results
+
+The matched phase-one experiment completed on 2026-08-14. For each target,
+the `all` and `sobol_subset` branches used the same run1 rows, split, random
+seed 42, 100 iterations, 12 populations, population size 80, max complexity
+24, operator set, and validation-only candidate selection. The training stage
+did not access test rows.
+
+The full Sobol-subset branch was not superior as a single replacement:
 
 ```text
-alpha
+Target/branch       Validation RMSE   Test RMSE   Test R2
+Re all              0.035596          0.034924    0.965403
+Re Sobol subset     0.038239          0.039506    0.955730
+Im all              0.031412          0.032371    0.912239
+Im Sobol subset     0.031752          0.032854    0.909605
 ```
 
-Size:
+Validation-only per-segment selection retained the Sobol subset only where it
+won its matched comparison:
 
 ```text
-64000 scalar samples
+Re: 100-700 Hz uses sobol_subset; the other seven segments use all.
+Im: 1300-1650 and 4000-4950 Hz use sobol_subset; the other six use all.
 ```
 
-Current global segment:
+The resulting validation-selected hybrid metrics are:
 
 ```text
-global_100_2000    100-2000 Hz
+Target   Validation RMSE   Validation R2   Test RMSE   Test R2
+Re       0.035577          0.964981        0.034823    0.965604
+Im       0.030429          0.930782        0.030686    0.921142
 ```
 
-## Teacher Model Logic
+Relative to the matched all-feature baseline, the hybrid changes Re test RMSE
+by only about -0.29 percent, but improves Im test RMSE by about 5.21 percent.
+This supports local validation-based feature restriction rather than replacing
+every segment with its Sobol subset. The phase-one feature decision remains
+separate from the later continuity/blending experiment.
 
-The MATLAB teacher dataset is generated from the JCAL acoustic model. The
-important conceptual chain is:
+Formal artifacts:
 
 ```text
-getFluidProperties
--> getFiberConstraints
--> jcal_reflection
--> generate_teacher_dataset
+surrogate_model/segmented_symbolic_regression/artifacts/re/comparison/20260814_run1_sobol_phase1
+surrogate_model/segmented_symbolic_regression/artifacts/im/comparison/20260814_run1_sobol_phase1
 ```
 
-Current material setup:
+## Segmented SR Frequency-Representation F1 Results
+
+The F1 experiment completed on 2026-08-15 without retraining F0. It froze the
+phase-one validation-selected material features, retained `log10_f`, and added
+segment-local `local_t`, `local_t2`, and `local_t3`. Frequency use was optional
+and candidate selection remained validation RMSE only. Shape metrics were
+diagnostics and did not influence candidate selection.
 
 ```text
-material: Wool
-porosity case: 92
-frequency range: 100-2000 Hz
+Target/model   Validation RMSE   Test RMSE   Test R2
+Re F0 hybrid   0.035577          0.034823    0.965604
+Re F1          0.032830          0.032171    0.970643
+Im F0 hybrid   0.030429          0.030686    0.921142
+Im F1          0.030213          0.031974    0.914382
 ```
 
-The MLP uses the curve-format teacher data directly. The symbolic regression
-branches use scalar frequency-expanded versions derived from the same teacher
-dataset.
+Re F1 improves validation RMSE by 7.72 percent and test RMSE by 7.61 percent.
+Its first-difference RMSE improves in all eight validation segments, although
+second-difference error worsens in six, so it is not yet accepted as the final
+shape model. Seven of eight selected Re equations use some frequency feature;
+the 1650-2000 Hz equation still ignores frequency.
 
-## MLP Branch State
+Im F1 improves validation RMSE by only 0.71 percent but worsens test RMSE by
+4.20 percent. Several Im formulas use local polynomial terminals inside
+division or logarithm expressions, producing excessive curvature. Therefore
+the complete Im F1 replacement is rejected on generalization evidence, and no
+shape-acceptance decision has been made.
 
-Branch directory:
+A validation-RMSE-only F0/F1 per-segment diagnostic would select six F1 Re
+segments and three F1 Im segments. Its test RMSE is `0.032079` for Re and
+`0.030103` for Im. This diagnostic is not the final model because shape has not
+yet been included in the acceptance rule.
+
+Formal artifacts:
 
 ```text
-surrogate_model/MLP
+surrogate_model/segmented_symbolic_regression/artifacts/re/comparison/20260815_run1_frequency_f1
+surrogate_model/segmented_symbolic_regression/artifacts/im/comparison/20260815_run1_frequency_f1
+surrogate_model/segmented_symbolic_regression/artifacts/frequency_f1_manifests/20260815_120054_run1_frequency_f1.json
 ```
 
-Current active status:
+### Curve-Aware F1 Hall-of-Fame Reselection
+
+On 2026-08-15, every existing F1 Hall-of-Fame candidate was rescored on full
+validation curves. F0 remained the segment fallback. An F1 candidate had to
+pass gates on overall and per-curve RMSE, first and second differences,
+prediction bounds, mean curve range, and excess turning points. No model was
+retrained, and choices were frozen before test evaluation.
 
 ```text
-The run2 MLP teacher dataset has been generated successfully.
-A formal run2 MLP baseline has completed using the shared source-curve split.
-The older 50-curve small baseline remains a historical pipeline smoke test.
+Target/model          Validation RMSE   Test RMSE   Test R2
+Re F0 hybrid          0.035577          0.034823    0.965604
+Re curve-aware hybrid 0.034318          0.033009    0.969094
+Im F0 hybrid          0.030429          0.030686    0.921142
+Im curve-aware hybrid 0.027730          0.030104    0.924101
 ```
 
-Known artifact:
+Re retained F1 only at 100-700, 1300-1650, 3000-4000, and 4000-4950 Hz.
+Im retained F1 only at 700-1000 and 3000-4000 Hz. All other segments reverted
+to their phase-one F0 winner. Among the retained Re segments, three improve
+second-difference error; 3000-4000 Hz worsens it by 7.4 percent, within the
+declared 10 percent gate. Both retained Im segments improve value, first-
+difference, and second-difference errors. Cross-segment boundary discontinuity
+is unchanged as a separate unresolved problem.
 
 ```text
-surrogate_model/MLP/artifacts/wool_baseline_mlp_small
+surrogate_model/segmented_symbolic_regression/artifacts/re/comparison/20260815_run1_frequency_f1_curve_aware
+surrogate_model/segmented_symbolic_regression/artifacts/im/comparison/20260815_run1_frequency_f1_curve_aware
 ```
 
-Latest formal shared-split artifact after the workspace rename:
+### Segmented SR Pause Decision
+
+Segmented SR optimization is paused after the curve-aware F0/F1 reselection.
+This is a deliberate project-scope decision, not a claim that the segmented
+model is finished. Each of the eight frequency domains still needs individual
+formula/grammar tuning, and any final segmented model would also require a
+separate validation-only treatment of the seven frequency-boundary handoffs.
+Those two work streams are deferred because their cost is high and neither is
+a direct substitute for improving the single-equation Global SR model.
+
+The curve-aware hybrid above is the current segmented checkpoint to preserve.
+Do not resume segmented training implicitly. If this branch is revisited,
+start from its persisted F0/F1 candidates and declared shape gates, then treat
+within-segment fitting and cross-segment continuity as separate experiments.
+That pause led to the completed Sobol-guided Global SR and Re F3 work recorded
+above. Segmented SR remains deferred while the accepted global models are
+used through the completed formal integration.
+
+## Current Cross-Family Comparison
 
 ```text
-surrogate_model/MLP/artifacts/wool_baseline_mlp_runs/20260808_113400_run2_baseline
+Family                    Re test RMSE   Re test R2   Im test RMSE   Im test R2
+MLP                       0.003426       0.998623     0.002914       0.998547
+Segmented SR baseline     0.034924       0.965403     0.032371       0.912239
+Segmented curve-aware F1  0.033009       0.969094     0.030104       0.924101
+Global SR current          0.061697      0.892028     0.063032       0.667266
 ```
 
-The older fixed-name `wool_baseline_mlp_run2` directory is preserved for
-traceability. New MLP executions use:
+The MLP RMSE is roughly one order of magnitude lower than segmented SR for both
+targets. Segmentation is substantially better than one global equation, but it
+still trails the MLP and introduces boundary discontinuities. The accepted Re
+F3 and Im F2 equations improve Global SR while preserving one whole-range
+analytic model per target. Those frozen models are now integrated into the
+formal pipeline without changing their validated formulas.
+
+## Frequency-Resolved Sobol Sensitivity
+
+Sensitivity-analysis code and artifacts are isolated under
+`surrogate_model/sobol`; no Sobol output is written into any model-family
+directory. The analysis fixes the two constant `run1` inputs (`phi=0.92` and
+`h=0.03 m`) and varies the five sampled material parameters independently over
+the same raw linear-uniform bounds used by teacher generation. Frequency is an
+output axis, not an uncertain material parameter.
+
+The formal MLP pilot uses nested base sample sizes `1024`, `2048`, and `4096`,
+estimates Jansen first-order and total-effect indices at all 128 frequencies,
+and reports both full-range and eight-segment variance-weighted functional
+indices:
 
 ```text
-surrogate_model/MLP/artifacts/wool_baseline_mlp_runs/
-  <timestamp>_<experiment_name>/
+Code:      surrogate_model/sobol/run_mlp_sobol_pilot.m
+Artifacts: surrogate_model/sobol/artifacts/mlp/20260810_run1_n4096
 ```
 
-Automatic names are collision-safe, and an explicitly supplied nonempty
-artifact directory is rejected rather than overwritten.
-
-Formal run2 test metrics are RMSE `0.0023771671`, MAE `0.0016958551`, and R2
-`0.9984784126`. These replace the earlier run2 MLP result that used an
-internally generated split.
-
-The 2026-08-08 run completed successfully from
-`C:/MasterThesis_Project_alpha`, recorded the new resolved dataset and split
-paths, and generated all expected model, prediction, metric, and figure
-artifacts. No MLP path-code change was required after the rename.
-
-The MLP branch should use:
+A JCAL teacher run validates the first `N=1024` points of the identical
+scrambled Sobol design, requiring 7,168 teacher material-curve evaluations:
 
 ```text
-surrogate_model/datasets/run2/MLP/Wool_surrogate_dataset.mat
+Code:      surrogate_model/sobol/run_teacher_sobol_validation.m
+Artifacts: surrogate_model/sobol/artifacts/teacher/20260810_run1_n1024
+
+Re MLP-teacher S1 RMSE:                0.004840
+Re MLP-teacher ST RMSE:                0.007870
+Re flattened ST correlation:           0.999645
+Re top-ST parameter agreement:         100% of frequency points
+Im MLP-teacher S1 RMSE:                0.003436
+Im MLP-teacher ST RMSE:                0.003490
+Im flattened ST correlation:           0.999947
+Im top-ST parameter agreement:         100% of frequency points
 ```
 
-## Segmented Symbolic Regression Branch State
-
-Branch directory:
+Teacher variance-weighted full-range total-effect indices are:
 
 ```text
-surrogate_model/segmented_symbolic_regression
+Parameter          Re ST      Im ST
+sigma              0.849552   0.840944
+alpha_infinity     0.171057   0.215920
+lambda             0.078213   0.096305
+k0_prime           0.032073   0.025709
+lambda_prime       0.006380   0.004819
 ```
 
-This is the most mature model branch. It trains separate PySR equations for
-five frequency segments.
+The global ordering hides strong local structure. For Re, `k0_prime` reaches
+ST `0.710769` near 482 Hz, `sigma` dominates most middle frequencies, and
+`alpha_infinity` reaches ST `0.722313` near 3422 Hz. For Im, `k0_prime` reaches
+ST `0.435505` at 100 Hz; high-frequency `alpha_infinity` and `lambda` effects
+are largely interaction-driven. The MLP pilot is reliable for screening, but
+teacher values remain authoritative, especially for Re `k0_prime` above 4 kHz
+where the emulator-index discrepancy is largest.
 
-Important entry points:
+Neither the current SR equations nor their omitted variables were used to
+define these sensitivities. Sobol results describe the teacher input-output
+mapping and should guide, not replace, validation-based SR model selection.
+
+## Sobol-Guided SR Optimization Plan
+
+The completed Sobol-guided optimization work used one shared principle: Sobol
+indices set feature and interaction priorities, but they did not select the
+final equation. Every feature-set decision was tested against a matched
+all-parameter control with the same training rows, search budget, random seed,
+validation partition, and raw target. Frequency remained available to every
+SR model. Preserve this contract for any future symbolic-search phase.
+
+### Segmented SR Strategy
+
+Segmented SR is the most direct consumer of the frequency-resolved sensitivity
+results because each local equation can use a different material feature set.
+Use the following priorities for both feature-subset experiments and operator
+design:
+
+| Frequency segment (Hz) | Re parameter priority | Im parameter priority |
+|---|---|---|
+| 100-700 | primary: `sigma`, `k0_prime`; secondary: `alpha_infinity` | primary: `sigma`; secondary: `k0_prime` |
+| 700-1000 | primary: `sigma`, `k0_prime`; secondary: `alpha_infinity`, `lambda` | primary: `sigma`; secondary: `alpha_infinity`, `lambda` |
+| 1000-1300 | primary: `sigma`; secondary: `k0_prime`, `lambda`, `alpha_infinity` | primary: `sigma`, `alpha_infinity`; secondary: `lambda` |
+| 1300-1650 | primary: `sigma`; secondary: `lambda`, `alpha_infinity` | primary: `alpha_infinity`, `sigma`; secondary: `lambda` |
+| 1650-2000 | primary: `sigma`, `lambda`; secondary: `alpha_infinity` | primary: `sigma`, `alpha_infinity`; secondary: `lambda` |
+| 2000-3000 | primary: `sigma`, `alpha_infinity`; secondary: `lambda` | primary: `sigma`, `alpha_infinity`; secondary: `lambda` |
+| 3000-4000 | primary: `alpha_infinity`, `sigma`; secondary: `lambda`, `k0_prime` | primary: `sigma`; interaction priority: `alpha_infinity`, `lambda` |
+| 4000-4950 | primary: `sigma`, `alpha_infinity`, `k0_prime`, `lambda`; diagnostic: `lambda_prime` | primary: `sigma`, `alpha_infinity`, `lambda`; secondary: `k0_prime`; diagnostic: `lambda_prime` |
+
+For every target and segment, run at least these two matched branches:
 
 ```text
-run_full_segmented_symbolic_dataset_generation.m
-run_full_segmented_symbolic_dataset_inspection.m
-train_segmented_symbolic_models.py
-evaluate_segmented_symbolic_candidates.py
+A. all five varying material parameters plus frequency
+B. Sobol-prioritized subset plus frequency
 ```
 
-All active model and data-generation entry points now resolve their default
-dataset run from the central selector:
+Do not remove a parameter from the shared dataset. Branch B only limits the
+features exposed to that particular PySR search. In bands where `ST-S1` is
+large, retain multiplication/division and nonlinear operators so PySR can
+represent interactions even when a parameter has a small first-order index.
+`lambda_prime` has the lowest global ST, but its removal is accepted only when
+the validation result is non-inferior; its high-frequency local effect remains
+a diagnostic.
+
+Use two optimization phases:
+
+1. improve within-segment validation accuracy with the current fixed domains;
+2. address continuity through explicit overlapping domains and smooth
+   blending, or through continuity-aware joint candidate selection.
+
+For phase 2, never choose adjacent formulas independently if the selection
+objective includes continuity. Define the validation-only joint objective in
+metadata, report its accuracy and boundary terms separately, and preserve the
+unblended predictions as a diagnostic. Test data must not choose overlap width,
+blend shape, boundary penalty, or candidate combination.
+
+### Global SR Strategy: Full-Range Sobol Feature Subset
+
+Global SR remains one equation over one frequency domain, 100-4950 Hz. Apply
+the same matched Phase 1 strategy previously used for Segmented SR, but make
+one whole-range decision per target instead of per-segment decisions.
+
+Run two matched branches independently for Re and Im:
 
 ```text
-surrogate_model/dataset_run_config.json
+A. all five varying material parameters plus frequency
+B. full-range teacher-Sobol subset plus frequency
 ```
 
-The current default is `run3`. MATLAB generation/inspection and Python
-training/evaluation therefore use the same run by default. Python also accepts
-`--dataset-run`; standard `datasets/run*/...` paths are checked against it,
-and evaluation refuses to combine a dataset with training metadata from a
-different run.
+For run1, branch B retains `sigma`, `alpha_infinity`, `lambda`, and `k0_prime`
+and omits `lambda_prime`, whose teacher variance-weighted full-range ST is the
+lowest for both targets. Feature selection occurs after the training-fitted
+base transform and constant-column removal, and frequency remains available.
+The dataset itself is never modified.
 
-Current output roots:
+A/B runs must match training rows, shared split, random seed, search budget,
+operators, and candidate-selection rule. Select one entire branch using only
+the complete 100-4950 Hz validation rows, then report the frozen winner on the
+test rows. There is no eight-frequency-domain comparison, frequency gating,
+local expert, or hybrid selection in this Global SR experiment.
+
+## Known Segmented Boundary Problem
+
+The segmented models are accurate within most frequency domains, but the eight
+equations are trained independently and have no continuity constraint.
+
+For the latest test results:
 
 ```text
-artifacts/wool_segmented_symbolic_pysr_runs
-artifacts/wool_segmented_symbolic_candidate_evaluation_runs
-artifacts/wool_segmented_symbolic_dataset_inspection
+Re largest mean absolute predicted boundary change: 0.077895 at 3000 Hz
+Re largest maximum excess boundary change:          0.375519
+Im largest mean absolute predicted boundary change: 0.055364 at 3000 Hz
+Im largest maximum excess boundary change:          0.404880
 ```
 
-Archived old pre-rename artifacts are grouped here:
+Teacher changes across the same adjacent samples are much smaller. Increasing
+iterations improves segment-local regression but is not a direct solution to
+cross-segment continuity. Do not add smoothing silently: any overlap, blending,
+continuity penalty, or joint boundary-selection rule must be explicit and must
+be evaluated against the unmodified test targets.
+
+Boundary diagnostics are stored in each evaluation directory as
+`boundary_transition_metrics.csv`.
+
+## Evaluation Contract
+
+Every formal evaluation must:
+
+- use validation data only for model decisions: early stopping for MLP and
+  candidate selection for symbolic regression;
+- report final metrics once on the shared test curves;
+- keep Re and Im selection independent;
+- report RMSE, MAE, maximum absolute error, R2, and prediction range;
+- generate predicted-versus-teacher scatter and error-versus-frequency plots;
+- generate full-curve comparisons with dynamic combined teacher/prediction
+  vertical limits;
+- preserve raw predictions without clipping or smoothing;
+- record dataset run, target, dataset path, split file, and split hash.
+
+The formal Global SR evaluator combines same-row Re F3 and Im F2 predictions
+into a complex reflection diagnostic after verifying their shared raw inputs,
+dataset run, split hash, source-curve ordering, and frequency ordering.
+
+## Runtime Environment
+
+The active PySR environment is available at:
 
 ```text
-artifacts/archived_pre_segmented_rename_artifacts
+surrogate_model/segmented_symbolic_regression/.venv_py311
 ```
 
-Those archived folders are retained for traceability only. Current scripts do
-not write to the old unsegmented names:
+Verified components:
 
 ```text
-wool_symbolic_pysr_segments_runs
-wool_symbolic_candidate_evaluation_runs
-wool_symbolic_dataset_inspection
-```
-
-### Latest Segmented SR Dataset Generation
-
-The current segmented SR dataset in `run2` has been generated successfully from
-the run2 teacher dataset:
-
-```text
-surrogate_model/datasets/run2/segmented_SR/Wool_symbolic_segmented.mat
-```
-
-### Latest Full Segmented SR Training
-
-Latest completed full shared-split segmented SR training run:
-
-```text
-surrogate_model/segmented_symbolic_regression/artifacts/archived_pre_segmented_rename_artifacts/wool_segmented_symbolic_pysr_runs/20260808_113903_run2_rootrename
-```
-
-This completed shared-split run is retained under the archive for traceability.
-Its metadata paths have been synchronized with the archived location. Future
-runs write directly under the active standard `wool_segmented_symbolic_*_runs`
-roots with short run names.
-
-Configuration:
-
-```text
-niterations = 100
-populations = 12
-population_size = 100
-maxsize = 28
-rows used = all 64000 scalar samples
-parallelism = serial
-dataset run = run2
-```
-
-Training summary:
-
-```text
-segment              complexity   test_rmse   test_mae   test_r2
-low_100_700          21           0.019449    0.015189   0.984828
-midlow_700_1000      18           0.030287    0.023426   0.757797
-midhigh_1000_1300    13           0.036732    0.028008   0.660112
-highlow_1300_1650    14           0.027023    0.019230   0.875655
-high_1650_2000        9           0.021219    0.015567   0.931240
-```
-
-### Latest Segmented SR Evaluation
-
-Latest complete shared-split evaluation run:
-
-```text
-surrogate_model/segmented_symbolic_regression/artifacts/archived_pre_segmented_rename_artifacts/wool_segmented_symbolic_candidate_evaluation_runs/20260808_120119_run2_rootrename_c16
-```
-
-Selection rule:
-
-```text
-max_complexity = 16
-```
-
-Selected candidates are identified by 1-based row/index in each segment's
-equations CSV. Candidate index and expression complexity are different fields:
-
-```text
-segment              candidate_index   complexity
-low_100_700           9                15
-midlow_700_1000      12                16
-midhigh_1000_1300     9                15
-highlow_1300_1650    13                16
-high_1650_2000        9                11
-```
-
-Overall selected-formula metrics:
-
-```text
-RMSE          0.0271962706
-MAE           0.0200443252
-max_abs_error 0.1576901805
-R2            0.9884268272
-```
-
-This `max_complexity=16` evaluation is the current shared-split segmented SR
-result for run2 comparison. Candidate selection used validation curves and the
-reported metrics use only test curves. Training row counts were 44,800 train,
-9,600 validation, and 9,600 test rows across the five segments.
-
-Evaluation now applies output clipping to every candidate and selected formula:
-`alpha_final = clip(alpha_raw, 0, 1)`. Candidate selection, reported metrics,
-figures, and boundary diagnostics all use the clipped predictions. For this
-run, the raw range was `-0.012258` to `1.026859`; 29 of 9,600 test predictions
-were clipped, and the final range is exactly `[0,1]`. Raw and clipped
-diagnostics are retained in `selected_combination_summary.json`.
-
-The earlier 2026-08-03 `run2_iface_full` / `run2_iface_maxc16` artifacts predate
-the shared source-curve split and are historical only. They must not replace
-the 2026-08-08 result in the final three-model comparison.
-
-The first validation attempt used an automatically generated directory whose
-deepest PySR path reached 265 characters and failed while Julia was opening
-`hall_of_fame.csv`. The incomplete trace directory is:
-
-```text
-surrogate_model/segmented_symbolic_regression/artifacts/wool_segmented_symbolic_pysr_runs/20260803_115855_run2_iter100_pop12_ps100_size28_allrows_interface_validation_full_serial
-```
-
-The training entry point was then hardened to use shorter automatic names,
-preflight Windows nested-path length, pass Julia forward-slash paths, prefer
-the project-venv Julia executable, and use deterministic serial PySR settings.
-The successful full run used the short explicit output directory above. The
-deterministic/serial follow-up was verified with a five-segment smoke run under
-the ignored `artifacts/_scratch` tree; the full run itself completed before the
-deterministic flag was added, so an exact bit-for-bit retrain is not guaranteed.
-
-### Local Environment And Smoke-Test Status
-
-The full segmented training/evaluation pipeline has also been smoke-tested
-successfully on `C:/MasterThesis_Project_alpha`. The verified local environment is:
-
-```text
-Python 3.11.9
+MATLAB R2025b with Deep Learning Toolbox
+Python 3.11 environment
 PySR 1.5.10
-Julia 1.11.9, installed inside the project venv through JuliaCall/JuliaPkg
-MATLAB R2025b
-venv: surrogate_model/segmented_symbolic_regression/.venv_py311
+Julia 1.11.9
+SymbolicRegression 1.11.3
 ```
 
-The venv is ignored by Git and must be recreated on another machine. The smoke
-test verified all of the following:
+The Python trainers default to deterministic serial PySR execution. A
+controlled Re validation-only benchmark on 2026-08-16 tested plan C
+(8-thread multithreading, batching, and turbo) twice with seed 42. C did not
+replay: its selected equation, validation metrics, and complete Hall-of-Fame
+CSV hash all differed. The automatic plan-B fallback (serial deterministic,
+batching with batch size 4096, and turbo) replayed exactly across two runs.
+Therefore use B for subsequent accelerated PySR experiments; do not use C for
+formal results. See
+`global_symbolic_regression/PYSR_ACCELERATION_BENCHMARK.md`. This benchmark
+did not change the MLP architecture and did not access test rows.
+
+## Artifact Layout
+
+Use short target parent directories and keep detailed parameters in metadata:
 
 ```text
-MATLAB teacher dataset: X = 1000 x 7, Y = 1000 x 64
-segmented scalar dataset: X = 64000 x 8, y = 64000
-all five segment names decoded correctly
-PySR successfully called Julia/SymbolicRegression.jl
-five-segment minimal training completed
-candidate evaluation and figure generation completed
+surrogate_model/MLP/artifacts/re/<run>/
+surrogate_model/MLP/artifacts/im/<run>/
+
+surrogate_model/global_symbolic_regression/artifacts/re/train/<run>/
+surrogate_model/global_symbolic_regression/artifacts/re/eval/<run>/
+surrogate_model/global_symbolic_regression/artifacts/im/train/<run>/
+surrogate_model/global_symbolic_regression/artifacts/im/eval/<run>/
+
+surrogate_model/segmented_symbolic_regression/artifacts/re/train/<run>/
+surrogate_model/segmented_symbolic_regression/artifacts/re/eval/<run>/
+surrogate_model/segmented_symbolic_regression/artifacts/im/train/<run>/
+surrogate_model/segmented_symbolic_regression/artifacts/im/eval/<run>/
 ```
 
-Committed local-disk smoke artifacts are retained under:
-
-```text
-surrogate_model/segmented_symbolic_regression/archive/smoke_tests/artifacts/
-  segmented_local_disk_smoke_training_20260727_193327/
-  segmented_local_disk_smoke_evaluation_20260727_193327/
-```
-
-An additional later smoke test exists only as untracked local temporary output
-under the old path requested for that test:
-
-```text
-surrogate_model/symbolic_regression/archive/smoke_tests/artifacts/
-  current_machine_smoke_20260727_201458/
-  current_machine_smoke_20260727_201458_eval/
-```
-
-That untracked `surrogate_model/symbolic_regression` tree contains smoke output
-only. It is not an active model branch, was intentionally excluded from the
-formal evaluation commit/PR, and should not be committed or deleted without an
-explicit decision.
-
-## Global Symbolic Regression Branch State
-
-Branch directory:
-
-```text
-surrogate_model/global_symbolic_regression
-```
-
-Current status:
-
-```text
-The run3 global scalar dataset has been generated successfully.
-Dataset generation, inspection, training, and evaluation code exist.
-Formal run3 global training and max-complexity evaluation completed successfully.
-```
-
-Important entry points:
-
-```text
-run_global_symbolic_dataset_generation.m
-run_global_symbolic_dataset_inspection.m
-train_global_symbolic_model.py
-evaluate_global_symbolic_candidates.py
-```
-
-Current global dataset:
-
-```text
-surrogate_model/datasets/run3/global_SR/Wool_symbolic_global.mat
-```
-
-Current global inspection artifact:
-
-```text
-surrogate_model/global_symbolic_regression/artifacts/wool_symbolic_global_dataset_inspection_run3
-```
-
-The global inspection driver reuses the segmented inspection logic but
-explicitly overrides the output directory so global artifacts stay under:
-
-```text
-surrogate_model/global_symbolic_regression/artifacts
-```
-
-Latest completed full shared-split global SR training run:
-
-```text
-surrogate_model/global_symbolic_regression/artifacts/wool_global_symbolic_pysr_runs/20260808_run3_full
-```
-
-Configuration:
-
-```text
-niterations = 100
-populations = 12
-population_size = 100
-maxsize = 28
-train rows = 89600 of 128000 scalar samples
-validation rows = 19200
-test rows = 19200
-parallelism = serial
-dataset run = run3
-```
-
-The PySR `model_selection=best` training equation has complexity 7 and test
-RMSE `0.0668924`, test MAE `0.0523545`, and test R2 `0.8969435`. This training
-summary is not the final reported candidate-selection result below.
-
-Latest complete global evaluation run:
-
-```text
-surrogate_model/global_symbolic_regression/artifacts/wool_global_symbolic_candidate_evaluation_runs/20260808_run3_c21
-```
-
-The `max_complexity=21` rule selected candidate 14, complexity 19:
-
-```text
-(2.185653 + f)
-* (0.0028456913 + f * (4.0260718e-7 - 6.216629e-5 / sqrt(f))
-   - 0.019528603 / sqrt(f))
-```
-
-Test metrics are RMSE `0.0578571752`, MAE `0.0456781372`, max absolute error
-`0.2638560413`, and R2 `0.9229031506`. The raw test prediction range was
-`0.031824` to `0.927263`; none of 19,200 test predictions required clipping.
-Candidate selection used validation curves; final reporting used test curves.
-
-The retained run3 c28 sensitivity evaluation has test RMSE `0.0553558465`, but
-150 raw negative predictions require clipping. Run1/run2 and earlier 2026-08-03
-results remain historical; run3 c21 is the current result eligible for the
-horizontal comparison.
-
-## Current Artifact Layout
-
-Segmented SR current artifact roots:
-
-```text
-surrogate_model/segmented_symbolic_regression/artifacts/
-  archived_pre_segmented_rename_artifacts/
-  wool_segmented_symbolic_candidate_evaluation_runs/
-  wool_segmented_symbolic_pysr_runs/
-```
-
-Segmented SR smoke-test artifacts are kept separately from formal artifacts:
-
-```text
-surrogate_model/segmented_symbolic_regression/archive/smoke_tests/artifacts/
-```
-
-If segmented dataset inspection is run again, this current-name folder may also
-appear:
-
-```text
-surrogate_model/segmented_symbolic_regression/artifacts/wool_segmented_symbolic_dataset_inspection
-```
-
-Global SR current artifact root:
-
-```text
-surrogate_model/global_symbolic_regression/artifacts/
-  wool_symbolic_global_dataset_inspection/
-  wool_global_symbolic_pysr_runs/
-  wool_global_symbolic_candidate_evaluation_runs/
-```
-
-Global SR smoke-test artifacts are kept under:
-
-```text
-surrogate_model/global_symbolic_regression/archive/smoke_tests/artifacts/
-```
-
-MLP current formal artifact root and latest verified run:
-
-```text
-surrogate_model/MLP/artifacts/wool_baseline_mlp_runs/
-  20260808_164951_run3_baseline/
-```
-
-The old `wool_baseline_mlp_small` output is a historical smoke result, not the
-current comparison baseline.
-
-## Run Logic
-
-A full fair comparison should use only one dataset run at a time. For the
-current project state that means all model branches should read from:
-
-```text
-surrogate_model/datasets/run3
-```
-
-Current data generation sequence is:
-
-```text
-1. Generate MLP teacher curve data:
-   surrogate_model/data_generation/generate_teacher_dataset.m
-
-2. Generate segmented SR scalar data:
-   surrogate_model/segmented_symbolic_regression/run_full_segmented_symbolic_dataset_generation.m
-
-3. Generate global SR scalar data:
-   surrogate_model/global_symbolic_regression/run_global_symbolic_dataset_generation.m
-```
-
-Current segmented SR training/evaluation sequence:
-
-```text
-1. train_segmented_symbolic_models.py
-   --niterations 100
-   --populations 12
-   --population-size 100
-   --maxsize 28
-
-2. evaluate_segmented_symbolic_candidates.py
-   --selection-rule max_complexity
-   --max-complexity 21
-```
-
-Current global SR training/evaluation sequence:
-
-```text
-1. train_global_symbolic_model.py
-   --niterations 100
-   --populations 12
-   --population-size 100
-   --maxsize 28
-
-2. evaluate_global_symbolic_candidates.py
-   --selection-rule max_complexity
-   --max-complexity 21
-```
-
-MLP, segmented SR, and global SR now all have completed run2 results tied to
-the same `shared_curve_split.json`. The three runs use identical source-curve
-membership: 700 training curves, 150 validation curves, and 150 test curves.
-The next stage is metric harmonization and horizontal comparison; retraining is
-not required merely to establish split comparability. Do not regenerate the
-datasets unless intentionally creating another dataset run.
-
-## Git And GitHub Sync Policy
-
-Intended workflow for two computers:
-
-```text
-Computer A:
-  git pull
-  run local training/evaluation
-  inspect outputs
-  git add curated outputs and any code changes
-  git commit
-  git push
-
-Computer B:
-  git pull
-  analyze the committed run or continue from the synchronized state
-```
-
-Use local hard-drive clones on both computers. Do not train from OneDrive.
-Do not train from two computers at the same time against the same run/artifact
-folder unless a separate run name is intentionally chosen.
-
-Before starting work on either computer:
-
-```powershell
-git pull --ff-only
-git status
-```
-
-After a successful training/evaluation run:
-
-```powershell
-git status
-git add <code changes> <dataset/run manifest if changed> <analysis-ready artifacts>
-git commit -m "Add segmented SR run ..."
-git push
-```
-
-Files that should be committed when another computer needs to analyze a run
-without retraining:
-
-```text
-dataset_manifest.json
-datasets/run*/**/*.mat, when the dataset run is part of the shared comparison
-segment_model_summary.csv
-segment_model_summary.json
-training_metadata.json
-*_best_equation.json
-equations/*.csv
-candidate_metrics.csv
-selected_candidates.csv
-selected_combination_summary.json
-figures/*.png
-models/*.pkl, only when another computer needs to load PySR model objects
-```
-
-Files that should normally stay out of Git:
-
-```text
-.venv/
-.venv_py311/
-__pycache__/
-*.pyc
-pysr_runs/**/checkpoint.pkl
-pysr_runs/**/*.bak
-local scratch/tmp output folders
-MATLAB autosave files
-OS metadata files
-```
-
-`models/*.pkl` are intentionally not ignored, but they should be committed only
-when they are needed for cross-computer analysis. Most analysis should work
-from:
-
-```text
-equations/*.csv
-*_best_equation.json
-candidate_metrics.csv
-selected_candidates.csv
-selected_combination_summary.json
-```
-
-`pysr_runs/**/hall_of_fame.csv` is also intentionally not globally ignored,
-but the preferred portable candidate table is `equations/*.csv`. Commit raw
-`hall_of_fame.csv` files only if a specific follow-up requires PySR's raw
-output.
-
-The current `.gitignore` policy ignores transient environments, Python caches,
-PySR checkpoints, PySR `.bak` files, and local scratch/tmp folders while keeping
-analysis-ready artifacts visible to Git.
-
-On Windows, long artifact paths can exceed the default Git path limit. The
-local setup should keep this enabled:
-
-```powershell
-git config --global core.longpaths true
-```
-
-`core.longpaths` helps Git but does not guarantee that Python can create every
-deep output path. The evaluation script's automatic directory name can exceed
-the Windows path limit because it includes the full training-run name. If that
-happens, pass an explicit short output directory, for example:
-
-```powershell
---output-dir surrogate_model/segmented_symbolic_regression/artifacts/wool_segmented_symbolic_candidate_evaluation_runs/<timestamp>_<run_id>_maxc16
-```
-
-## Naming And Separation Rules
-
-The old branch name:
-
-```text
-surrogate_model/symbolic_regression
-```
-
-has been replaced by:
-
-```text
-surrogate_model/segmented_symbolic_regression
-```
-
-Global SR must remain separate under:
-
-```text
-surrogate_model/global_symbolic_regression
-```
-
-Current segmented scripts and artifacts should use `segmented` in names where
-possible. Old unsegmented artifact directories under
-`archived_pre_segmented_rename_artifacts` are historical only and should not be
-used as active output locations.
-
-## Current Git State
-
-The local hard-drive clone at `C:/MasterThesis_Project_alpha` was last verified
-on 2026-08-08 after the root-rename validation runs:
-
-```text
-current branch: agent/add-segmented-evaluation
-tracking branch: origin/agent/add-segmented-evaluation
-working tree: dirty; it contains intentional code, split, artifact, and handoff changes
-latest MLP run: 20260808_164951_run3_baseline
-latest segmented shared-split run: 20260808_run3_full
-latest segmented shared-split evaluation: 20260808_run3_c21
-latest global shared-split run: 20260808_run3_full
-latest global shared-split evaluation: 20260808_run3_c21
-```
-
-Do not discard, reset, or overwrite the current dirty worktree. Historical
-smoke artifacts, raw PySR outputs, and user changes are mixed with the current
-uncommitted work and must be curated intentionally before committing.
-
-If a future conversation starts from this handoff, first run:
-
-```powershell
-cd C:\MasterThesis_Project_alpha
-git status --short --branch
-git pull --ff-only
-```
-
-Because the working tree is currently dirty, do not run `git pull` until the
-local changes have been reviewed and safely committed or otherwise protected.
-Remote/PR state was not revalidated during the 2026-08-08 model runs.
-
-## Current Maturity Summary
-
-All three model branches now have complete run3 runs using the same source-curve
-split and the 100-4950 Hz, 128-point grid. The workspace has been validated end
-to end for MLP, segmented SR, and global SR.
-
-Current comparable test results are:
-
-```text
-model          RMSE          MAE           R2
-MLP            0.00259070    0.00185830    0.99788779
-Segmented SR   0.02522758    0.01831311    0.98534204
-Global SR      0.05785718    0.04567814    0.92290315
-```
-
-These values share test curve membership, but the reporting protocol still
-needs one explicit harmonization pass before presenting the final comparison:
-MLP currently reports its native curve prediction metrics, while SR evaluation
-explicitly clips predictions to `[0,1]` and retains raw/clipped diagnostics.
-
-Immediate project next steps are:
-
-```text
-1. Define and compute identical raw and clipped test metrics for all models.
-2. Produce a three-model comparison table and common diagnostic figures.
-3. Review segmented boundary discontinuities and global-formula complexity.
-4. Only after the untouched baselines are documented, decide whether to tune MLP.
-5. Curate the dirty worktree and decide which code/datasets/artifacts to commit.
-```
+Do not infer target, split, or transform semantics from directory names alone;
+validate `training_metadata.json` and the evaluation summary.
+
+## Next Priorities
+
+The immediate integration plan is complete: the F3-B terminal and frozen
+residual are in formal inference/evaluation/export, the active pair is Re F3 /
+Im F2, exact prediction regression passes, and the full paired system test
+covers Re, Im, combined output, boundary frequencies, and serialization.
+
+The next priorities are:
+
+1. Preserve the current MLP results as the accuracy reference while improving
+   interpretable symbolic models. Any future SR model must use the same shared
+   split and raw targets under a newly declared validation/test contract.
+2. Treat the exported `run1_global_sr_re_f3_im_f2` manifest and active pointer
+   as immutable production inputs. Any replacement requires a new model ID,
+   validation decision, export bundle, and regression baseline.
+3. Keep further segmented work deferred. If explicitly resumed, separately
+   address constrained within-segment frequency grammar and validation-only
+   boundary continuity/blending.
+4. Use accepted PySR plan B for any future controlled symbolic-search run:
+   serial deterministic execution, batching with batch size 4096, turbo, and
+   one Julia thread. C is rejected because fixed-seed multithreading failed
+   exact replay. Always select on full validation data and report on full test
+   data only after the validation decision.
+
+The Re F3 formula and constants remain frozen. Integration completion does not
+authorize another F3 fit or any tuning against the consumed F3-F2 test set.
+
+## Invariants For Future Work
+
+- The targets are always the real and imaginary parts of `Reflect`.
+- Re and Im share one teacher call, material matrix, frequency grid, and curve
+  split.
+- Scalar symbolic rows retain their source-curve IDs.
+- No evaluator splits scalar frequency rows independently.
+- No target output is clipped.
+- Feature transforms are fitted on training data and persisted in metadata.
+- Evaluation reuses the training transform exactly.
+- Test data never participates in candidate selection.
+- Re and Im artifacts never overwrite one another.
+- Target, dataset-run, or split-hash mismatches fail loudly.

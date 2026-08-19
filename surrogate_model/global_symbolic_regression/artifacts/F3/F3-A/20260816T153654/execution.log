@@ -1,0 +1,7 @@
+[2026-08-16T13:36:54.521715+00:00] Starting validation-only F3-A ridge residual diagnosis.
+[2026-08-16T13:36:54.525719+00:00] Reading only train and validation curve blocks from the symbolic dataset.
+[2026-08-16T13:36:55.049969+00:00] Reconstructed frozen Re F1 validation RMSE=0.069978654881.
+[2026-08-16T13:36:55.055969+00:00] Fitting the zero control and four predeclared sigma-local ridge candidates.
+[2026-08-16T13:36:55.890208+00:00] Sigma shows a validation gain with sigma_bandpass_1250_2100; running the conditional lambda/alpha ridge diagnostic.
+[2026-08-16T13:36:57.322240+00:00] F3-A complete: stage_passed=True, selected_sigma=sigma_bandpass_1250_2100, raw_best_sigma=sigma_bandpass_1250_2100.
+[2026-08-16T13:36:57.323239+00:00] Artifacts written to C:\MasterThesis_Project_R\surrogate_model\global_symbolic_regression\artifacts\F3\F3-A\20260816T153654

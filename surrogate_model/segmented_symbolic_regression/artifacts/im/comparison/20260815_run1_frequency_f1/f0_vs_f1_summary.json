@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "target": "im",
+  "dataset_run": "run1",
+  "shared_split_hash": "cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0",
+  "f0_retrained": false,
+  "f0_hybrid_validation_metrics": {
+    "n_rows": 19200,
+    "rmse": 0.030428837005423648,
+    "mae": 0.02047691863362136,
+    "max_abs_error": 0.2051383214420949,
+    "r2": 0.9307820125455328,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.2375006444540555,
+    "prediction_min": -0.6152079399882533,
+    "prediction_max": 0.2048541016778201
+  },
+  "f0_hybrid_test_metrics": {
+    "n_rows": 19200,
+    "rmse": 0.030685500872090703,
+    "mae": 0.020056942408808027,
+    "max_abs_error": 0.2868630232163012,
+    "r2": 0.9211421498687876,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.2021341153837575,
+    "prediction_min": -0.6163292689456501,
+    "prediction_max": 0.2174440850105605
+  },
+  "f1_validation_metrics": {
+    "rmse": 0.03021349235971326,
+    "mae": 0.020156276560893954,
+    "max_abs_error": 0.24195838104635048,
+    "r2": 0.9317582561751527,
+    "true_min": -0.6045116854711113,
+    "true_max": 0.23750064445405558,
+    "prediction_min": -0.6187116296027878,
+    "prediction_max": 0.21278497207333766
+  },
+  "f1_test_metrics": {
+    "rmse": 0.03197371839690609,
+    "mae": 0.02050171336780359,
+    "max_abs_error": 0.3164141760032784,
+    "r2": 0.9143820566916312,
+    "true_min": -0.6430793623150733,
+    "true_max": 0.20213411538375756,
+    "prediction_min": -0.6436286949266858,
+    "prediction_max": 0.23209772784688656
+  },
+  "candidate_selection": "validation RMSE only",
+  "shape_metrics_used_for_selection": false,
+  "frequency_dependency_forced": false,
+  "per_segment_validation_rmse_winner": {
+    "low_100_700": "f0",
+    "midlow_700_1000": "f1",
+    "midhigh_1000_1300": "f0",
+    "highlow_1300_1650": "f0",
+    "high_1650_2000": "f1",
+    "upperlow_2000_3000": "f0",
+    "uppermid_3000_4000": "f1",
+    "upperhigh_4000_4950": "f0"
+  },
+  "validation_rmse_selected_hybrid_metrics": {
+    "validation": {
+      "n_rows": 19200,
+      "rmse": 0.02769302323999325,
+      "mae": 0.019185622308080096,
+      "max_abs_error": 0.1993557069822749,
+      "r2": 0.9426690682076329,
+      "true_min": -0.6045116854711113,
+      "true_max": 0.2375006444540555,
+      "prediction_min": -0.6119763876195714,
+      "prediction_max": 0.2048541016778201
+    },
+    "test": {
+      "n_rows": 19200,
+      "rmse": 0.03010316989070679,
+      "mae": 0.019999137649276456,
+      "max_abs_error": 0.2868630232163012,
+      "r2": 0.9241067835817549,
+      "true_min": -0.6430793623150733,
+      "true_max": 0.2021341153837575,
+      "prediction_min": -0.6069488921696533,
+      "prediction_max": 0.2174440850105605
+    }
+  },
+  "shape_acceptance_decision": "not yet made"
+}

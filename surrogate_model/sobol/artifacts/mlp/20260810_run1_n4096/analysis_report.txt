@@ -1,0 +1,28 @@
+MLP Frequency-Resolved Sobol Pilot
+Dataset run: run1
+Shared split hash: cdd4e1c726bf5f980a911bc50ce3fd37d7e9023df3adee6f7de81e12a365d5f0
+Method: Jansen first-order and total-effect indices
+Input distribution: independent linear-uniform in raw physical units
+Base sample sizes: [1024 2048 4096]
+Bootstrap replicates: 100
+Fixed phi: 0.92
+Fixed h (m): 0.03
+
+RE global functional indices
+sigma                S1= 0.735833 ST= 0.847894 gap= 0.112060
+alpha_infinity       S1= 0.086093 ST= 0.172530 gap= 0.086436
+lambda               S1= 0.027203 ST= 0.077756 gap= 0.050553
+lambda_prime         S1= 0.003569 ST= 0.006392 gap= 0.002823
+k0_prime             S1= 0.023028 ST= 0.033370 gap= 0.010342
+
+IM global functional indices
+sigma                S1= 0.698196 ST= 0.841368 gap= 0.143173
+alpha_infinity       S1= 0.100076 ST= 0.216101 gap= 0.116025
+lambda               S1= 0.027736 ST= 0.095367 gap= 0.067631
+lambda_prime         S1= 0.002223 ST= 0.004677 gap= 0.002454
+k0_prime             S1= 0.012622 ST= 0.024855 gap= 0.012233
+
+Segment rows: 80
+Convergence rows: 30
+
+MLP-based screening only. Confirm small effects, interactions, and sensitive frequency regions against the JCAL teacher.
